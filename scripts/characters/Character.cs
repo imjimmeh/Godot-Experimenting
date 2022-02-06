@@ -1,12 +1,11 @@
-using FaffLatest.scripts.constants;
-using FaffLatest.scripts.input;
 using Godot;
-using System;
 
 namespace FaffLatest.scripts.characters
 {
 	public class Character : Spatial
 	{
+		public Node CharacterKinematicBody;
+
 		public Character()
 		{
 		}
@@ -16,12 +15,9 @@ namespace FaffLatest.scripts.characters
 
 		public override void _Ready()
 		{
+			base._Ready();
+			CharacterKinematicBody = GetNode("KinematicBody");
 			AddToGroup("characters");
-		}
-
-		public void SetPosition(Vector3 position)
-		{
-			GetNode<KinematicBody>("KinematicBody").Transform = new Transform(Transform.basis, position);
 		}
 	}
 }

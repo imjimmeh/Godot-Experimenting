@@ -11,14 +11,17 @@ namespace FaffLatest.scripts.input
 	{
 		private GameStateManager gameStateManager;
 
+		private Navigation navigation;
+
 		[Signal]
-		public delegate void _Character_MoveTo(Character character, Vector3 target);
+		public delegate void _Character_MoveTo(Character character, Vector3[] target);
 
 		public override void _Ready()
 		{
 			base._Ready();
 
 			gameStateManager = GetNode<GameStateManager>("../GameStateManager");
+			navigation = GetNode<Navigation>("/root/Root/Environment/Navigation");
 		}
 
 		public void ConnectWorldClickedOnSignal(Node element)
@@ -81,19 +84,26 @@ namespace FaffLatest.scripts.input
 		{
 			if (mouseButtonEvent.ButtonIndex == 1 && gameStateManager.CurrentlySelectedCharacter != null)
 			{
-				GD.Print("Clearing unit selection");
 				gameStateManager.ClearCurrentlySelectedCharacter();
 			}
 			else if (mouseButtonEvent.ButtonIndex == 2 && gameStateManager.CurrentlySelectedCharacter != null)
 			{
-				GD.Print("Giving rotation signal");
-				EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.CurrentlySelectedCharacter, position);
+				IssueMoveOrder(position);
 			}
 			else
 			{ 
 				GD.Print($"Unhandled world mouse released event Mb.i is {mouseButtonEvent.ButtonIndex}");
 			}
 
+		}
+
+		private void IssueMoveOrder(Vector3 position)
+		{
+			var body = gameStateManager.CurrentlySelectedCharacter.GetNode<KinematicBody>("KinematicBody");
+			var path = navigation.GetSimplePath(body.Transform.origin, position);
+			EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.CurrentlySelectedCharacter, path);
+
+			gameStateManager.ClearCurrentlySelectedCharacter();
 		}
 	}
 }

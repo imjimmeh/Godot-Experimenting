@@ -15,3 +15,4 @@ CharacterName = "Instance"
 Health = 100
 IsPlayerCharacter = true
 FaceIcon = SubResource( 1 )
+MovementDistance = 10.0

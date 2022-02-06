@@ -1,5 +1,6 @@
 using FaffLatest.scripts.characters;
 using Godot;
+using System;
 using static FaffLatest.scripts.constants.SignalNames;
 
 public class CharacterKinematicBody : KinematicBody
@@ -22,7 +23,7 @@ public class CharacterKinematicBody : KinematicBody
 	public float CurrentRotationSpeed = 0.0f;
 
 	[Export]
-	public float MaxRotationSpeed = 1f;
+	public float MaxRotationSpeed = 0.999f;
 
 	[Export]
 	public float MaxSpeed = 5f;
@@ -32,6 +33,12 @@ public class CharacterKinematicBody : KinematicBody
 
 	[Export]
 	public float Acceleration = 0.2f;
+
+	public Vector3[] Path = null;
+	public Transform? TransformPath = null;
+	public int CurrentPathIndex = 0;
+
+	private bool haveMoreInPath => Path != null && Path.Length > CurrentPathIndex + 1;
 
 	public override void _Ready()
 	{
@@ -43,7 +50,7 @@ public class CharacterKinematicBody : KinematicBody
 		}    
 	}
 
-	public override void _InputEvent(Object camera, InputEvent inputEvent, Vector3 position, Vector3 normal, int shapeIdx)
+	public override void _InputEvent(Godot.Object camera, InputEvent inputEvent, Vector3 position, Vector3 normal, int shapeIdx)
 	{
 		if (inputEvent is InputEventMouseButton mouseButtonEvent)
 		{
@@ -57,13 +64,42 @@ public class CharacterKinematicBody : KinematicBody
 		base._PhysicsProcess(delta);
 
 		if (Destination == null)
-			return;
+		{
+			if (Path == null)
+				return;
+			else if (Path != null)
+			{
+				if(!GetNextPathPartIfAvailable())
+				{
+					return;
+				}
+			}
+		}
 
 		var playerIsFullyRotated = Rotate(delta);
 
 		if(playerIsFullyRotated)
 		{
 			Move(delta);
+		}
+	}
+
+	private bool GetNextPathPartIfAvailable()
+	{
+		CurrentPathIndex++;
+
+		if (CurrentPathIndex >= Path.GetLength(0))
+		{
+			Path = null;
+			CurrentPathIndex = 0;
+			GD.Print("Path fin");
+			return false;
+		}
+		else
+		{
+			GD.Print($"Fetching path #{CurrentPathIndex}");
+			InitialiseVariablesForNextTargetDestination(Path[CurrentPathIndex]);
+			return true;
 		}
 	}
 
@@ -95,11 +131,14 @@ public class CharacterKinematicBody : KinematicBody
 		
 		if(atSamePoint)
 		{
-			ClearDestination();
+			if (haveMoreInPath)
+				GetNextPathPartIfAvailable();
+			else
+				ClearDestination();
 		}
 		else
 		{
-			GD.Print(distance);
+			//GD.Print(distance);
 			InterpolateAndMove(delta);
 		}
 	}
@@ -109,7 +148,12 @@ public class CharacterKinematicBody : KinematicBody
 		GD.Print($"Reached destination - we are at {Transform.origin} and destination is {Destination.Value}");
 		Transform = new Transform(Transform.basis, Destination.Value);
 		Destination = null;
-		Velocity = new Vector3(0,0,0);
+
+		if (!haveMoreInPath)
+		{
+			GD.Print("Path over - clearing velocity");
+			Velocity = new Vector3(0, 0, 0);
+		}
 	}
 
 	private void InterpolateAndMove(float delta)
@@ -149,8 +193,18 @@ public class CharacterKinematicBody : KinematicBody
 			CurrentRotationSpeed = MaxRotationSpeed;
 		}
 
-		Transform = Transform.InterpolateWith(RotationTarget.Value, CurrentRotationSpeed);
-	}
+		if (RotationTarget.HasValue)
+        {
+            try
+            {
+                Transform = Transform.InterpolateWith(RotationTarget.Value, CurrentRotationSpeed);
+            }
+            catch (Exception ex)
+            {
+				GD.Print(ex.Message + " - " + CurrentRotationSpeed + " - " + RotationTarget.Value.origin);
+            }
+        }
+    }
 
 	private void ClearRotation()
 	{
@@ -169,7 +223,7 @@ public class CharacterKinematicBody : KinematicBody
 
 		var lookingAtDestination = dotProduct <= -0.99999f;
 
-		GD.Print(dotProduct);
+		//GD.Print(dotProduct);
 		return lookingAtDestination;
 	}
 
@@ -179,12 +233,24 @@ public class CharacterKinematicBody : KinematicBody
 		return MovementVector.Value;
 	}
 
-	private void _On_MoveTo(Node character, Vector3 target)
+	private void _On_MoveTo(Node character, Vector3[] path)
 	{
-		Destination = new Vector3(target.x, Transform.origin.y, target.z).Round();
+		Path = path;
+		CurrentPathIndex = 0;
+		GD.Print($"received new path - {string.Join(",", path)}");
+
+		GD.Print(path[0]);
+		InitialiseVariablesForNextTargetDestination(path[0]);
+	}
+
+	private void InitialiseVariablesForNextTargetDestination(Vector3 target)
+	{
+		Destination = new Vector3(target.x, Transform.origin.y, target.z);
+		GD.Print($"First destination is {target}");
 		MovementVector = CalculateMovementVector();
 		RotationTarget = Transform.LookingAt(Destination.Value, Vector3.Up);
+
 		Velocity = new Vector3(0, 0, 0);
-		GD.Print($"Received move command towards {Destination}");
+		GD.Print($"Moving to next part in path -  {Destination.Value}");
 	}
 }

@@ -15,12 +15,16 @@ public class CharacterStats : Resource
 	[Export]
 	public Texture FaceIcon { get; set; }
 
-	public CharacterStats(string name = null, int health = 0, bool isPlayerCharacter = false, Texture faceIcon = null)
+	[Export]
+	public float MovementDistance { get; set; }
+
+	public CharacterStats(string name = null, int health = 0, bool isPlayerCharacter = false, Texture faceIcon = null, float movemetDistance = 10.0f)
 	{
 		CharacterName = name;
 		Health = health;
 		IsPlayerCharacter = isPlayerCharacter;
 		FaceIcon = faceIcon;
+		MovementDistance = movemetDistance;
 	}
 
 	public CharacterStats()

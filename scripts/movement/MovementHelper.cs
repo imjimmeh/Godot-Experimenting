@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FaffLatest.scripts.characters
+namespace FaffLatest.scripts.movement
 {
+    public static class MovementHelper
+    {
+
+    }
 }

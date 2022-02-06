@@ -13,9 +13,16 @@ namespace FaffLatest.scripts.constants
 			private const string prefix = "_Character_";
 
 			public const string CLICKED_ON = prefix + SharedParts.CLICKED_ON;
+			public const string CLICKED_ON_METHOD = SharedParts.ON + CLICKED_ON;
+
 			public const string MOVE_TO = prefix + SharedParts.MOVE_TO;
+
 			public const string SELECTED = prefix + SharedParts.SELECTED;
+			public const string SELECTED_METHOD = SharedParts.ON + SELECTED;
+
 			public const string SELECTION_CLEARED = prefix + SharedParts.SELECTION_CLEARED;
+			public const string SELECTION_CLEARED_METHOD = SharedParts.ON + SELECTION_CLEARED;
+
 		}
 
 		public static class World
@@ -31,6 +38,7 @@ namespace FaffLatest.scripts.constants
 			public const string MOVE_TO = "MoveTo";
 			public const string SELECTED = "Selected";
 			public const string SELECTION_CLEARED = "SelectionCleared";
+			public const string ON = "_On";
 		}
 	}
 }
