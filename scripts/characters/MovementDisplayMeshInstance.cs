@@ -36,32 +36,30 @@ public class MovementDisplayMeshInstance : MeshInstance
 
 	public void ChangeSize()
 	{
-		GD.Print($"{parent.Stats.MovementDistance} vs {parent.Stats.Get("MovementDistance")}");
 		mesh.Size = new Vector2(parent.Stats.MovementDistance * 2, parent.Stats.MovementDistance * 2);
-		GD.Print($"Our new size is {mesh.Size}");
 	}
 
 	private void _On_Character_Selected(Character character)
 	{
-		GD.Print("Movement mesh received signal");
 		if(character != parent)
 		{
-			GD.Print("Character is not same");
-
 			return;
 		}
+
+		if(!parent.Stats.CanMove)
+        {
+			return;
+        }
 
 		ChangeSize();
 		UpdateShaderParams();
 
 		Visible = true;
-		GD.Print("Should see me now?");
 	}
 
 	private void _On_Character_SelectionCleared()
 	{
 		Visible = false;
-		GD.Print("Cya");
 	}
 
 	public override void _Process(float delta)
@@ -77,8 +75,5 @@ public class MovementDisplayMeshInstance : MeshInstance
 
 		currentMaterial.SetShaderParam("playerPosition", playerPosition);
 		currentMaterial.SetShaderParam("playerMovementDistance", parent.Stats.MovementDistance);
-
-		GD.Print(currentMaterial.GetShaderParam("playerPosition"));
-		GD.Print(currentMaterial.GetShaderParam("playerMovementDistance"));
 	}
 }

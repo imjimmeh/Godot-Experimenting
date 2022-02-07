@@ -1,4 +1,4 @@
-using FaffLatest.scripts.characters;
+using FaffLatest.scripts.movement;
 using Godot;
 using System;
 using static FaffLatest.scripts.constants.SignalNames;
@@ -8,16 +8,13 @@ public class CharacterKinematicBody : KinematicBody
 	[Signal]
 	public delegate void _Character_ClickedOn(Node character, InputEventMouseButton mouseButtonEvent);
 
+	[Signal]
+	public delegate void _Character_FinishedMoving(Node character, Vector3 newPosition);
+
 	public Node Parent;
 
-	public Transform? RotationTarget;
-
-	public Vector3? Destination;
-
-	public Vector3? MovementVector;
-
 	[Export]
-	public float RotationSpeedInterval = 0.1f;
+	public float RotationSpeedInterval = 30.0f;
 
 	[Export]
 	public float CurrentRotationSpeed = 0.0f;
@@ -26,7 +23,7 @@ public class CharacterKinematicBody : KinematicBody
 	public float MaxRotationSpeed = 0.999f;
 
 	[Export]
-	public float MaxSpeed = 5f;
+	public float MaxSpeed = 2f;
 
 	[Export]
 	public Vector3 Velocity = new Vector3(0, 0, 0);
@@ -34,11 +31,15 @@ public class CharacterKinematicBody : KinematicBody
 	[Export]
 	public float Acceleration = 0.2f;
 
-	public Vector3[] Path = null;
-	public Transform? TransformPath = null;
+	public MovementPathNode[] Path = null;
+
 	public int CurrentPathIndex = 0;
 
-	private bool haveMoreInPath => Path != null && Path.Length > CurrentPathIndex + 1;
+	private bool haveMoreInPath => Path != null && Path.Length > CurrentPathIndex;
+
+	public MovementPathNode CurrentMovementNode => haveMoreInPath ? Path[CurrentPathIndex] : null;
+
+	private bool haveRotated = true;
 
 	public override void _Ready()
 	{
@@ -63,78 +64,76 @@ public class CharacterKinematicBody : KinematicBody
 	{
 		base._PhysicsProcess(delta);
 
-		if (Destination == null)
+		if (!haveMoreInPath)
 		{
-			if (Path == null)
-				return;
-			else if (Path != null)
-			{
-				if(!GetNextPathPartIfAvailable())
-				{
-					return;
-				}
-			}
+			return;
 		}
+		else if(CurrentMovementNode == null)
+        {
+			GetNextPathPartIfAvailable();
+        }
 
-		var playerIsFullyRotated = Rotate(delta);
-
-		if(playerIsFullyRotated)
+		if (!haveRotated)
 		{
+			Rotate(delta);
+		}
+		else 
+		{ 
 			Move(delta);
 		}
 	}
 
 	private bool GetNextPathPartIfAvailable()
 	{
-		CurrentPathIndex++;
+		GD.Print("Attempting to get new path part");
+		if (!haveMoreInPath)
+			return false;
 
+		CurrentPathIndex++;
+		
 		if (CurrentPathIndex >= Path.GetLength(0))
 		{
-			Path = null;
-			CurrentPathIndex = 0;
-			GD.Print("Path fin");
+			GD.Print("Tried to get new path part but none available");
+			ClearPath();
 			return false;
 		}
-		else
-		{
-			GD.Print($"Fetching path #{CurrentPathIndex}");
-			InitialiseVariablesForNextTargetDestination(Path[CurrentPathIndex]);
-			return true;
-		}
+
+		return true;
 	}
 
-	public bool Rotate(float delta)
+	public void Rotate(float delta)
 	{
-		if (RotationTarget == null)
-			return true;
+		if (haveRotated)
+			return;
 
-
-		if (RotationMatchesTarget())
+		if (CurrentRotationMatchesCurrentRotationTarget())
 		{
-			ClearRotation();
-			return true;
+			haveRotated = true;
 		}
 		else
 		{
 			InterpolateAndRotate(delta);
-			return false;
 		}
 	}
 
 	private void Move(float delta)
 	{
-		if (Destination == null)
+		if (!haveMoreInPath)
 			return;
 
-		var distance = Destination.Value.DistanceTo(Transform.origin);
+		var distance = CurrentMovementNode.Destination.DistanceTo(Transform.origin);
 		var atSamePoint = distance <= 0.5f;
 		
 		if(atSamePoint)
 		{
 			if (haveMoreInPath)
-				GetNextPathPartIfAvailable();
+			{
+				IncrementPath();
+			}
 			else
-				ClearDestination();
+			{
+				ClearPath();
+			}
 		}
 		else
 		{
@@ -143,114 +142,144 @@ public class CharacterKinematicBody : KinematicBody
 		}
 	}
 
-	private void ClearDestination()
+	private void IncrementPath()
 	{
-		GD.Print($"Reached destination - we are at {Transform.origin} and destination is {Destination.Value}");
-		Transform = new Transform(Transform.basis, Destination.Value);
-		Destination = null;
+		GD.Print($"Reached path index {CurrentPathIndex}");
+		
+		if(!GetNextPathPartIfAvailable())
+        {
+			return;
+        }
 
-		if (!haveMoreInPath)
+		GD.Print($"Is it null? {Path[CurrentPathIndex] == null}");
+		haveRotated = CurrentRotationMatchesCurrentRotationTarget();
+
+		if (!haveRotated)
 		{
-			GD.Print("Path over - clearing velocity");
-			Velocity = new Vector3(0, 0, 0);
+			Velocity = new Vector3(CurrentMovementNode.MovementVector.x * 0.2f, 0, CurrentMovementNode.MovementVector.z * 0.2f);
 		}
+
+		GD.Print($"Next path target is {CurrentMovementNode?.Destination} - Movement vector us {CurrentMovementNode?.MovementVector}");
+	}
+
+	private void ClearPath()
+	{
+		GD.Print($"Reached destination - we are at {Transform.origin}");
+		ClearRotation();
+		Path = null;
+		CurrentPathIndex = -1;
+		haveRotated = true;
+
+		var snappedVector = Transform.origin.Round();
+		Transform = new Transform(Transform.basis, snappedVector);
+		GD.Print($"Snapepd to {snappedVector}");
+		EmitSignal("_Character_FinishedMoving", Parent, Transform.origin);
+
 	}
 
 	private void InterpolateAndMove(float delta)
 	{
-		var newVelocity = Velocity + MovementVector.Value * Acceleration * delta;
+		var newVelocity = Velocity + CurrentMovementNode.MovementVector * Acceleration * delta;
 
 		if (newVelocity.Length() < MaxSpeed)
 		{
 			Velocity = newVelocity;
 		}
 
-		var oldOrigin = Transform.origin;
-
 		var collision = MoveAndCollide(Velocity);
 
-		if(collision != null)
-		{
-			HandleCollision(collision, oldOrigin);
-		}
-
-	}
-
-	private void HandleCollision(KinematicCollision collision, Vector3 oldOrigin)
-	{
-		if (collision.Position.x == 0 && collision.Position.z == 0)
-			return;
-		Transform = new Transform(Transform.basis, oldOrigin);
-		ClearDestination();
+		//if(collision == null)
+		//{
+		//	MoveAndCollide(Velocity);
+		//}
+  //      else
+  //      {
+		//	if (!haveMoreInPath)
+		//	{
+		//		GD.Print($"Collided and path fin - clearing");
+		//		ClearPath();
+		//	}
+		//	else
+		//	{
+		//		GD.Print($"Collided and not fin - moving on");
+		//		GetNextPathPartIfAvailable();
+		//	}
+		//}
 	}
 
 	private void InterpolateAndRotate(float delta)
 	{
-		CurrentRotationSpeed += RotationSpeedInterval * delta;
+		CurrentRotationSpeed = Mathf.SmoothStep(CurrentRotationSpeed, 1.0f, RotationSpeedInterval * delta);
+		CurrentRotationSpeed = Mathf.Clamp(CurrentRotationSpeed, 0.0f, 1.0f);
 
-		if (CurrentRotationSpeed > MaxRotationSpeed)
+		if (!haveRotated)
 		{
-			CurrentRotationSpeed = MaxRotationSpeed;
-		}
+			try
+			{
+				Transform = Transform.InterpolateWith(CurrentMovementNode.RotationTarget, CurrentRotationSpeed);
+			}
+			catch (Exception ex)
+			{
+				Path[CurrentPathIndex] = new MovementPathNode
+				{
+					Destination = CurrentMovementNode.Destination,
+					MovementVector = CurrentMovementNode.MovementVector,
+					RotationTarget = Transform.LookingAt(CurrentMovementNode.Destination, new Vector3(0.0f, 100.0f, 0.0f))
+				};
 
-		if (RotationTarget.HasValue)
-        {
-            try
-            {
-                Transform = Transform.InterpolateWith(RotationTarget.Value, CurrentRotationSpeed);
-            }
-            catch (Exception ex)
-            {
-				GD.Print(ex.Message + " - " + CurrentRotationSpeed + " - " + RotationTarget.Value.origin);
-            }
-        }
-    }
+				GD.Print(ex.Message + " - " + CurrentRotationSpeed + " - " + CurrentMovementNode.RotationTarget.origin + " - " + Transform.origin + " - " + CurrentMovementNode.RotationTarget.basis);
+			}
+		}
+	}
 
 	private void ClearRotation()
 	{
 		GD.Print("Rotated towards target");
-		Transform = Transform.LookingAt(Destination.Value, new Vector3(0, 100, 0));
-		RotationTarget = null;
 		CurrentRotationSpeed = 0.0f;
 	}
 
-	private bool RotationMatchesTarget()
+	private bool CurrentRotationMatchesCurrentRotationTarget()
 	{
-		CalculateMovementVector();
 		var destinationVector = Transform.basis.z.Normalized();
 
-		var dotProduct = MovementVector.Value.Dot(destinationVector);
+		var dotProduct = CurrentMovementNode.MovementVector.Dot(destinationVector);
 
-		var lookingAtDestination = dotProduct <= -0.99999f;
+		var lookingAtDestination = dotProduct <= -0.9999f;
 
 		//GD.Print(dotProduct);
 		return lookingAtDestination;
 	}
 
-	private Vector3 CalculateMovementVector()
+	private bool CurrentRotationMatchesTargetRotation(Vector3 backwardsVector, Vector3 movementVector)
 	{
-		MovementVector = (Destination.Value - Transform.origin).Normalized();
-		return MovementVector.Value;
+		var dotProduct = movementVector.Dot(backwardsVector);
+
+		var lookingAtDestination = dotProduct < -0.9999f;
+		return lookingAtDestination;
 	}
 
-	private void _On_MoveTo(Node character, Vector3[] path)
+
+	private void SetInitialMovementVariables()
 	{
-		Path = path;
-		CurrentPathIndex = 0;
-		GD.Print($"received new path - {string.Join(",", path)}");
-
-		GD.Print(path[0]);
-		InitialiseVariablesForNextTargetDestination(path[0]);
-	}
-
-	private void InitialiseVariablesForNextTargetDestination(Vector3 target)
-	{
-		Destination = new Vector3(target.x, Transform.origin.y, target.z);
-		GD.Print($"First destination is {target}");
-		MovementVector = CalculateMovementVector();
-		RotationTarget = Transform.LookingAt(Destination.Value, Vector3.Up);
-
 		Velocity = new Vector3(0, 0, 0);
-		GD.Print($"Moving to next part in path -  {Destination.Value}");
+		haveRotated = false;
+		CurrentPathIndex = -1;
+		GetNextPathPartIfAvailable();
 	}
+
+	private void _On_MoveTo(Node character, MovementPathNode[] path)
+	{
+		if (character != Parent)
+			return;
+
+		GD.Print($"received new path");
+
+		Path = path;
+
+		GD.Print($"Path length is {path.Length}");
+		SetInitialMovementVariables();
+
+		GD.Print($"Moving to next part in path -  {Path[0].Destination}");
+	}
+
 }

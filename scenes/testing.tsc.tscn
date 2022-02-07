@@ -8,6 +8,9 @@
 [sub_resource type="NavigationMesh" id=3]
 vertices = PoolVector3Array( 18.2, 0.4, 24.5, 24.5, 0.4, 24.5, 24.5, 0.4, 18.2, -24.4, 0.4, 18.2, -24.4, 0.4, 24.5, -12.4, 0.4, 24.5, 24.5, 0.4, -12.4, 24.5, 0.4, -24.4, 18.2, 0.4, -24.4, 12.2, 0.4, 24.5, 18.2, 0.4, 24.5, 24.5, 0.4, 18.2, -12.4, 0.4, -24.4, -24.4, 0.4, -24.4, -24.4, 0.4, -12.4, -24.4, 0.4, 12.2, -24.4, 0.4, 18.2, -12.4, 0.4, 24.5, 24.5, 0.4, -12.4, 18.2, 0.4, -24.4, 12.2, 0.4, -24.4, 12.2, 0.4, 24.5, 24.5, 0.4, 18.2, 24.5, 0.4, 12.2, 5.9, 0.4, 24.5, -6.4, 0.4, -24.4, -12.4, 0.4, -24.4, -24.4, 0.4, -12.4, -24.4, 0.4, -6.4, -24.4, 0.4, 12.2, -12.4, 0.4, 24.5, -6.4, 0.4, 24.5, -24.4, 0.4, 5.9, 24.5, 0.4, -6.4, 24.5, 0.4, -12.4, 12.2, 0.4, -24.4, 5.9, 0.4, -24.4, -0.0999985, 0.4, -24.4, -6.4, 0.4, -24.4, -24.4, 0.4, -6.4, -24.4, 0.4, -0.0999985, -24.4, 0.4, -0.0999985, -24.4, 0.4, 5.9, -6.4, 0.4, 24.5, -24.4, 0.4, -0.0999985, -6.4, 0.4, 24.5, -0.0999985, 0.4, 24.5, 24.5, 0.4, 5.9, 24.5, 0.4, -0.0999985, -0.0999985, 0.4, -24.4, 24.5, 0.4, -6.4, 5.9, 0.4, -24.4, -0.0999985, 0.4, -24.4, 24.5, 0.4, -0.0999985, 5.9, 0.4, 24.5, 24.5, 0.4, 12.2, 24.5, 0.4, 5.9, -0.0999985, 0.4, 24.5 )
 polygons = [ PoolIntArray( 2, 1, 0 ), PoolIntArray( 5, 4, 3 ), PoolIntArray( 8, 7, 6 ), PoolIntArray( 11, 10, 9 ), PoolIntArray( 14, 13, 12 ), PoolIntArray( 17, 16, 15 ), PoolIntArray( 20, 19, 18 ), PoolIntArray( 22, 21, 23 ), PoolIntArray( 23, 21, 24 ), PoolIntArray( 26, 25, 27 ), PoolIntArray( 27, 25, 28 ), PoolIntArray( 30, 29, 31 ), PoolIntArray( 31, 29, 32 ), PoolIntArray( 34, 33, 35 ), PoolIntArray( 35, 33, 36 ), PoolIntArray( 38, 37, 39 ), PoolIntArray( 39, 37, 40 ), PoolIntArray( 43, 42, 41 ), PoolIntArray( 45, 44, 46 ), PoolIntArray( 46, 44, 47 ), PoolIntArray( 47, 44, 48 ), PoolIntArray( 48, 44, 49 ), PoolIntArray( 51, 50, 52 ), PoolIntArray( 52, 50, 53 ), PoolIntArray( 55, 54, 56 ), PoolIntArray( 56, 54, 57 ) ]
+cell/size = 1.0
+cell/height = 1.0
+agent/height = 1.0
 
 [sub_resource type="SpatialMaterial" id=1]
 flags_unshaded = true
@@ -17,15 +20,24 @@ albedo_texture = ExtResource( 1 )
 [sub_resource type="PlaneMesh" id=2]
 material = SubResource( 1 )
 size = Vector2( 50, 50 )
-subdivide_width = 1
-subdivide_depth = 1
+subdivide_width = 50
+subdivide_depth = 50
 
 [sub_resource type="BoxShape" id=4]
 extents = Vector3( 25, 0, 25.028 )
 
 [node name="Root" type="Spatial"]
 
-[node name="Environment" type="Node" parent="."]
+[node name="Characters" type="Node" parent="."]
+
+[node name="Player" type="Node" parent="Characters"]
+
+[node name="AI" type="Node" parent="Characters"]
+
+[node name="Systems" parent="." instance=ExtResource( 2 )]
+
+[node name="Environment" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0, 25 )
 
 [node name="Navigation" type="Navigation" parent="Environment"]
 up_vector = Vector3( 0, 100, 0 )
@@ -55,13 +67,5 @@ transform = Transform( 1, 0, 0, 0, 0.642788, 0.766044, 0, -0.766044, 0.642788, 0
 [node name="DirectionalLight" type="DirectionalLight" parent="Lights"]
 transform = Transform( 1, 0, 0, 0, -0.0333295, 0.999444, 0, -0.999444, -0.0333295, 0, 100, 0 )
 light_energy = 100.0
-
-[node name="Systems" parent="." instance=ExtResource( 2 )]
-
-[node name="Characters" type="Node" parent="."]
-
-[node name="Player" type="Node" parent="Characters"]
-
-[node name="AI" type="Node" parent="Characters"]
 
 [node name="UI" parent="." instance=ExtResource( 4 )]

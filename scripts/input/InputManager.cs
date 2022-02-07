@@ -1,5 +1,6 @@
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
+using FaffLatest.scripts.movement;
 using FaffLatest.scripts.state;
 using FaffLatest.scripts.world;
 using Godot;
@@ -12,6 +13,7 @@ namespace FaffLatest.scripts.input
 		private GameStateManager gameStateManager;
 
 		private Navigation navigation;
+		private AStarNavigator aStarNavigator;
 
 		[Signal]
 		public delegate void _Character_MoveTo(Character character, Vector3[] target);
@@ -20,6 +22,7 @@ namespace FaffLatest.scripts.input
 		{
 			base._Ready();
 
+			aStarNavigator = GetNode<AStarNavigator>("../AStarNavigator");
 			gameStateManager = GetNode<GameStateManager>("../GameStateManager");
 			navigation = GetNode<Navigation>("/root/Root/Environment/Navigation");
 		}
@@ -88,7 +91,10 @@ namespace FaffLatest.scripts.input
 			}
 			else if (mouseButtonEvent.ButtonIndex == 2 && gameStateManager.CurrentlySelectedCharacter != null)
 			{
-				IssueMoveOrder(position);
+				if (gameStateManager.CurrentlySelectedCharacter.Stats.CanMove)
+				{
+					IssueMoveOrder(position);
+				}
 			}
 			else
 			{ 
@@ -99,10 +105,25 @@ namespace FaffLatest.scripts.input
 
 		private void IssueMoveOrder(Vector3 position)
 		{
+			position = position.Round();
 			var body = gameStateManager.CurrentlySelectedCharacter.GetNode<KinematicBody>("KinematicBody");
-			var path = navigation.GetSimplePath(body.Transform.origin, position);
-			EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.CurrentlySelectedCharacter, path);
 
+			var distance = (position - body.Transform.origin).Length();
+
+			if(distance > gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance)
+			{
+				GD.Print($"Distance is {distance} - original position is {position}");
+				position = body.Transform.origin.MoveToward(position, gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance);
+
+				position = position.Round();
+				GD.Print($"New position is {position}");
+			}
+
+			var convertedPath = aStarNavigator.GetMovementPath(body.Transform.origin, position); // navigation.GetMovementPathNodes(body.Transform, position);
+
+			EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.CurrentlySelectedCharacter, convertedPath);
+
+			gameStateManager.CurrentlySelectedCharacter.Stats.HasMovedThisTurn = true;
 			gameStateManager.ClearCurrentlySelectedCharacter();
 		}
 	}

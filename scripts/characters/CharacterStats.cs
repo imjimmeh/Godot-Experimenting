@@ -18,6 +18,9 @@ public class CharacterStats : Resource
 	[Export]
 	public float MovementDistance { get; set; }
 
+	public bool CanMove => !HasMovedThisTurn;
+
+	public bool HasMovedThisTurn { get; set; } = false;
 	public CharacterStats(string name = null, int health = 0, bool isPlayerCharacter = false, Texture faceIcon = null, float movemetDistance = 10.0f)
 	{
 		CharacterName = name;
