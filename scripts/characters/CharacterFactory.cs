@@ -17,9 +17,9 @@ namespace FaffLatest.scripts.characters
         public string Name;
         public int Health;
         public bool IsPlayerCharacter;
-        public float MovementDistance;
+        public int MovementDistance;
 
-        public CharacterCreationStats(Vector3 startPosition, string name, int health, bool isPlayerCharacter, float movementDistance)
+        public CharacterCreationStats(Vector3 startPosition, string name = null, int health = 0, bool isPlayerCharacter = false, int movementDistance = 0)
         {
             StartPosition = startPosition;
             Name = name ?? throw new ArgumentNullException(nameof(name));

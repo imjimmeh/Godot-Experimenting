@@ -34,7 +34,7 @@ namespace FaffLatest.scripts.input
 
 		private void _On_Character_ClickedOn(Character character, InputEventMouseButton mouseButtonEvent)
 		{
-			GD.Print($"Mouse button {mouseButtonEvent.ButtonIndex} was {(mouseButtonEvent.Pressed ? "Pressed" : "Released")} on character {character.Stats.CharacterName}");
+			//GD.Print($"Mouse button {mouseButtonEvent.ButtonIndex} was {(mouseButtonEvent.Pressed ? "Pressed" : "Released")} on character {character.Stats.CharacterName}");
 
 			if(mouseButtonEvent.Pressed)	
 			{
@@ -55,18 +55,18 @@ namespace FaffLatest.scripts.input
 		{
 			if(mouseButtonEvent.ButtonIndex == 1 && character.Stats.IsPlayerCharacter)
 			{
-				GD.Print("yes");
+				//GD.Print("yes");
 				gameStateManager.SetCurrentlySelectedCharacter(character);
 			}
 			else
 			{
-				GD.Print($"Unhandled character mouse released event Mb.i is {mouseButtonEvent.ButtonIndex} - playercharacter is {character.Stats.IsPlayerCharacter}");
+				//GD.Print($"Unhandled character mouse released event Mb.i is {mouseButtonEvent.ButtonIndex} - playercharacter is {character.Stats.IsPlayerCharacter}");
 			}
 		}
 
 		private void _On_World_ClickedOn(ClickableWorldElement world, InputEventMouseButton mouseButtonEvent, Vector3 position)
 		{
-			GD.Print($"Mouse button {mouseButtonEvent.ButtonIndex} was {(mouseButtonEvent.Pressed ? "Pressed" : "Released")} on world");
+			//GD.Print($"Mouse button {mouseButtonEvent.ButtonIndex} was {(mouseButtonEvent.Pressed ? "Pressed" : "Released")} on world");
 
 			if (mouseButtonEvent.Pressed)
 			{
@@ -98,7 +98,7 @@ namespace FaffLatest.scripts.input
 			}
 			else
 			{ 
-				GD.Print($"Unhandled world mouse released event Mb.i is {mouseButtonEvent.ButtonIndex}");
+				//GD.Print($"Unhandled world mouse released event Mb.i is {mouseButtonEvent.ButtonIndex}");
 			}
 
 		}
@@ -112,14 +112,19 @@ namespace FaffLatest.scripts.input
 
 			if(distance > gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance)
 			{
-				GD.Print($"Distance is {distance} - original position is {position}");
+				//GD.Print($"Distance is {distance} - original position is {position}");
 				position = body.Transform.origin.MoveToward(position, gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance);
 
 				position = position.Round();
-				GD.Print($"New position is {position}");
+				//GD.Print($"New position is {position}");
 			}
 
 			var convertedPath = aStarNavigator.GetMovementPath(body.Transform.origin, position); // navigation.GetMovementPathNodes(body.Transform, position);
+
+			if(convertedPath.Length > gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance)
+			{
+				Array.Resize(ref convertedPath, gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance);
+			}
 
 			EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.CurrentlySelectedCharacter, convertedPath);
 

@@ -16,6 +16,13 @@ namespace FaffLatest.scripts.constants
 			public const string CLICKED_ON_METHOD = SharedParts.ON + CLICKED_ON;
 
 			public const string MOVE_TO = prefix + SharedParts.MOVE_TO;
+			public const string MOVE_TO_METHOD = prefix + SharedParts.MOVE_TO;
+
+			public const string MOVEMENT_FINISHED = prefix + SharedParts.MOVEMENT_FINISHED;
+			public const string MOVEMENT_FINISHED_METHOD = SharedParts.ON + MOVEMENT_FINISHED;
+
+			public const string REACHED_PATH_PART = prefix + SharedParts.REACHED_PATH_PART;
+			public const string REACHED_PATH_PART_METHOD = SharedParts.ON + REACHED_PATH_PART;
 
 			public const string SELECTED = prefix + SharedParts.SELECTED;
 			public const string SELECTED_METHOD = SharedParts.ON + SELECTED;
@@ -23,6 +30,8 @@ namespace FaffLatest.scripts.constants
 			public const string SELECTION_CLEARED = prefix + SharedParts.SELECTION_CLEARED;
 			public const string SELECTION_CLEARED_METHOD = SharedParts.ON + SELECTION_CLEARED;
 
+			public const string TURN_FINISHED = prefix + SharedParts.TURN_FINISHED;
+			public const string TURN_FINISHED_METHOD = SharedParts.ON + TURN_FINISHED;
 		}
 
 		public static class World
@@ -36,8 +45,11 @@ namespace FaffLatest.scripts.constants
 		{
 			public const string CLICKED_ON = "ClickedOn";
 			public const string MOVE_TO = "MoveTo";
+			public const string MOVEMENT_FINISHED = "FinishedMoving";
+			public const string REACHED_PATH_PART = "ReachedPathPart";
 			public const string SELECTED = "Selected";
 			public const string SELECTION_CLEARED = "SelectionCleared";
+			public const string TURN_FINISHED = "TurnFinished";
 			public const string ON = "_On";
 		}
 	}

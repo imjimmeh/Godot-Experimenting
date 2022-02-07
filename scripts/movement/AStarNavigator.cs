@@ -8,20 +8,21 @@ using System.Threading.Tasks;
 
 namespace FaffLatest.scripts.movement
 {
-	public class AStarNavigator : Godot.Node
+	public class AStarNavigator : Node
 	{
+		private Dictionary<Node, PointInfo> characterLocations;
+
 		[Export]
 		public int GridSize = 1;
 
 		[Export]
 		public float YValue = 1.0f;
 
-		public Dictionary<(float, float), int> PointIds;
+		private NonEuclideanAStar astar = new NonEuclideanAStar();
 
-		private AStar astar = new AStar();
+		public PointInfo[,] Points;
 
-		public Dictionary<Node, int> OccupyingNodes = new Dictionary<Node, int>(100);
-
+		
 		public AStarNavigator()
         {
 			CreatePointsForMap(50, 50, new Vector2[0]);
@@ -32,46 +33,82 @@ namespace FaffLatest.scripts.movement
 		}
 
 		public void CreatePointsForMap(int length, int width, Vector2[] initiallyOccupiedPoints)
-		{
-			astar.Clear();
+        {
+            InitialiseComponents(length, width);
 
-			int currentPoint = 0;
+            int currentPointId = 0;
 
-			PointIds = new Dictionary<(float, float), int>(length * width);
 
-			for (float x = 0; x < length; x += GridSize)
-			{
-				for (float y = 0; y < width; y += GridSize)
-				{
-					var location = new Vector3(x, YValue, y);
+            for (float x = 0; x < length; x += GridSize)
+            {
+                for (float y = 0; y < width; y += GridSize)
+                {
+                    CreatePoint(currentPointId, x, y, length, width);
 
-					astar.AddPoint(currentPoint, location);
-					PointIds.Add((x, y), currentPoint);
+                    currentPointId++;
+                }
+            }
+        }
 
-					if (x > 0)
-					{
-						GetAndConnectPoints(currentPoint, x - GridSize, y);
-					}
+        private void CreatePoint(int currentPointId, float x, float y, int xLength, int yLength)
+        {
+            var location = new Vector3(x, YValue, y);
 
-					if (y > 0)
-					{
-						GetAndConnectPoints(currentPoint, x, y - GridSize);
-					}
+            CreatePoints(currentPointId, x, y, location);
 
-					currentPoint++;
-				}
+            ConnectNearbyNodes(currentPointId, x, y);
+
+            var nodeIsAtEdge = x == 0 || y == 0 || x + 1 == xLength || y + 1 == yLength;
+
+			if(nodeIsAtEdge)
+            {
+				astar.SetPointDisabled(currentPointId);
 			}
 		}
 
-		public MovementPathNode[] GetMovementPath(Vector3 start, Vector3 end)
+        private void CreatePoints(int currentPointId, float x, float y, Vector3 location)
+        {
+			var intX = (int)x;
+
+			var intY = (int)y;
+
+            astar.AddPoint(currentPointId, location);
+            Points[intX, intY] = new PointInfo(currentPointId);
+        }
+
+        private void ConnectNearbyNodes(int currentPointId, float x, float y)
+        {
+            if (x > 0)
+            {
+				var xAbove = x - GridSize;
+				GetAndConnectPoints(currentPointId, xAbove, y);
+            }
+
+            if (y > 0)
+            {
+				var yAbove = y -GridSize;
+				GetAndConnectPoints(currentPointId, x, yAbove);
+            }
+        }
+
+        private void InitialiseComponents(int length, int width)
+        {
+            var numberOfNodes = length * width;
+            astar.ReserveSpace(numberOfNodes);
+            astar.Clear();
+            Points = new PointInfo[length, width];
+			characterLocations = new Dictionary<Node, PointInfo>(50);
+        }
+
+        public MovementPathNode[] GetMovementPath(Vector3 start, Vector3 end)
 		{
 			try
 			{
 				var nearestStart = astar.GetClosestPoint(start);
-				GD.Print($"Start is {start} vs nearest start {nearestStart} which is {astar.GetPointPosition(nearestStart)}");
+				//GD.Print($"Start is {start} vs nearest start {nearestStart} which is {astar.GetPointPosition(nearestStart)}");
 
 				var nearestEnd = astar.GetClosestPoint(end);
-				GD.Print($"end is {end} vs nearest end {nearestEnd}");
+				//GD.Print($"end is {end} vs nearest end {nearestEnd}");
 
 				var path = astar.GetPointPath(nearestStart, nearestEnd);
 
@@ -81,50 +118,77 @@ namespace FaffLatest.scripts.movement
 			}
 			catch
 			{
-				GD.Print($"Could not get movement path for {start} to {end}");
+				//GD.Print($"Could not get movement path for {start} to {end}");
 				throw;
 			}
 		}
 
 		public void _On_Character_Created(Node character)
+        {
+            var asCharacter = character as Character;
+            //GD.Print($"AStarNavigator received _OnCharacterCreated for character {asCharacter.Stats.CharacterName}");
+
+            var body = asCharacter.CharacterKinematicBody as CharacterKinematicBody;
+
+            //GD.Print("Charracter being added to astar");
+            var point = astar.GetClosestPoint(body.Transform.origin);
+
+            //GD.Print(astar.GetPointPosition(point));
+            astar.SetPointDisabled(point);
+
+            //GD.Print($"Disabled point {point}");
+
+            CreatePointInfos(character, body);
+        }
+
+        private void CreatePointInfos(Node character, CharacterKinematicBody body)
+        {	
+            var pointInfo = GetPointInfoForVector3(body.Transform.origin);
+            pointInfo.SetOccupier(character);
+            characterLocations.Add(character, pointInfo);
+        }
+
+        private bool GetAndConnectPoints(int currentPoint, float x, float y)
 		{
-			var asCharacter = character as Character;
-			GD.Print(asCharacter.CharacterKinematicBody == null);
-			var body = asCharacter.CharacterKinematicBody as CharacterKinematicBody;
+			var otherPoint = astar.GetClosestPoint(new Vector3(x, YValue, y));
 
-			GD.Print("Charracter being added to astar");
-			
-			var point = astar.GetClosestPoint(body.Transform.origin);
+			if (otherPoint == currentPoint)
+				return false;
 
-			GD.Print(astar.GetPointPosition(point));
-			astar.SetPointDisabled(point);
-
-			GD.Print($"Disabled point {point}");
-
-			OccupyingNodes.Add(character, point);
-		}
-
-		private void GetAndConnectPoints(int currentPoint, float x, float y)
-		{
-			var pointAbove = PointIds[(x, y)];
-			astar.ConnectPoints(pointAbove, currentPoint);
+			astar.ConnectPoints(otherPoint, currentPoint);
+			return true;
 		}
 
 		private void _On_Character_FinishedMoving(Node character, Vector3 newPosition)
 		{
-			if (OccupyingNodes.TryGetValue(character, out int point))
+			if (characterLocations.TryGetValue(character, out PointInfo oldLocationPointInfo))
 			{
-				astar.SetPointDisabled(point, false);
+				astar.SetPointDisabled(oldLocationPointInfo.Id, false);
 
 				var newOccupyingNode = astar.GetClosestPoint(newPosition);
 				astar.SetPointDisabled(newOccupyingNode);
-				OccupyingNodes[character] = newOccupyingNode;
-				GD.Print($"Moved {character.Name} from {point} to {newOccupyingNode}");
+
+				oldLocationPointInfo.SetOccupier(null);
+
+				characterLocations[character] = GetPointInfoForVector3(newPosition);
+				//GD.Print($"Moved {character.Name} from {oldLocationPointInfo} to {newOccupyingNode}");
 			}
 			else
 			{
-				GD.Print($"ERROR - Could not find matching node for {character.Name}");
+				//GD.Print($"ERROR - Could not find matching node for {character.Name}");
 			}
+		}
+
+		private PointInfo GetPointInfoForVector3(Vector3 location)
+			=> GetPointInfoForFloats(location.x, location.z);
+
+		private PointInfo GetPointInfoForFloats(float x, float y)
+		{
+			var intX = (int)x;
+
+			var intY = (int)y;
+
+			return Points[intX, intY];
 		}
 	}
 }

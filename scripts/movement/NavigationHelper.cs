@@ -9,7 +9,7 @@ namespace FaffLatest.scripts.movement
         {
             var convertedPath = new MovementPathNode[simplePath.Length - 1];
 
-            GD.Print($"Found path is {string.Join(",", simplePath)}");
+            //GD.Print($"Found path is {string.Join(",", simplePath)}");
 
             for (var x = 1; x < simplePath.Length; x++)
             {
@@ -24,11 +24,11 @@ namespace FaffLatest.scripts.movement
             var startY = start.origin.y;
             end = new Vector3(end.x, startY, end.z);
 
-            GD.Print($"Going from {start.origin} to {end}");
+            //GD.Print($"Going from {start.origin} to {end}");
 
             var simplePath = navigation.GetSimplePath(start.origin, end, true);
 
-            GD.Print($"Simple path is {string.Join(",", simplePath)}");
+            //GD.Print($"Simple path is {string.Join(",", simplePath)}");
 
             var convertedPath = new MovementPathNode[simplePath.Length];
 
@@ -47,14 +47,14 @@ namespace FaffLatest.scripts.movement
 
         private static MovementPathNode InitialiseVariablesForNextTargetDestinationInPath(Transform start, Vector3 end, float yToUse)
         {
-            GD.Print($"Calculating from {start} to {end}");
+            //GD.Print($"Calculating from {start} to {end}");
 
             var destination = new Vector3(end.x, yToUse, end.z);
             var movementVector = CalculateMovementVector(start.origin, end);
             var rotationTarget = start.LookingAt(destination, Vector3.Up);
 
-            GD.Print($"MV - {movementVector} ");
-            GD.Print($"Destination - {destination}");
+            //GD.Print($"MV - {movementVector} ");
+            //GD.Print($"Destination - {destination}");
             return new MovementPathNode
             {
                 Destination = destination,
@@ -65,7 +65,7 @@ namespace FaffLatest.scripts.movement
 
         private static MovementPathNode InitialiseVariablesForNextTargetDestinationInPath(Vector3 start, Vector3 end, float yToUse)
         {
-            GD.Print($"Calculating from {start} to {end}");
+            //GD.Print($"Calculating from {start} to {end}");
 
             var destination = new Vector3(end.x, yToUse, end.z);
             var movementVector = CalculateMovementVector(start, end);
@@ -74,8 +74,8 @@ namespace FaffLatest.scripts.movement
 
             var rotationTarget = startTransform.LookingAt(destination, Vector3.Up);
 
-            GD.Print($"MV - {movementVector} ");
-            GD.Print($"Destination - {destination}");
+            //GD.Print($"MV - {movementVector} ");
+            //GD.Print($"Destination - {destination}");
             return new MovementPathNode
             {
                 Destination = destination,

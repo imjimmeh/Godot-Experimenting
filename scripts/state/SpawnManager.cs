@@ -1,5 +1,6 @@
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
+using FaffLatest.scripts.effects;
 using FaffLatest.scripts.movement;
 using Godot;
 
@@ -8,12 +9,13 @@ namespace FaffLatest.scripts.state
 {
 	public class SpawnManager : Node
 	{
-		private PackedScene playerCharacter;
+		private PackedScene characterBase;
 
 		private Node aiCharactersRoot;
 		private AStarNavigator astarNavigator;
 		private Node inputManager;
 		private Node playerCharactersRoot;
+		private Node characterMovementPathManager;
 
 		public override void _Ready()
 		{
@@ -24,34 +26,42 @@ namespace FaffLatest.scripts.state
 
 			var characters = new CharacterCreationStats[]
 			{
-				new CharacterCreationStats(new Vector3(1, 1, 1), "Dave", 100, true, 10.0f),
-				new CharacterCreationStats(new Vector3(10, 1, 5), "NotDave", 100, true, 20.0f),
-				new CharacterCreationStats(new Vector3(3, 1, 3), "Bob", 100, true, 5.0f),
-				new CharacterCreationStats(new Vector3(17, 1, 3), "Bob", 100, true, 12.0f)
+				new CharacterCreationStats(new Vector3(1, 1, 1), "Dave", 100, true, 10),
+				new CharacterCreationStats(new Vector3(10, 1, 5), "NotDave", 100, true, 20),
+				new CharacterCreationStats(new Vector3(3, 1, 3), "Bob", 100, true, 5),
+				new CharacterCreationStats(new Vector3(17, 1, 3), "Bob", 100, true, 12),
+				new CharacterCreationStats(new Vector3(5, 1, 5), "Bad man", 100, false, 12),
+				new CharacterCreationStats(new Vector3(5, 1, 7), "Bad man2", 100, false, 12)
 			};
 
 			SpawnCharacters(characters);
+
 		}
 
 		public void SpawnCharacters(CharacterCreationStats[] charactersToCreate)
         {
 			for(var x = 0; x < charactersToCreate.Length; x++)
             {
-				SpawnPlayerCharacter(charactersToCreate[x]);
+				SpawnCharacter(charactersToCreate[x]);
             }
         }
 
-		public void SpawnPlayerCharacter(CharacterCreationStats stats)
+		public void SpawnCharacter(CharacterCreationStats stats)
         {
-            var newCharacter = playerCharacter.Instance<Character>();
-			playerCharactersRoot.AddChild(newCharacter);
+            var newCharacter = characterBase.Instance<Character>();
 
             newCharacter.Stats.CharacterName = stats.Name;
-            newCharacter.Stats.SetPlayerCharacter(stats.IsPlayerCharacter);
+			newCharacter.Stats.IsPlayerCharacter = stats.IsPlayerCharacter;
 			newCharacter.Stats.MovementDistance = stats.MovementDistance;
 
             var newCharacterKinematicBody = newCharacter.GetNode<KinematicBody>("KinematicBody");
             newCharacterKinematicBody.Transform = new Transform(newCharacterKinematicBody.Transform.basis, stats.StartPosition);
+
+			if (stats.IsPlayerCharacter)
+				playerCharactersRoot.AddChild(newCharacter);
+			else
+				aiCharactersRoot.AddChild(newCharacter);
+
 			AddCharacterSignals(newCharacterKinematicBody);
 
 			astarNavigator._On_Character_Created(newCharacter);
@@ -59,22 +69,28 @@ namespace FaffLatest.scripts.state
 
 		private void AddCharacterSignals(Node newCharacterKinematicBody)
 		{
+			inputManager.Connect(SignalNames.Characters.MOVE_TO, newCharacterKinematicBody, "_On_Character_MoveTo");
+			inputManager.Connect(SignalNames.Characters.MOVE_TO, characterMovementPathManager, "_On_Character_MoveTo");
+			//GD.Print(characterMovementPath.Name);
+
 			newCharacterKinematicBody.Connect(SignalNames.Characters.CLICKED_ON, inputManager, SignalNames.Characters.CLICKED_ON_METHOD);
-			inputManager.Connect(SignalNames.Characters.MOVE_TO, newCharacterKinematicBody, "_On_MoveTo");
-			newCharacterKinematicBody.Connect("_Character_FinishedMoving", astarNavigator, "_On_Character_FinishedMoving");
+			newCharacterKinematicBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, astarNavigator, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
+			newCharacterKinematicBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, characterMovementPathManager, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
+			newCharacterKinematicBody.Connect(SignalNames.Characters.TURN_FINISHED, GetNode("../GameStateManager"), SignalNames.Characters.TURN_FINISHED_METHOD);
 		}
 
 		private void FindNeededNodes()
 		{
 			aiCharactersRoot = GetNode<Node>("/root/Root/Characters/AI");
 			astarNavigator = GetNode<AStarNavigator>("../AStarNavigator");
+			characterMovementPathManager = GetNode<CharacterMovementPathManager>("/root/Root/Effects/CharacterMovementPath");
 			playerCharactersRoot = GetNode<Node>("/root/Root/Characters/Player");
 			inputManager = GetNode<Node>("../InputManager");
 		}
 
 		private void Preload()
 		{
-			playerCharacter = GD.Load<PackedScene>("res://scenes/characters/PlayerCharacter.tscn");
+			characterBase = GD.Load<PackedScene>("res://scenes/characters/Character.tscn");
 		}
 	}
 }

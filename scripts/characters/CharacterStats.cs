@@ -16,12 +16,12 @@ public class CharacterStats : Resource
 	public Texture FaceIcon { get; set; }
 
 	[Export]
-	public float MovementDistance { get; set; }
+	public int MovementDistance { get; set; }
 
 	public bool CanMove => !HasMovedThisTurn;
 
 	public bool HasMovedThisTurn { get; set; } = false;
-	public CharacterStats(string name = null, int health = 0, bool isPlayerCharacter = false, Texture faceIcon = null, float movemetDistance = 10.0f)
+	public CharacterStats(string name = null, int health = 0, bool isPlayerCharacter = false, Texture faceIcon = null, int movemetDistance = 10)
 	{
 		CharacterName = name;
 		Health = health;
@@ -38,12 +38,12 @@ public class CharacterStats : Resource
 	public void WithName(string name)
 	{
 		this.CharacterName = name;
-		GD.Print(this.CharacterName);
+		//GD.Print(this.CharacterName);
 	}
 
 	public void SetPlayerCharacter(bool isPlayerCharacter)
 	{
 		IsPlayerCharacter = isPlayerCharacter;
-		GD.Print(this.IsPlayerCharacter);
+		//GD.Print(this.IsPlayerCharacter);
 	}
 }

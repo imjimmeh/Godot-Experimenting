@@ -16,10 +16,10 @@ namespace FaffLatest.scripts.characters
 		public override void _Ready()
 		{
 			CharacterKinematicBody = GetNode("KinematicBody");
-			AddToGroup("characters");
+			AddToGroup("playerCharacters");
 
 			base._Ready();
 		}
-    }
+	}
 }
 

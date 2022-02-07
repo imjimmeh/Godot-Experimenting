@@ -20,7 +20,7 @@ namespace FaffLatest.scripts.world
         {
             if (inputEvent is InputEventMouseButton mouseButtonEvent)
             {
-                GD.Print("World clicked on - emitting signal");
+                //GD.Print("World clicked on - emitting signal");
                 EmitSignal(SignalNames.World.CLICKED_ON, this, mouseButtonEvent, position);
             }
         }
