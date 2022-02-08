@@ -47,7 +47,7 @@ namespace FaffLatest.scripts.effects.movementguide
 
         private void GetBody()
         {
-            body = parent.CharacterKinematicBody as KinematicBody;
+            body = parent.Body as KinematicBody;
         }
 
         private void ConnectSignals()
@@ -88,14 +88,14 @@ namespace FaffLatest.scripts.effects.movementguide
             RotationDegrees = body.RotationDegrees * -1;
 
             foreach (var cell in existingMovementGuide)
-                cell.Value.CalculateVisiblity(body.Transform.origin);
+                cell.Value.CalculateVisiblity(parent.Stats.AmountLeftToMoveThisTurn);
 
             Show();
         }
 
         public void CreateMeshes()
         {
-            var halfMovementDistance = parent.Stats.MovementDistance / 2;
+            var halfMovementDistance = parent.Stats.MaxMovementDistancePerTurn / 2;
 
             var pos = Vector3.Zero;
 
@@ -125,7 +125,7 @@ namespace FaffLatest.scripts.effects.movementguide
             var distanceToCharacter = (pos - currentVector).Abs();
 
             var distanceCalc = distanceToCharacter.x + distanceToCharacter.z;
-            var tooFar = distanceCalc > parent.Stats.MovementDistance;
+            var tooFar = distanceCalc > parent.Stats.MaxMovementDistancePerTurn;
 
             if (tooFar)
             {
@@ -169,15 +169,19 @@ namespace FaffLatest.scripts.effects.movementguide
             if(node is CharacterMovementGuideCell cell)
             {
                 GD.Print($"cell");
-                var path = astar.GetMovementPath(body.Transform.origin, cell.GlobalTransform.origin, parent.Stats.MovementDistance);
+                var path = astar.GetMovementPath(body.Transform.origin, cell.GlobalTransform.origin, parent.Stats.MaxMovementDistancePerTurn);
 
                 ClearExistingPath();
+
+                if (path == null || path.Length == 0)
+                    return;
 
                 currentPath = new CharacterMovementGuideCell[path.Length];
 
                 for(var x = 0; x < path.Length; x++)
                 {
-                   currentPath[x] = GetCellAndSetAsPathPart(path[x].Destination - body.Transform.origin);
+                    GD.Print($"Path is : {path[x]?.Destination}");
+                    currentPath[x] = GetCellAndSetAsPathPart(path[x].Destination - body.Transform.origin);
                 }
             }
         }
@@ -237,13 +241,13 @@ namespace FaffLatest.scripts.effects.movementguide
 
         private static (float x, float z) GetMinimumPossibleValues(Character character, float x, float z)
         {
-            (var minX, var minZ) = (x - character.Stats.MovementDistance, z - character.Stats.MovementDistance);
+            (var minX, var minZ) = (x - character.Stats.MaxMovementDistancePerTurn, z - character.Stats.MaxMovementDistancePerTurn);
             return (minX, minZ);
         }
 
         private static (float x, float z) GetMaxPossibleValues(Character character, float x, float z)
         {
-            (var maxX, var maxZ) = (x + character.Stats.MovementDistance, z + character.Stats.MovementDistance);
+            (var maxX, var maxZ) = (x + character.Stats.MaxMovementDistancePerTurn, z + character.Stats.MaxMovementDistancePerTurn);
             return (maxX, maxZ);
         }
 

@@ -36,7 +36,7 @@ public class MovementDisplayMeshInstance : MeshInstance
 
 	public void ChangeSize()
 	{
-		mesh.Size = new Vector2(parent.Stats.MovementDistance * 2, parent.Stats.MovementDistance * 2);
+		mesh.Size = new Vector2(parent.Stats.MaxMovementDistancePerTurn * 2, parent.Stats.MaxMovementDistancePerTurn * 2);
 	}
 
 	private void _On_Character_Selected(Character character)
@@ -74,6 +74,6 @@ public class MovementDisplayMeshInstance : MeshInstance
 		var playerPosition = body.Transform.origin;
 
 		currentMaterial.SetShaderParam("playerPosition", playerPosition);
-		currentMaterial.SetShaderParam("playerMovementDistance", parent.Stats.MovementDistance);
+		currentMaterial.SetShaderParam("playerMovementDistance", parent.Stats.MaxMovementDistancePerTurn);
 	}
 }

@@ -117,16 +117,16 @@ namespace FaffLatest.scripts.input
 
 			var distance = (position - body.Transform.origin).Length();
 
-			if(distance > gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance)
+			if(distance > gameStateManager.CurrentlySelectedCharacter.Stats.MaxMovementDistancePerTurn)
 			{
 				//GD.Print($"Distance is {distance} - original position is {position}");
-				position = body.Transform.origin.MoveToward(position, gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance);
+				position = body.Transform.origin.MoveToward(position, gameStateManager.CurrentlySelectedCharacter.Stats.MaxMovementDistancePerTurn);
 
 				position = position.Round();
 				//GD.Print($"New position is {position}");
 			}
 
-			var convertedPath = aStarNavigator.GetMovementPath(body.Transform.origin, position, gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance); // navigation.GetMovementPathNodes(body.Transform, position);
+			var convertedPath = aStarNavigator.GetMovementPath(body.Transform.origin, position, gameStateManager.CurrentlySelectedCharacter.Stats.MaxMovementDistancePerTurn); // navigation.GetMovementPathNodes(body.Transform, position);
 
 			if(convertedPath == null)
             {
@@ -134,15 +134,14 @@ namespace FaffLatest.scripts.input
 				return;
             }
 
-			GD.Print($"We can move {gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance}");
-			if(convertedPath.Length > gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance)
+			GD.Print($"We can move {gameStateManager.CurrentlySelectedCharacter.Stats.MaxMovementDistancePerTurn}");
+			if(convertedPath.Length > gameStateManager.CurrentlySelectedCharacter.Stats.MaxMovementDistancePerTurn)
 			{
-				Array.Resize(ref convertedPath, gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance);
+				Array.Resize(ref convertedPath, gameStateManager.CurrentlySelectedCharacter.Stats.MaxMovementDistancePerTurn);
 			}
 
 			EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.CurrentlySelectedCharacter, convertedPath);
 
-			gameStateManager.CurrentlySelectedCharacter.Stats.HasMovedThisTurn = true;
 			gameStateManager.ClearCurrentlySelectedCharacter();
 		}
 	}

@@ -51,7 +51,7 @@ namespace FaffLatest.scripts.state
 
             newCharacter.Stats.CharacterName = stats.Name;
 			newCharacter.Stats.IsPlayerCharacter = stats.IsPlayerCharacter;
-			newCharacter.Stats.MovementDistance = stats.MovementDistance;
+			newCharacter.Stats.SetMaxMovementDistance(stats.MovementDistance);
 
             var newCharacterKinematicBody = newCharacter.GetNode<KinematicBody>("KinematicBody");
             newCharacterKinematicBody.Transform = new Transform(newCharacterKinematicBody.Transform.basis, stats.StartPosition);

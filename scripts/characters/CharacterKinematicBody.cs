@@ -110,7 +110,9 @@ public class CharacterKinematicBody : KinematicBody
 		}
 
 		if (CurrentPathIndex > -1)
+		{
 			EmitSignal(Characters.REACHED_PATH_PART, this, Transform.origin.Round());
+		}
 
 		return true;
 	}

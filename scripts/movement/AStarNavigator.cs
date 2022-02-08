@@ -130,7 +130,8 @@ namespace FaffLatest.scripts.movement
 
 				if(path == null)
                 {
-					//GD.Print($"Could not find path from {nearestStart} to {nearestEnd}");
+					return null;
+					GD.Print($"Could not find path from {nearestStart} to {nearestEnd}");
                 }
 				var converted = NavigationHelper.GetMovementPathNodes(path, movementDistance);
 				//GD.Print($"Going from {start} to {end}");
@@ -141,7 +142,9 @@ namespace FaffLatest.scripts.movement
 			}
 			catch(Exception ex)
 			{
-				//GD.Print(ex.Message);
+				GD.Print($"Error getting path - {ex.Message}");
+				return null;
+				//
 				//GD.Print(ex.StackTrace);
 				//GD.Print($"Could not get movement path for {start} to {end}");
 				throw;
@@ -153,7 +156,7 @@ namespace FaffLatest.scripts.movement
             var asCharacter = character as Character;
             //GD.Print($"AStarNavigator received _OnCharacterCreated for character {asCharacter.Stats.CharacterName}");
 
-            var body = asCharacter.CharacterKinematicBody as CharacterKinematicBody;
+            var body = asCharacter.Body as CharacterKinematicBody;
             var point = astar.GetClosestPoint(body.Transform.origin);
 
             astar.SetPointDisabled(point);

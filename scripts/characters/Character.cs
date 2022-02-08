@@ -1,3 +1,4 @@
+using FaffLatest.scripts.constants;
 using Godot;
 
 namespace FaffLatest.scripts.characters
@@ -7,7 +8,7 @@ namespace FaffLatest.scripts.characters
 		[Signal]
 		public delegate void _Character_Ready(Node character);
 
-		public Node CharacterKinematicBody;
+		public Node Body;
 
 		public Character()
 		{
@@ -20,9 +21,11 @@ namespace FaffLatest.scripts.characters
 		{
 			base._Ready();
 
-			CharacterKinematicBody = GetNode("KinematicBody");
+			Body = GetNode("KinematicBody");
 			AddToGroup("playerCharacters");
 			EmitSignal("_Character_Ready", this);
+
+			Body.Connect(SignalNames.Characters.REACHED_PATH_PART, Stats, SignalNames.Characters.REACHED_PATH_PART_METHOD);
 		}
 	}
 }
