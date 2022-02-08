@@ -1,11 +1,16 @@
 using Godot;
 using System;
 
-public class WorldManager : Spatial
+namespace FaffLatest.scripts.world
 {
-	public override void _Ready()
-	{
-		
-	}
 
+	public class WorldManager : Spatial
+	{
+		public override void _Ready()
+		{
+
+		}
+
+
+	}
 }

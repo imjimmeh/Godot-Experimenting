@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FaffLatest.scripts.constants
 {
-    public static class GroupNames
+    public class GroupNames
     {
         public const string CHARACTER = "characters";
     }

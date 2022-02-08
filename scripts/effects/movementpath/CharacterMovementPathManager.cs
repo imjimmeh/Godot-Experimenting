@@ -27,10 +27,7 @@ namespace FaffLatest.scripts.effects
 
             for (var x = 0; x < path.Length; x++)
             {
-                var newMesh = MovementPathFactory.CreateMeshInstanceForPoint(path[x].Destination, (plane =>
-                {
-                    plane.Material = MeshMaterial;
-                }));
+                var newMesh = MovementPathFactory.CreateMeshInstanceForPoint(path[x].Destination, SetPlaneVariables());
 
                 SetMeshVariables(body, newMesh);
                 ConnectSignals(body, newMesh);
@@ -39,6 +36,11 @@ namespace FaffLatest.scripts.effects
                 existingPath[x] = newMesh;
             }
         }
+
+        private Action<PlaneMesh> SetPlaneVariables() => plane =>{
+            plane.Material = MeshMaterial;
+        };
+
 
         private static void ConnectSignals(Node body, CharacterMovementPath newMesh)
         {

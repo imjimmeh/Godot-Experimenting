@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace FaffLatest.scripts.constants
 {
-	public static class SignalNames
+	public class SignalNames
 	{
-		public static class Characters
+		public class Characters
 		{
 			private const string prefix = "_Character_";
 
@@ -34,14 +34,14 @@ namespace FaffLatest.scripts.constants
 			public const string TURN_FINISHED_METHOD = SharedParts.ON + TURN_FINISHED;
 		}
 
-		public static class World
+		public class World
 		{
 			private const string prefix = "_World_";
 
 			public const string CLICKED_ON = prefix + SharedParts.CLICKED_ON;
 		}
 
-		public static class SharedParts
+		public class SharedParts
 		{
 			public const string CLICKED_ON = "ClickedOn";
 			public const string MOVE_TO = "MoveTo";

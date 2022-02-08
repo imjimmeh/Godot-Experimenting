@@ -10,47 +10,50 @@ namespace FaffLatest.scripts.movement
 {
 	public class AStarNavigator : Node
 	{
+		private readonly NonEuclideanAStar astar = new NonEuclideanAStar();
 		private Dictionary<Node, PointInfo> characterLocations;
+		private PointInfo[,] points;
 
 		[Export]
-		public int GridSize = 1;
+		public int GridSize { get; private set; } = 1;
 
 		[Export]
-		public float YValue = 1.0f;
+		public float YValue { get; private set; } = 1.0f;
 
-		private NonEuclideanAStar astar = new NonEuclideanAStar();
+		public PointInfo[,] Points { get => points; private set => points = value; }
 
-		public PointInfo[,] Points;
+		public long Length { get; private set; }
+		public long Width { get; private set; }
 
-		
 		public AStarNavigator()
         {
 			CreatePointsForMap(50, 50, new Vector2[0]);
 		}
 
 		public override void _Ready()
-		{
-		}
+        {
+        }
 
-		public void CreatePointsForMap(int length, int width, Vector2[] initiallyOccupiedPoints)
+        public void CreatePointsForMap(int length, int width, Vector2[] initiallyOccupiedPoints)
         {
             InitialiseComponents(length, width);
 
             int currentPointId = 0;
-
-
-            for (float x = 0; x < length; x += GridSize)
+			float x, y = 0;
+            for (x = 0; x < length; x += GridSize)
             {
-                for (float y = 0; y < width; y += GridSize)
+                for (y = 0; y < width; y += GridSize)
                 {
                     CreatePoint(currentPointId, x, y, length, width);
 
                     currentPointId++;
                 }
             }
-        }
 
-        private void CreatePoint(int currentPointId, float x, float y, int xLength, int yLength)
+			GD.Print($"Created {x} - {y} points");
+		}
+
+		private void CreatePoint(int currentPointId, float x, float y, int xLength, int yLength)
         {
             var location = new Vector3(x, YValue, y);
 
@@ -96,29 +99,41 @@ namespace FaffLatest.scripts.movement
             var numberOfNodes = length * width;
             astar.ReserveSpace(numberOfNodes);
             astar.Clear();
+
             Points = new PointInfo[length, width];
 			characterLocations = new Dictionary<Node, PointInfo>(50);
+
+			Length = length;
+			Width = width;
         }
 
-        public MovementPathNode[] GetMovementPath(Vector3 start, Vector3 end)
+        public MovementPathNode[] GetMovementPath(Vector3 start, Vector3 end, float movementDistance)
 		{
 			try
 			{
-				var nearestStart = astar.GetClosestPoint(start);
-				//GD.Print($"Start is {start} vs nearest start {nearestStart} which is {astar.GetPointPosition(nearestStart)}");
+				(var startX, var startY) = ((int)start.x, (int)start.z);
+				(var endX, var endY) = ((int)end.x, (int)end.z);
 
-				var nearestEnd = astar.GetClosestPoint(end);
-				//GD.Print($"end is {end} vs nearest end {nearestEnd}");
+				var nearestStart = Points[startX, startY]; // astar.GetClosestPoint(start);
+				var nearestEnd = Points[endX, endY];
 
-				var path = astar.GetPointPath(nearestStart, nearestEnd);
+				var s = astar.GetPointPosition(nearestStart.Id);
+				var e = astar.GetPointPosition(nearestEnd.Id);
 
-				var converted = NavigationHelper.GetMovementPathNodes(path);
+				GD.Print($"Nearest Start {s} vs {start} - End is {e} vs {end}");
+				var path = astar.GetPointPath(nearestStart.Id, nearestEnd.Id);
+				var converted = NavigationHelper.GetMovementPathNodes(path, movementDistance);
+				GD.Print($"Going from {start} to {end}");
+				GD.Print($"Start path is {path[0]} and is {path[path.Length - 1]}");
 
+				GD.Print($"Path count is {path.Length}");
 				return converted;
 			}
-			catch
+			catch(Exception ex)
 			{
-				//GD.Print($"Could not get movement path for {start} to {end}");
+				GD.Print(ex.Message);
+				GD.Print(ex.StackTrace);
+				GD.Print($"Could not get movement path for {start} to {end}");
 				throw;
 			}
 		}
@@ -126,18 +141,12 @@ namespace FaffLatest.scripts.movement
 		public void _On_Character_Created(Node character)
         {
             var asCharacter = character as Character;
-            //GD.Print($"AStarNavigator received _OnCharacterCreated for character {asCharacter.Stats.CharacterName}");
+            GD.Print($"AStarNavigator received _OnCharacterCreated for character {asCharacter.Stats.CharacterName}");
 
             var body = asCharacter.CharacterKinematicBody as CharacterKinematicBody;
-
-            //GD.Print("Charracter being added to astar");
             var point = astar.GetClosestPoint(body.Transform.origin);
 
-            //GD.Print(astar.GetPointPosition(point));
             astar.SetPointDisabled(point);
-
-            //GD.Print($"Disabled point {point}");
-
             CreatePointInfos(character, body);
         }
 
@@ -171,11 +180,10 @@ namespace FaffLatest.scripts.movement
 				oldLocationPointInfo.SetOccupier(null);
 
 				characterLocations[character] = GetPointInfoForVector3(newPosition);
-				//GD.Print($"Moved {character.Name} from {oldLocationPointInfo} to {newOccupyingNode}");
 			}
 			else
 			{
-				//GD.Print($"ERROR - Could not find matching node for {character.Name}");
+				GD.Print($"AStarNavigatorError - Could not find matching node for {character.Name}");
 			}
 		}
 

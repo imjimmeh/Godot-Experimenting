@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Godot;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FaffLatest.scripts.constants
+namespace FaffLatest.scripts.characters
 {
-    public class SharedConstants
+    public class MovementDisplayManager : Node
     {
     }
 }

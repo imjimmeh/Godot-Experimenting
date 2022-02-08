@@ -11,8 +11,6 @@ namespace FaffLatest.scripts.input
 	public class InputManager : Node
 	{
 		private GameStateManager gameStateManager;
-
-		private Navigation navigation;
 		private AStarNavigator aStarNavigator;
 
 		[Signal]
@@ -24,7 +22,6 @@ namespace FaffLatest.scripts.input
 
 			aStarNavigator = GetNode<AStarNavigator>("../AStarNavigator");
 			gameStateManager = GetNode<GameStateManager>("../GameStateManager");
-			navigation = GetNode<Navigation>("/root/Root/Environment/Navigation");
 		}
 
 		public void ConnectWorldClickedOnSignal(Node element)
@@ -106,6 +103,13 @@ namespace FaffLatest.scripts.input
 		private void IssueMoveOrder(Vector3 position)
 		{
 			position = position.Round();
+
+			(var x, var y, var z) = (position.x, 1, position.z);
+			x = Mathf.Clamp(x, 1, 50);
+			z = Mathf.Clamp(z, 1, 50);
+
+			position = new Vector3(x, 1, z);
+
 			var body = gameStateManager.CurrentlySelectedCharacter.GetNode<KinematicBody>("KinematicBody");
 
 			var distance = (position - body.Transform.origin).Length();
@@ -119,8 +123,9 @@ namespace FaffLatest.scripts.input
 				//GD.Print($"New position is {position}");
 			}
 
-			var convertedPath = aStarNavigator.GetMovementPath(body.Transform.origin, position); // navigation.GetMovementPathNodes(body.Transform, position);
+			var convertedPath = aStarNavigator.GetMovementPath(body.Transform.origin, position, gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance); // navigation.GetMovementPathNodes(body.Transform, position);
 
+			GD.Print($"We can move {gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance}");
 			if(convertedPath.Length > gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance)
 			{
 				Array.Resize(ref convertedPath, gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance);

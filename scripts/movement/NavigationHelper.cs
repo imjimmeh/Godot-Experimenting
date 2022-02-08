@@ -1,53 +1,37 @@
 ﻿using Godot;
 using System;
+using System.Text;
 
 namespace FaffLatest.scripts.movement
 {
     public static class NavigationHelper
     {
-        public static MovementPathNode[] GetMovementPathNodes(Vector3[] simplePath)
+        public static MovementPathNode[] GetMovementPathNodes(Vector3[] simplePath, float maxDistance)
         {
             var convertedPath = new MovementPathNode[simplePath.Length - 1];
 
-            //GD.Print($"Found path is {string.Join(",", simplePath)}");
-
+            GD.Print($"Found path is {string.Join(",", simplePath)}");
+            var sb = new StringBuilder();
+            float currentDistance = 0;
             for (var x = 1; x < simplePath.Length; x++)
             {
                 convertedPath[x - 1] = InitialiseVariablesForNextTargetDestinationInPath(simplePath[x - 1], simplePath[x], 1);
+                currentDistance += convertedPath[x - 1].MovementVector.Length();
+
+                sb.AppendLine(convertedPath[x - 1].Destination.ToString());
+
+                if (currentDistance == maxDistance)
+                {
+                    return convertedPath;
+                }
             }
 
             return convertedPath;
         }
-
-        public static MovementPathNode[] GetMovementPathNodes(this Navigation navigation, Transform start, Vector3 end)
-        {
-            var startY = start.origin.y;
-            end = new Vector3(end.x, startY, end.z);
-
-            //GD.Print($"Going from {start.origin} to {end}");
-
-            var simplePath = navigation.GetSimplePath(start.origin, end, true);
-
-            //GD.Print($"Simple path is {string.Join(",", simplePath)}");
-
-            var convertedPath = new MovementPathNode[simplePath.Length];
-
-            for (var x = 0; x < simplePath.Length; x++)
-            {
-                simplePath[x] = new Vector3(simplePath[x].x, startY, simplePath[x].z);
-
-                var startToUse = x == 0 ? start : convertedPath[x - 1].RotationTarget;
-
-                convertedPath[x] = InitialiseVariablesForNextTargetDestinationInPath(startToUse, simplePath[x], startY);
-            }
-
-            return convertedPath;
-        }
-
 
         private static MovementPathNode InitialiseVariablesForNextTargetDestinationInPath(Transform start, Vector3 end, float yToUse)
         {
-            //GD.Print($"Calculating from {start} to {end}");
+             //GD.Print($"Calculating from {start} to {end}");
 
             var destination = new Vector3(end.x, yToUse, end.z);
             var movementVector = CalculateMovementVector(start.origin, end);

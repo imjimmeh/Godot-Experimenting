@@ -31,6 +31,5 @@ namespace FaffLatest.scripts.movement
 
         public static bool CurrentRotationMatchesTarget(this Transform transform, Vector3 movementVector) 
             => VectorHelpers.LookingAtSamePoint(transform.basis.z.Normalized(), movementVector);
-
     }
 }

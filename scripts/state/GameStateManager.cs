@@ -82,7 +82,7 @@ namespace FaffLatest.scripts.state
 
             var nextTurn = triggeredCharacter.Stats.IsPlayerCharacter ? CurrentTurn.ENEMY : CurrentTurn.PLAYER;
 
-            SetCurrentTurn(CurrentTurn.ENEMY);
+            SetCurrentTurn(nextTurn);
         }
     }
 }

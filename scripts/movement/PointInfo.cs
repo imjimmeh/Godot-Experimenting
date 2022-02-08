@@ -3,7 +3,7 @@ using Godot;
 
 namespace FaffLatest.scripts.movement
 {
-    public class PointInfo
+    public class PointInfo : Godot.Object
     {
         private Node _occupyingNode;
 

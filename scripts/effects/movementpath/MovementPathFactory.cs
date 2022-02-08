@@ -7,23 +7,25 @@ namespace FaffLatest.scripts.effects
     {
 		private static PlaneMesh CreatePlaneForPoint(Vector3 point, Action<PlaneMesh> options)
 		{
-			var plane = new PlaneMesh();
-			plane.Size = new Vector2(1, 1);
+            var plane = new PlaneMesh
+            {
+                Size = new Vector2(1, 1)
+            };
 
-			if (options != null)
-			{
-				options(plane);
-			}
+            options?.Invoke(plane);
 
-			return plane;
+            return plane;
 		}
 
 		public static CharacterMovementPath CreateMeshInstanceForPoint(Vector3 point, Action<PlaneMesh> options = null)
 		{
-			var meshInstance = new CharacterMovementPath();
-			meshInstance.Mesh = CreatePlaneForPoint(point, options);
+            var meshInstance = new CharacterMovementPath
+            {
+                Mesh = CreatePlaneForPoint(point, options)
+            };
 
-			meshInstance.Transform = new Transform(meshInstance.Transform.basis, point);
+            meshInstance.Transform = new Transform(meshInstance.Transform.basis, point);
+
 			return meshInstance;
 		}
 
