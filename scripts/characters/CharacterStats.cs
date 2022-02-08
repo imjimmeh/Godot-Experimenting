@@ -24,7 +24,7 @@ public class CharacterStats : Resource
 
 	public int AmountLeftToMoveThisTurn => MaxMovementDistancePerTurn - AmountMovedThisTurn;
 
-	public bool FinishedTurnMovement => AmountMovedThisTurn == MaxMovementDistancePerTurn;
+	public bool FinishedTurnMovement => AmountMovedThisTurn >= MaxMovementDistancePerTurn;
 	public bool CanMove => !FinishedTurnMovement;
 
 	public CharacterStats(string name = null, int health = 0, bool isPlayerCharacter = false, Texture faceIcon = null, int movemetDistance = 10)
@@ -62,7 +62,7 @@ public class CharacterStats : Resource
 	public void IncrementMovement()
     {
 		AmountMovedThisTurn++;
-		GD.Print($"Now moved {AmountMovedThisTurn} out of {MaxMovementDistancePerTurn}");
+		//GD.Print($"Now moved {AmountMovedThisTurn} out of {MaxMovementDistancePerTurn}");
     }
 
 	private void _On_Character_ReachedPathPart(Node character, Vector3 part)

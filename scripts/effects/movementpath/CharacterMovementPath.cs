@@ -11,18 +11,24 @@ namespace FaffLatest.scripts.effects
 
         }
 
-        private void _On_Character_ReachedPathPart(Node character, Vector3 pathLocation)
+        private void _On_Character_ReachedPathPart(Node character, Vector3 part)
         {
-            if (!ShouldHidePart(character, pathLocation))
+            if (!ShouldHidePart(character, part))
                 return;
 
-            HideFromSceneAndDisconnect();
+            DisconnectAndRemove();
+        }
+
+        public void DisconnectAndRemove()
+        {
             DisconnectSignals();
+            RemoveFromScene();
         }
 
         private void DisconnectSignals()
         {
             characterBody.Disconnect(SignalNames.Characters.REACHED_PATH_PART, this, SignalNames.Characters.REACHED_PATH_PART_METHOD);
+            GD.Print($"Disconnected mesh");
         }
 
         private bool ShouldHidePart(Node character, Vector3 pathLocation)

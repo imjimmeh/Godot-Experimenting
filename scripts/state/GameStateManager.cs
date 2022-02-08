@@ -8,11 +8,11 @@ namespace FaffLatest.scripts.state
 {
     public class GameStateManager : Node
     {
-        private Character currentlySelectedCharacter;
-        private CurrentTurn currentTurn;
+        private Character selectedCharacter;
+        private Faction currentTurn;
 
-        public Character CurrentlySelectedCharacter => currentlySelectedCharacter;
-        public CurrentTurn CurrentTurn => currentTurn;
+        public Character SelectedCharacter => selectedCharacter;
+        public Faction CurrentTurn => currentTurn;
 
         [Signal]
         public delegate void _Character_Selected(Character character);
@@ -25,6 +25,8 @@ namespace FaffLatest.scripts.state
 
         public AStarNavigator AStarNavigator { get; private set; }
         public SpawnManager SpawnManager { get; private set; }
+
+        public bool CharacterIsActive = false;
 
         public override void _Ready()
         {
@@ -42,7 +44,7 @@ namespace FaffLatest.scripts.state
 
         public void SetCurrentlySelectedCharacter(Character character)
         {
-            currentlySelectedCharacter = character;
+            selectedCharacter = character;
             EmitSignal(SignalNames.Characters.SELECTED, character);
 
             //GD.Print($"{character.Stats.CharacterName} has been selected");
@@ -50,37 +52,61 @@ namespace FaffLatest.scripts.state
 
         public void ClearCurrentlySelectedCharacter()
         {
-            currentlySelectedCharacter = null;
+            selectedCharacter = null;
             EmitSignal(SignalNames.Characters.SELECTION_CLEARED);
 
             //GD.Print("Character has been unselected");
         }
 
-        public void SetCurrentTurn(CurrentTurn turn)
+        public void SetCurrentTurn(Faction turn)
         {
             currentTurn = turn;
 
             EmitSignal("_Turn_Changed", currentTurn.ToString());
         }
 
-        private void _On_Character_TurnFinished(Node character)
+        private void _On_Character_FinishedMoving(Node character, Vector3 newPosition)
         {
-            //GD.Print($"Character has finished turn");
-            var allPlayerCharacters = GetTree().GetNodesInGroup("playerCharacters");
-
-            var triggeredCharacter = character as Character;
-            for(var x = 0; x < allPlayerCharacters.Count; x++)
+            if (character is Character c)
             {
-                var asCharacter = allPlayerCharacters[x] as Character;
+                SetCharacterActive(false);
+                CheckTurnIsFinished(c);
+            }
+        }
 
-                if (asCharacter.Stats.IsPlayerCharacter != triggeredCharacter.Stats.IsPlayerCharacter)
+        public void SetCharacterActive(bool isActive = true)
+        {
+            SetCharacterActive(SelectedCharacter, isActive);
+        }
+
+        public static void SetCharacterActive(Character character, bool isActive = true)
+        {
+
+        }
+
+        private void CheckTurnIsFinished(Character c)
+        {
+            //GD.Print($"Character {c.Stats.CharacterName} has finished a movement");
+
+            var characterParentNode = c.Stats.IsPlayerCharacter ? "playerCharacters" : "aiCharacters";
+
+            var charactersInGroup = GetTree().GetNodesInGroup(characterParentNode);
+
+            for (var x = 0; x < charactersInGroup.Count; x++)
+            {
+                var asCharacter = charactersInGroup[x] as Character;
+
+                if (asCharacter.Stats.IsPlayerCharacter != c.Stats.IsPlayerCharacter)
                     continue;
 
-                if(asCharacter.Stats.CanMove)
+                if (asCharacter.Stats.CanMove)
+                {
+                    //GD.Print($"Turn not over - {asCharacter.Stats.CharacterName} still has {asCharacter.Stats.AmountLeftToMoveThisTurn} movement left");
                     return;
+                }
             }
 
-            var nextTurn = triggeredCharacter.Stats.IsPlayerCharacter ? CurrentTurn.ENEMY : CurrentTurn.PLAYER;
+            var nextTurn = c.Stats.IsPlayerCharacter ? Faction.ENEMY : Faction.PLAYER;
 
             SetCurrentTurn(nextTurn);
         }

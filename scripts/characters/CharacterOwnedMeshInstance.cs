@@ -13,11 +13,13 @@ namespace FaffLatest.characters
         public Node Parent => parentNode;
         public Node CharacterBody => characterBody;
 
+        public bool IsVisible => isHidden;
+
         public void DisconnectAndDispose()
         {
             if (!isHidden)
             {
-                HideFromSceneAndDisconnect();
+                RemoveFromScene();
             }
 
             Dispose();
@@ -34,7 +36,7 @@ namespace FaffLatest.characters
             isHidden = false;
         }
 
-        protected internal void HideFromSceneAndDisconnect()
+        protected internal void RemoveFromScene()
         {
             parentNode.RemoveChild(this);
             isHidden = true;

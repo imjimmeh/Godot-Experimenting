@@ -96,7 +96,7 @@ public class CharacterKinematicBody : KinematicBody
 
 	private bool GetNextPathPartIfAvailable()
 	{
-		GD.Print("Attempting to get new path part");
+		//GD.Print("Attempting to get new path part");
 		if (!haveMoreInPath)
 			return false;
 
@@ -104,14 +104,22 @@ public class CharacterKinematicBody : KinematicBody
 		
 		if (CurrentPathIndex >= Path.GetLength(0))
 		{
-			GD.Print("Tried to get new path part but none available");
+			//GD.Print("Tried to get new path part but none available");
 			ClearPath();
 			return false;
 		}
 
 		if (CurrentPathIndex > -1)
 		{
-			EmitSignal(Characters.REACHED_PATH_PART, this, Transform.origin.Round());
+			try
+			{
+				EmitSignal(Characters.REACHED_PATH_PART, this, Transform.origin.Round());
+			}
+			catch
+            {
+				//GD.Print($"HERE");
+				throw;
+            }
 		}
 
 		return true;
@@ -135,7 +143,6 @@ public class CharacterKinematicBody : KinematicBody
 
 		else
 		{
-			////GD.Print(distance);
 			///
 			//InterpolateAndMove(delta);
 			//GD.Print($"Moving");
@@ -144,6 +151,7 @@ public class CharacterKinematicBody : KinematicBody
 
 			var distance = CurrentMovementNode.Destination.DistanceTo(Transform.origin);
 			var atSamePoint = distance <= 0.2f;
+			//GD.Print(distance);
 
 			if (atSamePoint)
 			{
@@ -161,7 +169,7 @@ public class CharacterKinematicBody : KinematicBody
 
 	private void IncrementPath()
 	{
-		GD.Print($"Reached path index {CurrentPathIndex}");
+		//GD.Print($"Reached path index {CurrentPathIndex}");
 		
 		if(!GetNextPathPartIfAvailable())
         {
@@ -176,12 +184,12 @@ public class CharacterKinematicBody : KinematicBody
 			Velocity = new Vector3(CurrentMovementNode.MovementVector.x * 0.2f, 0, CurrentMovementNode.MovementVector.z * 0.2f);
 		}
 
-		GD.Print($"Next path target is {CurrentMovementNode?.Destination} - Movement vector us {CurrentMovementNode?.MovementVector}");
+		//GD.Print($"Next path target is {CurrentMovementNode?.Destination} - Movement vector us {CurrentMovementNode?.MovementVector}");
 	}
 
 	private void ClearPath()
 	{
-		GD.Print($"Reached destination - we are at {Transform.origin}");
+		//GD.Print($"Reached destination - we are at {Transform.origin}");
 		ClearRotation();
 		Path = null;
 		CurrentPathIndex = -1;
@@ -190,9 +198,9 @@ public class CharacterKinematicBody : KinematicBody
 		var snappedVector = Transform.origin.Round();
 		Transform = new Transform(Transform.basis, snappedVector);
 	
-		GD.Print($"Snapepd to {snappedVector}");
+		//GD.Print($"Snapepd to {snappedVector}");
+
 		EmitSignal(Characters.MOVEMENT_FINISHED, Parent, Transform.origin);
-		EmitSignal(Characters.TURN_FINISHED, Parent);
 	}
 
 	private void ClearRotation()
@@ -221,7 +229,7 @@ public class CharacterKinematicBody : KinematicBody
 		//GD.Print($"Path length is {path.Length}");
 		SetInitialMovementVariables();
 
-		GD.Print($"Received movement command - moving to first part in path -  {Path[0].Destination}");
+		//GD.Print($"Received movement command - moving to first part in path -  {Path[0].Destination}");
 	}
 
 }

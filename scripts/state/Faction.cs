@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FaffLatest.scripts.state
 {
-	public enum CurrentTurn
+	public enum Faction
 	{
 		PLAYER,
 		ENEMY

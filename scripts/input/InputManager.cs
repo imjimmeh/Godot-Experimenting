@@ -77,13 +77,13 @@ namespace FaffLatest.scripts.input
 
 		private void _On_World_Mouse_Released(ClickableWorldElement world, InputEventMouseButton mouseButtonEvent, Vector3 position)
 		{
-			if (mouseButtonEvent.ButtonIndex == 1 && gameStateManager.CurrentlySelectedCharacter != null)
+			if (mouseButtonEvent.ButtonIndex == 1 && gameStateManager.SelectedCharacter != null)
 			{
 				gameStateManager.ClearCurrentlySelectedCharacter();
 			}
-			else if (mouseButtonEvent.ButtonIndex == 2 && gameStateManager.CurrentlySelectedCharacter != null)
+			else if (mouseButtonEvent.ButtonIndex == 2 && gameStateManager.SelectedCharacter != null)
 			{
-				if (gameStateManager.CurrentlySelectedCharacter.Stats.CanMove)
+				if (gameStateManager.SelectedCharacter.Stats.CanMove)
 				{
 					IssueMoveOrder(position);
 				}
@@ -97,7 +97,7 @@ namespace FaffLatest.scripts.input
 
 		private void _On_Character_MoveOrder(Vector3 position)
         {
-			if (gameStateManager.CurrentlySelectedCharacter.Stats.CanMove)
+			if (gameStateManager.SelectedCharacter.Stats.CanMove)
 			{
 				IssueMoveOrder(position);
 			}
@@ -113,36 +113,35 @@ namespace FaffLatest.scripts.input
 
 			position = new Vector3(x, 1, z);
 
-			var body = gameStateManager.CurrentlySelectedCharacter.GetNode<KinematicBody>("KinematicBody");
+			var body = gameStateManager.SelectedCharacter.GetNode<KinematicBody>("KinematicBody");
 
 			var distance = (position - body.Transform.origin).Length();
 
-			if(distance > gameStateManager.CurrentlySelectedCharacter.Stats.MaxMovementDistancePerTurn)
+			if(distance > gameStateManager.SelectedCharacter.Stats.MaxMovementDistancePerTurn)
 			{
 				//GD.Print($"Distance is {distance} - original position is {position}");
-				position = body.Transform.origin.MoveToward(position, gameStateManager.CurrentlySelectedCharacter.Stats.MaxMovementDistancePerTurn);
+				position = body.Transform.origin.MoveToward(position, gameStateManager.SelectedCharacter.Stats.MaxMovementDistancePerTurn);
 
 				position = position.Round();
 				//GD.Print($"New position is {position}");
 			}
 
-			var convertedPath = aStarNavigator.GetMovementPath(body.Transform.origin, position, gameStateManager.CurrentlySelectedCharacter.Stats.MaxMovementDistancePerTurn); // navigation.GetMovementPathNodes(body.Transform, position);
+			var convertedPath = aStarNavigator.GetMovementPath(body.Transform.origin, position, gameStateManager.SelectedCharacter.Stats.MaxMovementDistancePerTurn); // navigation.GetMovementPathNodes(body.Transform, position);
 
 			if(convertedPath == null)
             {
-				GD.Print("Cannot move here");
+				//GD.Print("Cannot move here");
 				return;
             }
 
-			GD.Print($"We can move {gameStateManager.CurrentlySelectedCharacter.Stats.MaxMovementDistancePerTurn}");
-			if(convertedPath.Length > gameStateManager.CurrentlySelectedCharacter.Stats.MaxMovementDistancePerTurn)
+			//GD.Print($"We can move {gameStateManager.SelectedCharacter}");
+			if(convertedPath.Length > gameStateManager.SelectedCharacter.Stats.MaxMovementDistancePerTurn)
 			{
-				Array.Resize(ref convertedPath, gameStateManager.CurrentlySelectedCharacter.Stats.MaxMovementDistancePerTurn);
+				Array.Resize(ref convertedPath, gameStateManager.SelectedCharacter.Stats.MaxMovementDistancePerTurn);
 			}
 
-			EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.CurrentlySelectedCharacter, convertedPath);
-
-			gameStateManager.ClearCurrentlySelectedCharacter();
+			EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.SelectedCharacter, convertedPath);
+			gameStateManager.SetCharacterActive(true);
 		}
 	}
 }

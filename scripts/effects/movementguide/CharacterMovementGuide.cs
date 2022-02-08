@@ -54,7 +54,7 @@ namespace FaffLatest.scripts.effects.movementguide
         {
             var gsm = GetNode("/root/Root/Systems/GameStateManager");
             gsm.Connect(SignalNames.Characters.SELECTED, this, SignalNames.Characters.SELECTED_METHOD);
-            gsm.Connect(SignalNames.Characters.SELECTION_CLEARED, this, SignalNames.Characters.SELECTION_CLEARED_METHOD);
+            //gsm.Connect(SignalNames.Characters.SELECTION_CLEARED, this, SignalNames.Characters.SELECTION_CLEARED_METHOD);
 
             parent.Connect("_Character_Ready", this, "_On_Character_Ready");
 
@@ -66,16 +66,11 @@ namespace FaffLatest.scripts.effects.movementguide
             CreateMeshes();
         }
 
-        private void _On_Character_SelectionCleared()
-        {
-            Hide();
-        }
-
         private void _On_Character_Selected(Node character)
         {
             if(character != parent)
             {
-                _On_Character_SelectionCleared();                   
+                Hide();                   
                 return;
             }
 
@@ -165,10 +160,10 @@ namespace FaffLatest.scripts.effects.movementguide
 
         private void _On_Cell_Mouse_Entered(Node node)
         {
-            GD.Print($"Entered {node.Name}");
+            //GD.Print($"Entered {node.Name}");
             if(node is CharacterMovementGuideCell cell)
             {
-                GD.Print($"cell");
+                //GD.Print($"cell");
                 var path = astar.GetMovementPath(body.Transform.origin, cell.GlobalTransform.origin, parent.Stats.MaxMovementDistancePerTurn);
 
                 ClearExistingPath();
@@ -177,12 +172,20 @@ namespace FaffLatest.scripts.effects.movementguide
                     return;
 
                 currentPath = new CharacterMovementGuideCell[path.Length];
-
+                int pathCount = 0;
                 for(var x = 0; x < path.Length; x++)
                 {
-                    GD.Print($"Path is : {path[x]?.Destination}");
-                    currentPath[x] = GetCellAndSetAsPathPart(path[x].Destination - body.Transform.origin);
+                    if(path[x] == null)
+                    {
+                        break;
+                    }
+
+                    currentPath[pathCount] = GetCellAndSetAsPathPart(path[x].Destination - body.Transform.origin);
+                    pathCount++;
                 }
+
+                System.Array.Resize(ref currentPath, pathCount);
+
             }
         }
 
@@ -215,7 +218,7 @@ namespace FaffLatest.scripts.effects.movementguide
         {
             if (currentPath != null)
             {
-                GD.Print($"Clearing path");
+                //GD.Print($"Clearing path");
                 for (var x = 0; x < currentPath.Length; x++)
                 {
                     currentPath[x].SetPartOfPath(false);
@@ -225,7 +228,7 @@ namespace FaffLatest.scripts.effects.movementguide
 
         private void _On_Cell_Mouse_Exited(Node node)
         {
-            GD.Print($"Exited {node.Name}");
+            //GD.Print($"Exited {node.Name}");
         }       
 
         private void _On_Cell_Clicked(Node node, InputEventMouseButton mouseInput)
@@ -233,8 +236,9 @@ namespace FaffLatest.scripts.effects.movementguide
             if(mouseInput.ButtonIndex == 2)
             {
                 var cell = node as CharacterMovementGuideCell;
-                var worldPos = cell.Transform.origin + body.Transform.origin;
+                var worldPos = cell.GlobalTransform.origin;
                 EmitSignal("_Character_MoveOrder", worldPos);
+                Hide();
             }
         }
 

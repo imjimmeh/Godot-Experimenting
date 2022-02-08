@@ -10,7 +10,7 @@ namespace FaffLatest.scripts.movement
         {
             var convertedPath = new MovementPathNode[simplePath.Length - 1];
 
-            GD.Print($"Found path is {string.Join(",", simplePath)}");
+            //GD.Print($"Found path is {string.Join(",", simplePath)}");
             var sb = new StringBuilder();
             float currentDistance = 0;
             for (var x = 1; x < simplePath.Length; x++)

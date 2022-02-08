@@ -17,6 +17,8 @@ namespace FaffLatest.scripts.characters
 		[Export]
 		public CharacterStats Stats;
 
+		public bool IsActive = false;
+
 		public override void _Ready()
 		{
 			base._Ready();

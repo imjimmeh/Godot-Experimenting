@@ -29,6 +29,7 @@ namespace FaffLatest.scripts.effects
 
 			for (var x = 0; x < path.Length; x++)
 			{
+				GD.Print($"{x} - {path[x]?.Destination}");
 				var newMesh = MovementPathFactory.CreateMeshInstanceForPoint(path[x].Destination, SetPlaneVariables());
 
 				SetMeshVariables(body, newMesh);
@@ -46,6 +47,7 @@ namespace FaffLatest.scripts.effects
 
 		private static void ConnectSignals(Node body, CharacterMovementPath newMesh)
 		{
+			//GD.Print($"Connected mesh");
 			body.Connect(SignalNames.Characters.REACHED_PATH_PART, newMesh, SignalNames.Characters.REACHED_PATH_PART_METHOD);
 		}
 
@@ -63,7 +65,7 @@ namespace FaffLatest.scripts.effects
 
 		private void _On_Character_FinishedMoving(Node character, Vector3 newPosition)
 		{
-			GD.Print("Disposing");
+			//GD.Print("Disposing");
 			DisposeMesh();
 		}
 
@@ -76,7 +78,10 @@ namespace FaffLatest.scripts.effects
 			{
 				if(part != null)
 				{
-					part.DisconnectAndDispose();
+					if(!part.isHidden)
+						part.DisconnectAndRemove();
+
+					part.Dispose();
 				}
 			}
 

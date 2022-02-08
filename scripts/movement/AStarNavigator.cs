@@ -131,7 +131,7 @@ namespace FaffLatest.scripts.movement
 				if(path == null)
                 {
 					return null;
-					GD.Print($"Could not find path from {nearestStart} to {nearestEnd}");
+					//GD.Print($"Could not find path from {nearestStart} to {nearestEnd}");
                 }
 				var converted = NavigationHelper.GetMovementPathNodes(path, movementDistance);
 				//GD.Print($"Going from {start} to {end}");
@@ -142,7 +142,7 @@ namespace FaffLatest.scripts.movement
 			}
 			catch(Exception ex)
 			{
-				GD.Print($"Error getting path - {ex.Message}");
+				//GD.Print($"Error getting path - {ex.Message}");
 				return null;
 				//
 				//GD.Print(ex.StackTrace);
