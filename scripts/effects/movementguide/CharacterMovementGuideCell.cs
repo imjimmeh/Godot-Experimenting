@@ -83,11 +83,11 @@ namespace FaffLatest.scripts.effects.movementguide
 		}
 
 		public void CalculateVisiblity(float movementDistanceLeft)
-        {
+		{
 			bool shouldHide = IsOutsideWorldBounds() || PositionIsOccupied() || IsOutsideMovementDistance(movementDistanceLeft);
 
-            SetVisiblity(!shouldHide);
-        }
+			SetVisiblity(!shouldHide);
+		}
 
 		private bool IsOutsideMovementDistance(float movementDistanceLeft)
 			=> (Transform.origin).Length() > movementDistanceLeft;
@@ -97,7 +97,7 @@ namespace FaffLatest.scripts.effects.movementguide
 		private bool IsOutsideWorldBounds()
 			=> GlobalTransform.origin.x < 1 || GlobalTransform.origin.x >= 50 || GlobalTransform.origin.z < 1 || GlobalTransform.origin.z >= 50;
 
-        private bool PositionIsOccupied()
+		private bool PositionIsOccupied()
 		{
 			var astarPoint = AStar.GetPointInfoForVector3(GlobalTransform.origin);
 

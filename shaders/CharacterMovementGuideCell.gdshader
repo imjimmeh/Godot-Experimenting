@@ -1,6 +1,7 @@
 shader_type spatial;
 
-uniform float alpha = 0.8;
+uniform float alpha = 0.5;
+
 uniform vec3 highlightedColour = vec3(0.0,1.0,0.0);
 uniform vec3 normalColour = vec3(1.0,0.0,0.0);
 uniform vec3 pathColour = vec3(1.0,0.0,1.0);
@@ -20,13 +21,14 @@ vec3 GetColour(){
 	{
 		colour = highlightedColour;
 	}
-		
+	
 	return colour;
 }
 
 void fragment(){ 
 	vec3 colour = GetColour();   
 	
+	
 	ALBEDO = colour;
-	ALPHA = alpha;
+	ALPHA = colour == normalColour ? alpha * 0.5 : alpha;
 }

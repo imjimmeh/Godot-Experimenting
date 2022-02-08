@@ -11,7 +11,7 @@ config_version=4
 [application]
 
 config/name="FaffLatest"
-run/main_scene="res://scenes/testing.tsc.tscn"
+run/main_scene="res://scenes/menus/MainMenu.tscn"
 config/icon="res://icon.png"
 
 [input]

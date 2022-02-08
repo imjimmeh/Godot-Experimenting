@@ -2,8 +2,9 @@ using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
 using FaffLatest.scripts.effects;
 using FaffLatest.scripts.movement;
+using FaffLatest.scripts.ui;
 using Godot;
-
+using System;
 
 namespace FaffLatest.scripts.state
 {
@@ -17,7 +18,13 @@ namespace FaffLatest.scripts.state
 		private Node playerCharactersRoot;
 		private Node characterMovementPathManager;
 
-		public override void _Ready()
+		private UIElementContainer ui;
+
+		private Character[] characters;
+
+        public Character[] Characters { get => characters; set => characters = value; }
+
+        public override void _Ready()
 		{
 			FindNeededNodes();
 			Preload();
@@ -39,13 +46,28 @@ namespace FaffLatest.scripts.state
 
 		public void SpawnCharacters(CharacterCreationStats[] charactersToCreate)
         {
+			Character[] characters = new Character[charactersToCreate.Length];
+
+			int pc = 0;
+
 			for(var x = 0; x < charactersToCreate.Length; x++)
             {
-				SpawnCharacter(charactersToCreate[x]);
-            }
+				var character = SpawnCharacter(charactersToCreate[x]);
+
+				if(character.Stats.IsPlayerCharacter)
+                {
+					characters[pc] = character;
+					pc++;
+                }
+
+			}
+
+			Array.Resize(ref characters, pc);
+
+			this.characters = characters;
         }
 
-		public void SpawnCharacter(CharacterCreationStats stats)
+		public Character SpawnCharacter(CharacterCreationStats stats)
         {
             var newCharacter = characterBase.Instance<Character>();
 
@@ -64,6 +86,8 @@ namespace FaffLatest.scripts.state
 			AddCharacterSignals(newCharacterKinematicBody);
 
 			astarNavigator._On_Character_Created(newCharacter);
+
+			return newCharacter;
 		}
 
 		private void AddCharacterSignals(Node newCharacterKinematicBody)
@@ -83,6 +107,7 @@ namespace FaffLatest.scripts.state
 			characterMovementPathManager = GetNode<CharacterMovementPathManager>("/root/Root/Effects/CharacterMovementPath");
 			playerCharactersRoot = GetNode<Node>("/root/Root/Characters/Player");
 			inputManager = GetNode<Node>("../InputManager");
+			ui = GetNode<UIElementContainer>("/root/Root/UI");
 		}
 
 		private void Preload()

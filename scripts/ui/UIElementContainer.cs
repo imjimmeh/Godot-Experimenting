@@ -6,18 +6,28 @@ namespace FaffLatest.scripts.ui
 { 
 	public class UIElementContainer : Node
 	{
-		private TextureRect characterFaceIcon;
-		public TextureRect CharacterFaceIcon => characterFaceIcon;
+		private Control selectedCharacterPart;
 
+		private TextureRect characterFaceIcon;
+		public TextureRect CharacterFaceIcon {get =>characterFaceIcon; private set => characterFaceIcon = value;}
+
+		public Label CharacterName;
+
+		public CharacterSelector CharacterSelector { get; private set; }
 		public override void _Ready()
 		{
-			base._Ready();
-
-			characterFaceIcon = GetNode<TextureRect>("CharacterIcon");
+			selectedCharacterPart = GetNode<Control>("SelectedCharacter");
 
 			var viewportSize = GetViewport().GetVisibleRect().Size;
 
-			characterFaceIcon.RectPosition = new Vector2(viewportSize.x - 148, viewportSize.y - 148);
+			selectedCharacterPart.RectPosition = new Vector2(viewportSize.x - 200, viewportSize.y - 200);
+
+			CharacterFaceIcon = selectedCharacterPart.	GetNode<TextureRect>("CharacterIcon");
+			CharacterName = CharacterFaceIcon.GetNode<Label>("Name");
+
+			CharacterSelector = GetNode<CharacterSelector>("CharacterSelector");
+
+			base._Ready();
 		}
 
 	}

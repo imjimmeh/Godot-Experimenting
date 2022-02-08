@@ -85,7 +85,7 @@ namespace FaffLatest.scripts.input
 			{
 				if (gameStateManager.SelectedCharacter.Stats.CanMove)
 				{
-					IssueMoveOrder(position);
+					//IssueMoveOrder(position);
 				}
 			}
 			else
@@ -96,7 +96,7 @@ namespace FaffLatest.scripts.input
 		}
 
 		private void _On_Character_MoveOrder(Vector3 position)
-        {
+		{
 			if (gameStateManager.SelectedCharacter.Stats.CanMove)
 			{
 				IssueMoveOrder(position);
@@ -129,10 +129,10 @@ namespace FaffLatest.scripts.input
 			var convertedPath = aStarNavigator.GetMovementPath(body.Transform.origin, position, gameStateManager.SelectedCharacter.Stats.MaxMovementDistancePerTurn); // navigation.GetMovementPathNodes(body.Transform, position);
 
 			if(convertedPath == null)
-            {
+			{
 				//GD.Print("Cannot move here");
 				return;
-            }
+			}
 
 			//GD.Print($"We can move {gameStateManager.SelectedCharacter}");
 			if(convertedPath.Length > gameStateManager.SelectedCharacter.Stats.MaxMovementDistancePerTurn)

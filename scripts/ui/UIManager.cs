@@ -5,51 +5,52 @@ using Godot;
 namespace FaffLatest.scripts.ui
 {
 
-    public class UIManager : Node
+	public class UIManager : Node
 	{
 		private UIElementContainer elementContainer;
 
-		public override void _Ready()
-        {
-            base._Ready();
+		public UIElementContainer ElementContainer { get => elementContainer; private set => elementContainer = value; }
 
-            FindChildren();
+		public override void _Ready()
+		{
+			base._Ready();
+
+			FindChildren();
 		}
 
 		private void FindChildren()
-        {
-            elementContainer = GetNode<UIElementContainer>("/root/Root/UI");
-        }
+		{
+			ElementContainer = GetNode<UIElementContainer>("/root/Root/UI");
+		}
 
-        private void RegisterSignals()
+		private void RegisterSignals()
 		{
 
 		}
 
 		private void _On_Character_Selected(Character character)
 		{
-			elementContainer.CharacterFaceIcon.Texture = character.Stats.FaceIcon;
+			ElementContainer.CharacterFaceIcon.Texture = character.Stats.FaceIcon;
+			ElementContainer.CharacterName.Text = character.Stats.CharacterName;
 		}
 
 		private void _On_Character_Unselected()
 		{
-			elementContainer.CharacterFaceIcon.Texture = null;
+			ElementContainer.CharacterFaceIcon.Texture = null;
+			ElementContainer.CharacterName.Text = "";
 		}
 
 		private void _On_Turn_Change(string whoseTurn)
-        {
-            var newLabel = new LabelWithTimeToLive
-            {
-                Text = $"{whoseTurn} Turn"
-            };
+		{
+			var newLabel = new LabelWithTimeToLive
+			{
+				Text = $"{whoseTurn} Turn"
+			};
 
-            var viewportSize = GetViewport().GetVisibleRect().Size;
+			var viewportSize = GetViewport().GetVisibleRect().Size;
 
 			newLabel.RectPosition = new Vector2(viewportSize.x * 0.5f, viewportSize.y * 0.5f);
-			elementContainer.AddChild(newLabel);
-
-
-			//GD.Print("Created turn change text");
+			ElementContainer.AddChild(newLabel);
 		}
 	}
 

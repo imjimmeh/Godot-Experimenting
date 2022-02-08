@@ -1,18 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FaffLatest.scripts.characters;
 using Godot;
-using FaffLatest.scripts.characters;
+using System;
+
 namespace FaffLatest.scripts.map
 {
     public class MapInfo : Resource
     {
-        [Export]
-        public PackedScene Environment { get; set; }
+        public MapInfo()
+        {
+        }
+
+        public MapInfo(PackedScene level = null)
+        {
+            Level = level;
+        }
 
         [Export]
-        public Character[] Characters { get; set; }
+        public PackedScene Level { get; set; }
     }
 }

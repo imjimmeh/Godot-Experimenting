@@ -1,0 +1,39 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://scripts/ui/BackgroundColour.cs" type="Script" id=1]
+[ext_resource path="res://scripts/menus/MainMenu.cs" type="Script" id=2]
+[ext_resource path="res://resources/fonts/TitilliumWeb-s72.tres" type="DynamicFont" id=3]
+
+[node name="Control" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+FontToUse = ExtResource( 3 )
+
+[node name="BackgroundColour" type="ColorRect" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+color = Color( 0, 0.298039, 1, 1 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="GameTitle" type="RichTextLabel" parent="."]
+margin_right = 130.0
+margin_bottom = 47.0
+text = "ZomboCom!!!"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="StartGame" type="Button" parent="."]
+margin_left = 476.0
+margin_top = 266.0
+margin_right = 568.0
+margin_bottom = 286.0
+text = "START GAME"
+flat = true
