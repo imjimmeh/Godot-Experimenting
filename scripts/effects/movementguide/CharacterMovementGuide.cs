@@ -12,10 +12,12 @@ namespace FaffLatest.scripts.effects.movementguide
         private bool isVisible = false;
         private AStarNavigator astar;
 
-        private MeshInstance[] existingMovementGuide;
+        private CharacterMovementGuideCell[] existingMovementGuide;
 
         private Character parent;
         private KinematicBody body;
+
+        private Basis initialRotation;
 
         [Export]
         public Material MeshMaterial;
@@ -26,10 +28,15 @@ namespace FaffLatest.scripts.effects.movementguide
 
             astar = GetNode<AStarNavigator>("/root/Root/Systems/AStarNavigator");
             parent = GetNode<Character>("../../");
-            body = parent.CharacterKinematicBody as KinematicBody;
+            GetBody();
 
             ConnectSignals();
             Hide();
+        }
+
+        private void GetBody()
+        {
+            body = parent.CharacterKinematicBody as KinematicBody;
         }
 
         private void ConnectSignals()
@@ -49,13 +56,27 @@ namespace FaffLatest.scripts.effects.movementguide
         private void _On_Character_SelectionCleared()
         {
             Hide();
+            isVisible = false;
         }
 
         private void _On_Character_Selected(Node character)
         {
             if(character != parent)
             {
+                _On_Character_SelectionCleared();                   
                 return;
+            }
+
+            if (body == null)
+                GetBody();
+
+            if (body == null)
+                throw new Exception("Player body is null?");
+
+            RotationDegrees = body.RotationDegrees * -1;
+            for (var x = 0; x < existingMovementGuide.Length; x++)
+            {
+                existingMovementGuide[x].CalculateVisiblity(body.Transform.origin);
             }
 
             Show();
@@ -76,8 +97,7 @@ namespace FaffLatest.scripts.effects.movementguide
             int meshCount = 0;
             int totalPossibleMeshCount = (int)((maxX - minX) * (maxZ - minZ));
 
-            existingMovementGuide = new MeshInstance[totalPossibleMeshCount];
-
+            existingMovementGuide = new CharacterMovementGuideCell[totalPossibleMeshCount];
             for (var a = minX; a <= maxX; a += astar.GridSize)
             {
                 for (var b = minZ; b <= maxZ; b += astar.GridSize)
@@ -114,15 +134,16 @@ namespace FaffLatest.scripts.effects.movementguide
             return (true, meshCount);
         }
 
-        private MeshInstance CreateMesh(Vector3 currentVector)
+        private CharacterMovementGuideCell CreateMesh(Vector3 currentVector)
         {
-            var meshInstance = new MeshInstance();
+            var meshInstance = new CharacterMovementGuideCell();
             meshInstance.Transform = new Transform(new Quat(0, 100,0,0), currentVector);
             meshInstance.Mesh = new PlaneMesh
             {
                 Size = new Vector2(1, 1)
             };
 
+            meshInstance.AStar = astar;
             var shader = MeshMaterial as ShaderMaterial;
             shader.SetShaderParam("Colour", new Vector3(1.0f, 0.0f, 0.0f));
             shader.SetShaderParam("Alpha", 0.8f);

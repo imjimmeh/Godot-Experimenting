@@ -125,6 +125,12 @@ namespace FaffLatest.scripts.input
 
 			var convertedPath = aStarNavigator.GetMovementPath(body.Transform.origin, position, gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance); // navigation.GetMovementPathNodes(body.Transform, position);
 
+			if(convertedPath == null)
+            {
+				GD.Print("Cannot move here");
+				return;
+            }
+
 			GD.Print($"We can move {gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance}");
 			if(convertedPath.Length > gameStateManager.CurrentlySelectedCharacter.Stats.MovementDistance)
 			{

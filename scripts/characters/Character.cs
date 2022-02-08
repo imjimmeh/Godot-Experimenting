@@ -2,7 +2,7 @@ using Godot;
 
 namespace FaffLatest.scripts.characters
 {
-    public class Character : Spatial
+	public class Character : Spatial
 	{
 		[Signal]
 		public delegate void _Character_Ready(Node character);

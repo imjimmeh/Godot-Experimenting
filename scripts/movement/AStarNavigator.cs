@@ -114,14 +114,24 @@ namespace FaffLatest.scripts.movement
 				(var startX, var startY) = ((int)start.x, (int)start.z);
 				(var endX, var endY) = ((int)end.x, (int)end.z);
 
-				var nearestStart = Points[startX, startY]; // astar.GetClosestPoint(start);
-				var nearestEnd = Points[endX, endY];
+				PointInfo nearestStart = Points[startX, startY]; // astar.GetClosestPoint(start);
+				PointInfo nearestEnd = Points[endX, endY];
 
 				var s = astar.GetPointPosition(nearestStart.Id);
 				var e = astar.GetPointPosition(nearestEnd.Id);
 
+				if(nearestEnd.OccupyingNode != null)
+                {
+					return null;
+                }
+
 				GD.Print($"Nearest Start {s} vs {start} - End is {e} vs {end}");
 				var path = astar.GetPointPath(nearestStart.Id, nearestEnd.Id);
+
+				if(path == null)
+                {
+					GD.Print($"Could not find path from {nearestStart} to {nearestEnd}");
+                }
 				var converted = NavigationHelper.GetMovementPathNodes(path, movementDistance);
 				GD.Print($"Going from {start} to {end}");
 				GD.Print($"Start path is {path[0]} and is {path[path.Length - 1]}");
@@ -173,11 +183,14 @@ namespace FaffLatest.scripts.movement
 			if (characterLocations.TryGetValue(character, out PointInfo oldLocationPointInfo))
 			{
 				astar.SetPointDisabled(oldLocationPointInfo.Id, false);
+				var newOccupyingNode = GetPointInfoForVector3(newPosition);
 
-				var newOccupyingNode = astar.GetClosestPoint(newPosition);
-				astar.SetPointDisabled(newOccupyingNode);
+				astar.SetPointDisabled(newOccupyingNode.Id);
+
+				GD.Print($"Found new node {newOccupyingNode} for {newPosition} which should be {astar.GetPointPosition(newOccupyingNode.Id)}");
 
 				oldLocationPointInfo.SetOccupier(null);
+				newOccupyingNode.SetOccupier(character);
 
 				characterLocations[character] = GetPointInfoForVector3(newPosition);
 			}
@@ -187,7 +200,7 @@ namespace FaffLatest.scripts.movement
 			}
 		}
 
-		private PointInfo GetPointInfoForVector3(Vector3 location)
+		public PointInfo GetPointInfoForVector3(Vector3 location)
 			=> GetPointInfoForFloats(location.x, location.z);
 
 		private PointInfo GetPointInfoForFloats(float x, float y)
