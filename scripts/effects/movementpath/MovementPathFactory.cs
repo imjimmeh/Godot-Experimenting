@@ -19,7 +19,6 @@ namespace FaffLatest.scripts.effects
 
 		public static CharacterMovementPath CreateMeshInstanceForPoint(Vector3 point, Action<PlaneMesh> options = null)
 		{
-            GD.Print("Created mesh");
             var meshInstance = new CharacterMovementPath
             {
                 Mesh = CreatePlaneForPoint(point, options)

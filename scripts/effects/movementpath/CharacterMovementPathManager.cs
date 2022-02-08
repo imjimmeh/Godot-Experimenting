@@ -29,7 +29,6 @@ namespace FaffLatest.scripts.effects
 
 			for (var x = 0; x < path.Length; x++)
 			{
-				GD.Print($"{x} - {path[x]?.Destination}");
 				var newMesh = MovementPathFactory.CreateMeshInstanceForPoint(path[x].Destination, SetPlaneVariables());
 
 				SetMeshVariables(body, newMesh);

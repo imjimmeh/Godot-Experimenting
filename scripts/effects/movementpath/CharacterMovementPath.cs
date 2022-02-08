@@ -28,7 +28,7 @@ namespace FaffLatest.scripts.effects
         private void DisconnectSignals()
         {
             characterBody.Disconnect(SignalNames.Characters.REACHED_PATH_PART, this, SignalNames.Characters.REACHED_PATH_PART_METHOD);
-            GD.Print($"Disconnected mesh");
+            //GD.Print($"Disconnected mesh");
         }
 
         private bool ShouldHidePart(Node character, Vector3 pathLocation)

@@ -26,7 +26,7 @@ namespace FaffLatest.scripts.state
         public AStarNavigator AStarNavigator { get; private set; }
         public SpawnManager SpawnManager { get; private set; }
 
-        public bool CharacterIsActive = false;
+        public bool CharacterIsActive => SelectedCharacter != null && SelectedCharacter.IsActive;
 
         public override void _Ready()
         {
@@ -81,7 +81,7 @@ namespace FaffLatest.scripts.state
 
         public static void SetCharacterActive(Character character, bool isActive = true)
         {
-
+            character.IsActive = isActive;
         }
 
         private void CheckTurnIsFinished(Character c)

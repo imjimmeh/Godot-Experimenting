@@ -45,7 +45,7 @@ namespace FaffLatest.scripts.input
 
 		private void _On_Character_Mouse_Released(Character character, InputEventMouseButton mouseButtonEvent)
 		{
-			if(mouseButtonEvent.ButtonIndex == 1 && character.Stats.IsPlayerCharacter)
+			if(mouseButtonEvent.ButtonIndex == 1 && character.Stats.IsPlayerCharacter && !gameStateManager.CharacterIsActive)
 			{
 				//GD.Print("yes");
 				gameStateManager.SetCurrentlySelectedCharacter(character);
