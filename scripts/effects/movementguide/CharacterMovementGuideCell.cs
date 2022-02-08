@@ -7,6 +7,9 @@ namespace FaffLatest.scripts.effects.movementguide
 {
 	public class CharacterMovementGuideCell : MeshInstance
 	{
+		private const string SHADER_PATHPART_PARAM = "isPartOfPath";
+		private const string SHADER_TARGETCELL_PARAM = "isTargetCell";
+
 		private ShaderMaterial material;
 
 		[Signal]
@@ -19,15 +22,10 @@ namespace FaffLatest.scripts.effects.movementguide
 		public delegate void _Mouse_Exited(Node node);
 
 		public bool MouseIsOver = false;
+		public bool IsPartOfPath = false;
 
 		public AStarNavigator AStar;
 
-		[Export(PropertyHint.ColorNoAlpha)]
-		public Vector3 HighlightedColour { get; set; } = new Vector3(0.0f, 0.0f, 1.0f);
-
-		[Export(PropertyHint.ColorNoAlpha)]
-		public Vector3 NormalColour { get; set; } = new Vector3(1.0f, 0.0f, 0.0f);
-		
 		public override void _Ready()
 		{
 			base._Ready();
@@ -37,12 +35,20 @@ namespace FaffLatest.scripts.effects.movementguide
 			Connect("_Clicked_On", GetNode("../"), "_On_Cell_Clicked");
 		}
 
+		public void SetPartOfPath(bool isPathPart)
+		{
+			IsPartOfPath = isPathPart;
+			MouseIsOver = false;
+
+			material.SetShaderParam(SHADER_PATHPART_PARAM, isPathPart);
+		}
+
 		private void _On_Mouse_Entered()
 		{
 			MouseIsOver = true;
 			EmitSignal("_Mouse_Entered", this);
 
-			material.SetShaderParam("colour", HighlightedColour);
+			material.SetShaderParam(SHADER_TARGETCELL_PARAM, true);
 		}
 		
 		private void _On_Mouse_Exited()
@@ -50,9 +56,8 @@ namespace FaffLatest.scripts.effects.movementguide
 			MouseIsOver = false;
 			EmitSignal("_Mouse_Exited", this);
 
-			material.SetShaderParam("colour", NormalColour);
+			material.SetShaderParam("isTargetCell", false);
 		}
-
 
 		private void _on_StaticBody_input_event(Godot.Object camera, InputEvent inputEvent, Vector3 position, Vector3 normal, int shapeIdx)
 		{
@@ -72,7 +77,9 @@ namespace FaffLatest.scripts.effects.movementguide
 			if (!visible)
 				Hide();
 			else
+			{
 				Show();
+			}
 		}
 
 		public void CalculateVisiblity(Vector3 parentOrigin)

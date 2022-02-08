@@ -4,11 +4,14 @@ using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
 using FaffLatest.scripts.movement;
 using Godot;
+using Godot.Collections;
 
 namespace FaffLatest.scripts.effects.movementguide
 {
     public class CharacterMovementGuide : Spatial
     {
+        private CharacterMovementGuideCell[] currentPath;
+
         [Signal]
         public delegate void _Character_MoveOrder(Vector3 position);
 
@@ -16,7 +19,8 @@ namespace FaffLatest.scripts.effects.movementguide
 
         private AStarNavigator astar;
 
-        private CharacterMovementGuideCell[] existingMovementGuide;
+        private Dictionary<Vector2, CharacterMovementGuideCell> existingMovementGuide;
+        private int movementGuideCount = 0;
 
         private Character parent;
         private KinematicBody body;
@@ -82,10 +86,9 @@ namespace FaffLatest.scripts.effects.movementguide
                 throw new Exception("Player body is null?");
 
             RotationDegrees = body.RotationDegrees * -1;
-            for (var x = 0; x < existingMovementGuide.Length; x++)
-            {
-                existingMovementGuide[x].CalculateVisiblity(body.Transform.origin);
-            }
+
+            foreach (var cell in existingMovementGuide)
+                cell.Value.CalculateVisiblity(body.Transform.origin);
 
             Show();
         }
@@ -102,24 +105,20 @@ namespace FaffLatest.scripts.effects.movementguide
 
             (var minX, var minZ) = GetMinimumPossibleValues(parent, x, z);
 
-            int meshCount = 0;
             int totalPossibleMeshCount = (int)((maxX - minX) * (maxZ - minZ));
 
-            existingMovementGuide = new CharacterMovementGuideCell[totalPossibleMeshCount];
+            existingMovementGuide = new Dictionary<Vector2, CharacterMovementGuideCell>();
+
             for (var a = minX; a <= maxX; a += astar.GridSize)
             {
                 for (var b = minZ; b <= maxZ; b += astar.GridSize)
                 {
-                    (var success, var count) = ProcessCoordinates(pos, meshCount, a, b);
-
-                    meshCount = count;
+                    ProcessCoordinates(pos, a, b);
                 }
             }
-
-            Array.Resize(ref existingMovementGuide, meshCount);
         }
 
-        private (bool valid, int meshCount) ProcessCoordinates(Vector3 pos, int meshCount, float a, float b)
+        private void ProcessCoordinates(Vector3 pos, float a, float b)
         {
             var currentVector = new Vector3(a, pos.y, b);
 
@@ -130,21 +129,27 @@ namespace FaffLatest.scripts.effects.movementguide
 
             if (tooFar)
             {
-                return (false, meshCount);
+                return;
             }
 
-            var meshInstance = CreateMesh(currentVector);
+            BuildMesh(a, b, currentVector);
+
+            return;
+        }
+
+        private void BuildMesh(float a, float b, Vector3 currentVector)
+        {
+            var meshInstance = CreateMeshInstance(currentVector);
 
             meshInstance.Connect("_Mouse_Entered", this, "_On_Cell_Mouse_Entered");
             meshInstance.Connect("_Mouse_Exited", this, "_On_Cell_Mouse_Exited");
 
             AddChild(meshInstance);
-            existingMovementGuide[meshCount] = meshInstance;
-            meshCount++;
-            return (true, meshCount);
+            existingMovementGuide[new Vector2(a, b)] = meshInstance;
+            movementGuideCount++;
         }
 
-        private CharacterMovementGuideCell CreateMesh(Vector3 currentVector)
+        private CharacterMovementGuideCell CreateMeshInstance(Vector3 currentVector)
         {
             var meshInstanceNode = MovementGuideCellScene.Instance();
 
@@ -161,12 +166,63 @@ namespace FaffLatest.scripts.effects.movementguide
         private void _On_Cell_Mouse_Entered(Node node)
         {
             GD.Print($"Entered {node.Name}");
+            if(node is CharacterMovementGuideCell cell)
+            {
+                GD.Print($"cell");
+                var path = astar.GetMovementPath(body.Transform.origin, cell.GlobalTransform.origin, parent.Stats.MovementDistance);
+
+                ClearExistingPath();
+
+                currentPath = new CharacterMovementGuideCell[path.Length];
+
+                for(var x = 0; x < path.Length; x++)
+                {
+                   currentPath[x] = GetCellAndSetAsPathPart(path[x].Destination - body.Transform.origin);
+                }
+            }
+        }
+
+        private CharacterMovementGuideCell GetCellAndSetAsPathPart(Vector3 targetVector)
+        {
+            var newPathCell = GetCellFromLocalTransform(targetVector);
+
+            if (newPathCell == null)
+                throw new Exception($"Error - could not find cell for {targetVector}");
+
+            newPathCell.SetPartOfPath(true);
+
+            return newPathCell;
+        }
+
+        private CharacterMovementGuideCell GetCellFromLocalTransform(Vector3 targetVector)
+        {
+            (int intX, int intY) = ((int)targetVector.x, (int)targetVector.z);
+            var vector = new Vector2(intX, intY);
+
+            if (existingMovementGuide.TryGetValue(vector, out CharacterMovementGuideCell foundCell))
+            {
+                return foundCell;
+            }
+
+            return null;
+        }
+
+        private void ClearExistingPath()
+        {
+            if (currentPath != null)
+            {
+                GD.Print($"Clearing path");
+                for (var x = 0; x < currentPath.Length; x++)
+                {
+                    currentPath[x].SetPartOfPath(false);
+                }
+            }
         }
 
         private void _On_Cell_Mouse_Exited(Node node)
         {
             GD.Print($"Exited {node.Name}");
-        }
+        }       
 
         private void _On_Cell_Clicked(Node node, InputEventMouseButton mouseInput)
         { 
