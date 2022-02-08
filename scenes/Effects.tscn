@@ -5,4 +5,5 @@
 [node name="Effects" type="Node"]
 
 [node name="CharacterMovementPath" type="Spatial" parent="."]
+process_priority = 10
 script = ExtResource( 1 )

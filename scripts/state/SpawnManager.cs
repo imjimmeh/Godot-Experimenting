@@ -35,7 +35,6 @@ namespace FaffLatest.scripts.state
 			};
 
 			SpawnCharacters(characters);
-
 		}
 
 		public void SpawnCharacters(CharacterCreationStats[] charactersToCreate)
@@ -70,7 +69,6 @@ namespace FaffLatest.scripts.state
 		private void AddCharacterSignals(Node newCharacterKinematicBody)
 		{
 			inputManager.Connect(SignalNames.Characters.MOVE_TO, newCharacterKinematicBody, "_On_Character_MoveTo");
-			inputManager.Connect(SignalNames.Characters.MOVE_TO, characterMovementPathManager, "_On_Character_MoveTo");
 			//GD.Print(characterMovementPath.Name);
 
 			newCharacterKinematicBody.Connect(SignalNames.Characters.CLICKED_ON, inputManager, SignalNames.Characters.CLICKED_ON_METHOD);

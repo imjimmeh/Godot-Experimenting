@@ -9,7 +9,11 @@ namespace FaffLatest.scripts.effects.movementguide
 {
     public class CharacterMovementGuide : Spatial
     {
-        private bool isVisible = false;
+        [Signal]
+        public delegate void _Character_MoveOrder(Vector3 position);
+
+        private Node currentlyHighlightedNode;
+
         private AStarNavigator astar;
 
         private CharacterMovementGuideCell[] existingMovementGuide;
@@ -21,6 +25,9 @@ namespace FaffLatest.scripts.effects.movementguide
 
         [Export]
         public Material MeshMaterial;
+
+        [Export]
+        public PackedScene MovementGuideCellScene;
 
         public override void _Ready()
         {
@@ -46,6 +53,8 @@ namespace FaffLatest.scripts.effects.movementguide
             gsm.Connect(SignalNames.Characters.SELECTION_CLEARED, this, SignalNames.Characters.SELECTION_CLEARED_METHOD);
 
             parent.Connect("_Character_Ready", this, "_On_Character_Ready");
+
+            Connect("_Character_MoveOrder", GetNode("/root/Root/Systems/InputManager"), "_On_Character_MoveOrder");
         }
 
         private void _On_Character_Ready(Node character)
@@ -56,7 +65,6 @@ namespace FaffLatest.scripts.effects.movementguide
         private void _On_Character_SelectionCleared()
         {
             Hide();
-            isVisible = false;
         }
 
         private void _On_Character_Selected(Node character)
@@ -126,30 +134,48 @@ namespace FaffLatest.scripts.effects.movementguide
             }
 
             var meshInstance = CreateMesh(currentVector);
+
+            meshInstance.Connect("_Mouse_Entered", this, "_On_Cell_Mouse_Entered");
+            meshInstance.Connect("_Mouse_Exited", this, "_On_Cell_Mouse_Exited");
+
             AddChild(meshInstance);
             existingMovementGuide[meshCount] = meshInstance;
-
             meshCount++;
-
             return (true, meshCount);
         }
 
         private CharacterMovementGuideCell CreateMesh(Vector3 currentVector)
         {
-            var meshInstance = new CharacterMovementGuideCell();
+            var meshInstanceNode = MovementGuideCellScene.Instance();
+
+            var meshInstance = meshInstanceNode as CharacterMovementGuideCell;
+            meshInstance.Mesh.ResourceLocalToScene = true;
+
             meshInstance.Transform = new Transform(new Quat(0, 100,0,0), currentVector);
-            meshInstance.Mesh = new PlaneMesh
-            {
-                Size = new Vector2(1, 1)
-            };
-
             meshInstance.AStar = astar;
-            var shader = MeshMaterial as ShaderMaterial;
-            shader.SetShaderParam("Colour", new Vector3(1.0f, 0.0f, 0.0f));
-            shader.SetShaderParam("Alpha", 0.8f);
 
-            meshInstance.SetSurfaceMaterial(0, shader);
+            meshInstance.Name = currentVector.ToString();
             return meshInstance;
+        }
+
+        private void _On_Cell_Mouse_Entered(Node node)
+        {
+            GD.Print($"Entered {node.Name}");
+        }
+
+        private void _On_Cell_Mouse_Exited(Node node)
+        {
+            GD.Print($"Exited {node.Name}");
+        }
+
+        private void _On_Cell_Clicked(Node node, InputEventMouseButton mouseInput)
+        { 
+            if(mouseInput.ButtonIndex == 2)
+            {
+                var cell = node as CharacterMovementGuideCell;
+                var worldPos = cell.Transform.origin + body.Transform.origin;
+                EmitSignal("_Character_MoveOrder", worldPos);
+            }
         }
 
 

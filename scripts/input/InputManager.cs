@@ -24,11 +24,6 @@ namespace FaffLatest.scripts.input
 			gameStateManager = GetNode<GameStateManager>("../GameStateManager");
 		}
 
-		public void ConnectWorldClickedOnSignal(Node element)
-		{
-			element.Connect(constants.SignalNames.World.CLICKED_ON, this, "_On_World_ClickedOn");
-		}
-
 		private void _On_Character_ClickedOn(Character character, InputEventMouseButton mouseButtonEvent)
 		{
 			//GD.Print($"Mouse button {mouseButtonEvent.ButtonIndex} was {(mouseButtonEvent.Pressed ? "Pressed" : "Released")} on character {character.Stats.CharacterName}");
@@ -98,6 +93,14 @@ namespace FaffLatest.scripts.input
 				//GD.Print($"Unhandled world mouse released event Mb.i is {mouseButtonEvent.ButtonIndex}");
 			}
 
+		}
+
+		private void _On_Character_MoveOrder(Vector3 position)
+        {
+			if (gameStateManager.CurrentlySelectedCharacter.Stats.CanMove)
+			{
+				IssueMoveOrder(position);
+			}
 		}
 
 		private void IssueMoveOrder(Vector3 position)
