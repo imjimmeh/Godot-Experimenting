@@ -8,8 +8,11 @@ namespace FaffLatest.scripts.characters
 		[Signal]
 		public delegate void _Character_Ready(Node character);
 
-		public Node Body;
+		[Signal]
+		public delegate void _Character_ReceivedDamage(Node character, int damage, Node origin);
 
+		public Node Body;
+		public CharacterKinematicBody ProperBody;
 		public Character()
 		{
 		}
@@ -26,6 +29,7 @@ namespace FaffLatest.scripts.characters
 			base._Ready();
 
 			Body = GetNode("KinematicBody");
+			ProperBody = Body as CharacterKinematicBody;
 			AddToGroup("playerCharacters");
 			EmitSignal("_Character_Ready", this);
 
@@ -33,28 +37,39 @@ namespace FaffLatest.scripts.characters
 			Body.GetNode<ColouredBox>("CSGBox").SetColour(Stats);
 		}
 
-        public override void _Process(float delta)
-        {
-            base._Process(delta);
+		public override void _Process(float delta)
+		{
+			base._Process(delta);
 			if(IsDisposing)
-            {
+			{
 				GetParent().RemoveChild(this);
 				Dispose();
 			}
-        }
+		}
 
-        public void _On_Character_ReceiveDamage(int damage, Node origin)
+		public void _On_Character_ReceiveDamage(int damage, Node origin)
         {
-			Stats.AddHealth(-damage);
-			GD.Print("Being attacked");
-			if(Stats.CurrentHealth <= 0)
+            Stats.AddHealth(-damage);
+
+			EmitSignal("_Character_ReceivedDamage", this, damage, origin);
+            GD.Print("Being attacked");
+            if (NoHealthLeft())
             {
-				GD.Print($"No health - disposing");
-				IsDisposing = true;
-				QueueFree();
+                InitialiseDispose();
             }
         }
 
-	}
+        private void InitialiseDispose()
+        {
+            GD.Print($"No health - disposing");
+            IsDisposing = true;
+            QueueFree();
+        }
+
+        private bool NoHealthLeft()
+        {
+            return Stats.CurrentHealth <= 0;
+        }
+    }
 }
 

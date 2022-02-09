@@ -66,33 +66,33 @@ namespace FaffLatest.scripts.ai
 		private void MoveCharacterIfPossible()
 		{
 			if (!currentlyActioningCharacter.IsActive && currentlyActioningCharacter.Stats.AmountLeftToMoveThisTurn > 0)
-            {
-                MoveCharacter();
-            }
-            else if (currentlyActioningCharacter.IsActive && currentlyActioningCharacter.Stats.AmountLeftToMoveThisTurn <= 0)
+			{
+				MoveCharacter();
+			}
+			else if (currentlyActioningCharacter.IsActive && currentlyActioningCharacter.Stats.AmountLeftToMoveThisTurn <= 0)
 			{
 				currentlyActioningCharacter.IsActive = false;
 				currentlyActioningCharacter = null;
 			}
 			else if(currentlyActioningCharacter.Stats.AmountLeftToMoveThisTurn <= 0)
-            {
+			{
 				currentlyActioningCharacter = null;
 			}
 		}
 
-        private void MoveCharacter()
-        {
+		private void MoveCharacter()
+		{
 			var body = currentlyActioningCharacter.Body as CharacterKinematicBody;
 
 			var target = GetNearestPCToCharacter(body.Transform.origin);
 			GD.Print($"{target.targetPosition}");
-            var path = aStarNavigator.GetMovementPath(body.Transform.origin, target.targetPosition, currentlyActioningCharacter.Stats.AmountLeftToMoveThisTurn);
+			var path = aStarNavigator.GetMovementPath(body.Transform.origin, target.targetPosition, currentlyActioningCharacter.Stats.AmountLeftToMoveThisTurn);
 
-            body.MoveWithPath(path);
-            currentlyActioningCharacter.IsActive = true;
-        }
+			body.MoveWithPath(path);
+			currentlyActioningCharacter.IsActive = true;
+		}
 
-        private void ResetTurn()
+		private void ResetTurn()
 		{
 			currentArrayPos = 0;
 			isOurTurn = false;
@@ -111,7 +111,7 @@ namespace FaffLatest.scripts.ai
 		}
 
 		public (Character closestChar, Vector3 targetPosition) GetNearestPCToCharacter(Vector3 ourCharPos)
-        {
+		{
 			Character closestCharacter = null;
 			CharacterKinematicBody body = null;
 
@@ -120,7 +120,7 @@ namespace FaffLatest.scripts.ai
 			float closestDistance = 99999;
 
 			foreach(var character in aStarNavigator.CharacterLocations)
-            {
+			{
 				var asChar = character.Key as Character;
 
 				if (!asChar.Stats.IsPlayerCharacter)
@@ -130,16 +130,16 @@ namespace FaffLatest.scripts.ai
 
 				var vector = (body.Transform.origin - ourCharPos);
 				var distance = vector.Length();
-                if (distance < closestDistance)
-                {
+				if (distance < closestDistance)
+				{
 					var direction = vector.Normalized().Round();
 					targetPos = body.Transform.origin - direction;
 					closestDistance = distance;
-                    closestCharacter = asChar;
+					closestCharacter = asChar;
 				}
 			}
 
 			return (closestCharacter, targetPos);
-        }
+		}
 	}	
 }

@@ -45,7 +45,7 @@ namespace FaffLatest.scripts.input
 			{
 				//GD.Print("yes");
 				GD.Print("$attack");
-				character._On_Character_ReceiveDamage(5, character);
+				character._On_Character_ReceiveDamage(gameStateManager.SelectedCharacter.Stats.EquippedWeapon.MinDamage, character);
 
 			}
 		}

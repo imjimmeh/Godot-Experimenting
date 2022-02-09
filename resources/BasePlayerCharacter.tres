@@ -7,7 +7,7 @@
 resource_local_to_scene = true
 script = ExtResource( 2 )
 CharacterName = "Instance"
-Health = 100
+MaxHealth = 0
 IsPlayerCharacter = true
 FaceIcon = ExtResource( 1 )
 MaxMovementDistancePerTurn = 0

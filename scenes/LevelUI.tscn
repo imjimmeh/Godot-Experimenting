@@ -33,3 +33,7 @@ margin_right = 327.0
 margin_bottom = 24.0
 text = "FINISH TURN"
 script = ExtResource( 5 )
+
+[node name="EffectLabels" type="Control" parent="."]
+margin_right = 40.0
+margin_bottom = 14.0

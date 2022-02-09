@@ -12,6 +12,17 @@ namespace FaffLatest.scripts.ui
 
         private float secondsAlive = 0.0f;
 
+        private bool isDisposing = false;
+
+        public LabelWithTimeToLive(float secondsToLive)
+        {
+            SecondsToLive = secondsToLive;
+        }
+
+        public LabelWithTimeToLive()
+        {
+        }
+
         public override void _Ready()
         {
             base._Ready();
@@ -23,7 +34,15 @@ namespace FaffLatest.scripts.ui
 
             if (secondsAlive > secondsToLive)
             {
+                if(isDisposing)
+                {
+                    GetParent().RemoveChild(this);
+                    Dispose();
+                    return;
+                }
+
                 QueueFree();
+                isDisposing = true;
             }
         }
 

@@ -4,6 +4,7 @@ using FaffLatest.scripts.constants;
 using FaffLatest.scripts.effects;
 using FaffLatest.scripts.movement;
 using FaffLatest.scripts.ui;
+using FaffLatest.scripts.weapons;
 using Godot;
 using System;
 
@@ -13,6 +14,12 @@ namespace FaffLatest.scripts.state
 	{
 		[Signal]
 		public delegate void _Characters_Spawned(Node spawnManager);
+
+		[Export]
+		public Weapon ZombieWeapon { get; set; }
+
+		[Export]
+		public Weapon[] PossibleInitialWeapons { get; set; }
 
         private const string CHARACTERS_SPAWNED = "_Characters_Spawned";
         private PackedScene characterBase;
@@ -39,6 +46,9 @@ namespace FaffLatest.scripts.state
 
 		public void SpawnCharacters(CharacterStats[] charactersToCreate, Vector3[] spawnPositions)
         {
+			var rng = new RandomNumberGenerator();
+			rng.Randomize();
+
 			Character[] characters = new Character[charactersToCreate.Length];
 
 			int pc = 0;
@@ -51,15 +61,19 @@ namespace FaffLatest.scripts.state
 
 				if(character.Stats.IsPlayerCharacter)
                 {
+					var weaponNumber = rng.RandiRange(0, PossibleInitialWeapons.Length - 1);
+					character.Stats.SetWeapon(PossibleInitialWeapons[weaponNumber]);
+					GD.Print($"Setting character {character.Stats} weapon {PossibleInitialWeapons[weaponNumber].Name}");
 					characters[pc] = character;
 					pc++;
                 }
                 else
                 {
+					character.Stats.EquippedWeapon = ZombieWeapon;
 					aiChars[nonPc] = character;
 					nonPc++;
                 }
-
+				GD.Print($"Created {character}");
 			}
 
 			Array.Resize(ref characters, pc);
@@ -70,7 +84,6 @@ namespace FaffLatest.scripts.state
 			var nodes = characters as Node[];
 
 			GetNode<AIManager>("../AIManager").SetCharacters(aiChars);
-			GD.Print($"{nodes.Length}");
 			EmitSignal(CHARACTERS_SPAWNED, this);
         }
 
@@ -95,14 +108,14 @@ namespace FaffLatest.scripts.state
 
 			}
 
-			AddCharacterSignals(newCharacterKinematicBody);
+			AddCharacterSignals(newCharacterKinematicBody, newCharacter);
 
 			astarNavigator._On_Character_Created(newCharacter);
 
 			return newCharacter;
 		}
 
-		private void AddCharacterSignals(Node newCharacterKinematicBody)
+		private void AddCharacterSignals(Node newCharacterKinematicBody, Character character)
 		{
 			inputManager.Connect(SignalNames.Characters.MOVE_TO, newCharacterKinematicBody, SignalNames.Characters.MOVE_TO_METHOD);
 
@@ -110,6 +123,8 @@ namespace FaffLatest.scripts.state
 			newCharacterKinematicBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, astarNavigator, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
 			newCharacterKinematicBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, characterMovementPathManager, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
 			newCharacterKinematicBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, GetNode("../GameStateManager"), SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
+			character.Connect("_Character_ReceivedDamage", GetNode<UIElementContainer>("/root/Root/UI"), "_On_Character_ReceiveDamage");
+
 		}
 
 		private void FindNeededNodes()

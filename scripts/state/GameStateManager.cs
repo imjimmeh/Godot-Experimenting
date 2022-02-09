@@ -90,34 +90,48 @@ namespace FaffLatest.scripts.state
 		}
 
 		private void CheckTurnIsFinished(Character c)
-		{
-			//GD.Print($"Character {c.Stats.CharacterName} has finished a movement");
+        {
+            //GD.Print($"Character {c.Stats.CharacterName} has finished a movement");
 
-			var characterParentNode = c.Stats.IsPlayerCharacter ? GroupNames.PLAYER_CHARACTERS : GroupNames.AI_CHARACTERS;
+            var characterParentNode = c.Stats.IsPlayerCharacter ? GroupNames.PLAYER_CHARACTERS : GroupNames.AI_CHARACTERS;
+            GD.Print($"{c.Stats.CharacterName} has fin their turn");
+            GD.Print($"Checking for characters in {characterParentNode}");
+            var charactersInGroup = GetTree().GetNodesInGroup(characterParentNode);
 
-			GD.Print($"{c.Stats.CharacterName} has fin their turn");
-			GD.Print($"Checking for characters in {characterParentNode}");
-			var charactersInGroup = GetTree().GetNodesInGroup(characterParentNode);
+            GD.Print($"found {charactersInGroup.Count} chars in group");
+            for (var x = 0; x < charactersInGroup.Count; x++)
+            {
+                var asCharacter = charactersInGroup[x] as Character;
 
-			GD.Print($"found {charactersInGroup.Count} chars in group");
-			for (var x = 0; x < charactersInGroup.Count; x++)
-			{
-				var asCharacter = charactersInGroup[x] as Character;
+                if (asCharacter.Stats.IsPlayerCharacter != c.Stats.IsPlayerCharacter)
+                    continue;
 
-				if (asCharacter.Stats.IsPlayerCharacter != c.Stats.IsPlayerCharacter)
-					continue;
+                if (asCharacter.Stats.CanMove)
+                {
+                    GD.Print($"{asCharacter.Stats.CharacterName} can still move");
+                    //GD.Print($"Turn not over - {asCharacter.Stats.CharacterName} still has {asCharacter.Stats.AmountLeftToMoveThisTurn} movement left");
+                    return;
+                }
+            }
 
-				if (asCharacter.Stats.CanMove)
-				{
-					GD.Print($"{asCharacter.Stats.CharacterName} can still move");
-					//GD.Print($"Turn not over - {asCharacter.Stats.CharacterName} still has {asCharacter.Stats.AmountLeftToMoveThisTurn} movement left");
-					return;
-				}
-			}
+            GD.Print($"next turn");
+            var nextTurn = c.Stats.IsPlayerCharacter ? Faction.ENEMY : Faction.PLAYER;
 
-			GD.Print($"next turn");
-			var nextTurn = c.Stats.IsPlayerCharacter ? Faction.ENEMY : Faction.PLAYER;
-			SetCurrentTurn(nextTurn);
-		}
-	}
+            SetCurrentTurn(nextTurn);
+            ResetTurnStats(c, charactersInGroup);
+        }
+
+        private static void ResetTurnStats(Character c, Godot.Collections.Array charactersInGroup)
+        {
+            for (var x = 0; x < charactersInGroup.Count; x++)
+            {
+                var asCharacter = charactersInGroup[x] as Character;
+
+                if (asCharacter.Stats.IsPlayerCharacter != c.Stats.IsPlayerCharacter)
+                    continue;
+
+                asCharacter.Stats.ResetMovement();
+            }
+        }
+    }
 }

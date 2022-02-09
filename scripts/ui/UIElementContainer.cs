@@ -6,6 +6,8 @@ namespace FaffLatest.scripts.ui
 { 
 	public class UIElementContainer : Node
 	{
+		private Camera camera;
+
 		private Control selectedCharacterPart;
 
 		private TextureRect characterFaceIcon;
@@ -16,6 +18,8 @@ namespace FaffLatest.scripts.ui
 		public CharacterSelector CharacterSelector { get; private set; }
 
 		public HealthBar HealthBar { get; private set; }
+
+		public Control EffectLabelsParent { get; private set; }
 
 		public override void _Ready()
 		{
@@ -30,8 +34,32 @@ namespace FaffLatest.scripts.ui
 
 			CharacterSelector = GetNode<CharacterSelector>("CharacterSelector");
 			HealthBar = CharacterFaceIcon.GetNode<HealthBar>("HealthBar");
+
+			EffectLabelsParent = GetNode<Control>("EffectLabels");
+
 			base._Ready();
 		}
 
+		private void _On_Character_ReceiveDamage(Node character, int damage, Node origin)
+		{
+			var asChar = character as Character;
+
+			if(camera == null)
+				camera = GetNode<Camera>("/root/Root/Cameras/MainCamera");
+
+			SpawnExpiringLabel(camera.UnprojectPosition(asChar.ProperBody.GlobalTransform.origin), damage.ToString(), 5, true);
+		}
+
+		private LabelWithTimeToLive SpawnExpiringLabel(Vector2 pos, string text, float timeToLive, bool addChild = true)
+		{
+			var label = new LabelWithTimeToLive(timeToLive);
+			label.Text = text;
+			label.RectPosition = pos;
+			
+			if(addChild)
+				EffectLabelsParent.AddChild(label);
+
+			return label;
+		}
 	}
 }
