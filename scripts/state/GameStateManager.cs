@@ -46,8 +46,6 @@ namespace FaffLatest.scripts.state
         {
             selectedCharacter = character;
             EmitSignal(SignalNames.Characters.SELECTED, character);
-
-            //GD.Print($"{character.Stats.CharacterName} has been selected");
         }
 
         public void ClearCurrentlySelectedCharacter()

@@ -9,13 +9,13 @@ public class BaseLevel : Spatial
 
 	public override void _Ready()
 	{
-		Map.ResourcePath = "res://resources/levels/level1.tres";
-		GD.Print(Map.Level.ResourcePath);
-		LoadMap();
+		if (Map == null)
+			return;
 	}
 
-	public void LoadMap()
+	public void LoadMap(MapInfo map)
 	{
+		Map = map;
 
 		var baseNodeForLevel = GetNode("Environment");
 

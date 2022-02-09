@@ -30,18 +30,6 @@ namespace FaffLatest.scripts.state
 			Preload();
 
 			base._Ready();
-
-			var characters = new CharacterCreationStats[]
-			{
-				new CharacterCreationStats(new Vector3(1, 1, 1), "Dave", 100, true, 10),
-				new CharacterCreationStats(new Vector3(10, 1, 5), "NotDave", 100, true, 20),
-				new CharacterCreationStats(new Vector3(3, 1, 3), "Bob", 100, true, 5),
-				new CharacterCreationStats(new Vector3(17, 1, 3), "Bob", 100, true, 12),
-				new CharacterCreationStats(new Vector3(5, 1, 5), "Bad man", 100, false, 12),
-				new CharacterCreationStats(new Vector3(5, 1, 7), "Bad man2", 100, false, 12)
-			};
-
-			SpawnCharacters(characters);
 		}
 
 		public void SpawnCharacters(CharacterCreationStats[] charactersToCreate)

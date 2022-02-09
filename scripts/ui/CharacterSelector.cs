@@ -25,16 +25,21 @@ namespace FaffLatest.scripts.ui
         {
             base._Ready();
             var spawnManager = GetNode<SpawnManager>("/root/Root/Systems/SpawnManager");
+
             AddCharacters(spawnManager.Characters);
         }
 
         public void AddCharacters(Character[] characters)
         {
+            if (characters == null || characters.Length == 0)
+                return;
+
             characterDisplays = new MiniCharacterDisplay[characters.Length];
 
             var drawn = 0;
             for (int i = 0; i < characters.Length; i++)
             {
+
                 var display = CreateDisplay(characters[i], MiniDisplay);
                 display.MarginTop = (Spacing * i) + (64 * i);
                 AddChild(display);
