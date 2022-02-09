@@ -1,16 +1,8 @@
-﻿using FaffLatest.scripts.constants;
-using FaffLatest.scripts.input;
-using Godot;
+﻿using Godot;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FaffLatest.scripts.characters;
 
 namespace FaffLatest.scripts.characters
 {
-
     public struct CharacterCreationStats
     {
         public Vector3 StartPosition;

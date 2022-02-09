@@ -1,11 +1,6 @@
 ﻿using FaffLatest.scripts.characters;
 using FaffLatest.scripts.state;
 using Godot;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FaffLatest.scripts.ui
 {
@@ -19,6 +14,7 @@ namespace FaffLatest.scripts.ui
 
         [Export]
         public float Spacing { get; set; }
+
         private MiniCharacterDisplay[] characterDisplays;
 
         public override void _Ready()
@@ -26,7 +22,8 @@ namespace FaffLatest.scripts.ui
             base._Ready();
             var spawnManager = GetNode<SpawnManager>("/root/Root/Systems/SpawnManager");
 
-            AddCharacters(spawnManager.Characters);
+            spawnManager.Connect("_Characters_Spawned", this, "_Characters_Spawned");
+
         }
 
         public void AddCharacters(Character[] characters)
@@ -50,7 +47,18 @@ namespace FaffLatest.scripts.ui
             }
         }
 
-        private static MiniCharacterDisplay CreateDisplay(Character character, PackedScene miniDisplay)
+        private void _Characters_Spawned(Node spawnManager)
+        {
+            GD.Print(spawnManager);
+            if(spawnManager is SpawnManager sm)
+            {
+                GD.Print(sm);
+
+                AddCharacters(sm.Characters);
+            }
+        }
+
+        private MiniCharacterDisplay CreateDisplay(Character character, PackedScene miniDisplay)
         {
             var newInstance = miniDisplay.Instance() as MiniCharacterDisplay;
             newInstance.SetCharacter(character);

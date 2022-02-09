@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
 using FaffLatest.scripts.movement;
@@ -6,107 +6,110 @@ using Godot;
 
 namespace FaffLatest.scripts.state
 {
-    public class GameStateManager : Node
-    {
-        private Character selectedCharacter;
-        private Faction currentTurn;
+	public class GameStateManager : Node
+	{
+		private Character selectedCharacter;
+		private Faction currentTurn;
 
-        public Character SelectedCharacter => selectedCharacter;
-        public Faction CurrentTurn => currentTurn;
+		public Character SelectedCharacter => selectedCharacter;
+		public Faction CurrentTurn => currentTurn;
 
-        [Signal]
-        public delegate void _Character_Selected(Character character);
+		[Signal]
+		public delegate void _Character_Selected(Character character);
 
-        [Signal]
-        public delegate void _Character_SelectionCleared();
+		[Signal]
+		public delegate void _Character_SelectionCleared();
 
-        [Signal]
-        public delegate void _Turn_Changed(string whoseTurn);
+		[Signal]
+		public delegate void _Turn_Changed(string whoseTurn);
 
-        public AStarNavigator AStarNavigator { get; private set; }
-        public SpawnManager SpawnManager { get; private set; }
+		public AStarNavigator AStarNavigator { get; private set; }
+		public SpawnManager SpawnManager { get; private set; }
 
-        public bool CharacterIsActive => SelectedCharacter != null && SelectedCharacter.IsActive;
+		public bool CharacterIsActive => SelectedCharacter != null && SelectedCharacter.IsActive;
 
-        public override void _Ready()
-        {
-            base._Ready();
+		public override void _Ready()
+		{
+			base._Ready();
 
-            AStarNavigator = GetNode<AStarNavigator>("../AStarNavigator");
-            SpawnManager = GetNode<SpawnManager>("../SpawnManager");
+			AStarNavigator = GetNode<AStarNavigator>("../AStarNavigator");
+			SpawnManager = GetNode<SpawnManager>("../SpawnManager");
 
-           Connect("_Turn_Changed", GetNode("../UIManager"), "_On_Turn_Change");
-        }
+		   Connect("_Turn_Changed", GetNode("../UIManager"), "_On_Turn_Change");
+		}
 
-        public void InitialiseMap()
-        {
-        }
+		public void InitialiseMap()
+		{
+		}
 
-        public void SetCurrentlySelectedCharacter(Character character)
-        {
-            selectedCharacter = character;
-            EmitSignal(SignalNames.Characters.SELECTED, character);
-        }
+		public void SetCurrentlySelectedCharacter(Character character)
+		{
+			selectedCharacter = character;
+			EmitSignal(SignalNames.Characters.SELECTED, character);
+		}
 
-        public void ClearCurrentlySelectedCharacter()
-        {
-            selectedCharacter = null;
-            EmitSignal(SignalNames.Characters.SELECTION_CLEARED);
+		public void ClearCurrentlySelectedCharacter()
+		{
+			selectedCharacter = null;
+			EmitSignal(SignalNames.Characters.SELECTION_CLEARED);
 
-            //GD.Print("Character has been unselected");
-        }
+			//GD.Print("Character has been unselected");
+		}
 
-        public void SetCurrentTurn(Faction turn)
-        {
-            currentTurn = turn;
+		public void SetCurrentTurn(Faction turn)
+		{
+			currentTurn = turn;
 
-            EmitSignal("_Turn_Changed", currentTurn.ToString());
-        }
+			EmitSignal("_Turn_Changed", currentTurn.ToString());
+		}
 
-        private void _On_Character_FinishedMoving(Node character, Vector3 newPosition)
-        {
-            if (character is Character c)
-            {
-                SetCharacterActive(false);
-                CheckTurnIsFinished(c);
-            }
-        }
+		private void _On_Character_FinishedMoving(Node character, Vector3 newPosition)
+		{
+			if (character is Character c)
+			{
+				SetCharacterActive(false);
+				CheckTurnIsFinished(c);
+			}
+		}
 
-        public void SetCharacterActive(bool isActive = true)
-        {
-            SetCharacterActive(SelectedCharacter, isActive);
-        }
+		public void SetCharacterActive(bool isActive = true)
+		{
+			SetCharacterActive(SelectedCharacter, isActive);
+		}
 
-        public static void SetCharacterActive(Character character, bool isActive = true)
-        {
-            character.IsActive = isActive;
-        }
+		public static void SetCharacterActive(Character character, bool isActive = true)
+		{
+			if(character == null)
+				return;
+				
+			character.IsActive = isActive;
+		}
 
-        private void CheckTurnIsFinished(Character c)
-        {
-            //GD.Print($"Character {c.Stats.CharacterName} has finished a movement");
+		private void CheckTurnIsFinished(Character c)
+		{
+			//GD.Print($"Character {c.Stats.CharacterName} has finished a movement");
 
-            var characterParentNode = c.Stats.IsPlayerCharacter ? "playerCharacters" : "aiCharacters";
+			var characterParentNode = c.Stats.IsPlayerCharacter ? "playerCharacters" : "aiCharacters";
 
-            var charactersInGroup = GetTree().GetNodesInGroup(characterParentNode);
+			var charactersInGroup = GetTree().GetNodesInGroup(characterParentNode);
 
-            for (var x = 0; x < charactersInGroup.Count; x++)
-            {
-                var asCharacter = charactersInGroup[x] as Character;
+			for (var x = 0; x < charactersInGroup.Count; x++)
+			{
+				var asCharacter = charactersInGroup[x] as Character;
 
-                if (asCharacter.Stats.IsPlayerCharacter != c.Stats.IsPlayerCharacter)
-                    continue;
+				if (asCharacter.Stats.IsPlayerCharacter != c.Stats.IsPlayerCharacter)
+					continue;
 
-                if (asCharacter.Stats.CanMove)
-                {
-                    //GD.Print($"Turn not over - {asCharacter.Stats.CharacterName} still has {asCharacter.Stats.AmountLeftToMoveThisTurn} movement left");
-                    return;
-                }
-            }
+				if (asCharacter.Stats.CanMove)
+				{
+					//GD.Print($"Turn not over - {asCharacter.Stats.CharacterName} still has {asCharacter.Stats.AmountLeftToMoveThisTurn} movement left");
+					return;
+				}
+			}
 
-            var nextTurn = c.Stats.IsPlayerCharacter ? Faction.ENEMY : Faction.PLAYER;
+			var nextTurn = c.Stats.IsPlayerCharacter ? Faction.ENEMY : Faction.PLAYER;
 
-            SetCurrentTurn(nextTurn);
-        }
-    }
+			SetCurrentTurn(nextTurn);
+		}
+	}
 }

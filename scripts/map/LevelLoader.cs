@@ -13,16 +13,19 @@ namespace FaffLatest.scripts.map
 
         public void LoadLevel(MapInfo map)
         {
-            var baseLevel = BaseLevel.Instance() as BaseLevel;
 
+            var baseLevel = BaseLevel.Instance() as BaseLevel;
 
             var root = GetNode("/root");
 
             var currentScene = root.GetChild(0);
+            currentScene.QueueFree();
+
             root.AddChild(baseLevel);
 
             baseLevel.Map = map;
             baseLevel.LoadMap(map); ;
+
             root.RemoveChild(currentScene);
 
             currentScene.Dispose();

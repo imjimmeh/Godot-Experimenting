@@ -10,7 +10,11 @@ namespace FaffLatest.scripts.state
 {
 	public class SpawnManager : Node
 	{
-		private PackedScene characterBase;
+		[Signal]
+		public delegate void _Characters_Spawned(Node spawnManager);
+
+        private const string CHARACTERS_SPAWNED = "_Characters_Spawned";
+        private PackedScene characterBase;
 
 		private Node aiCharactersRoot;
 		private AStarNavigator astarNavigator;
@@ -32,7 +36,7 @@ namespace FaffLatest.scripts.state
 			base._Ready();
 		}
 
-		public void SpawnCharacters(CharacterCreationStats[] charactersToCreate)
+		public void SpawnCharacters(CharacterStats[] charactersToCreate, Vector3[] spawnPositions)
         {
 			Character[] characters = new Character[charactersToCreate.Length];
 
@@ -40,7 +44,7 @@ namespace FaffLatest.scripts.state
 
 			for(var x = 0; x < charactersToCreate.Length; x++)
             {
-				var character = SpawnCharacter(charactersToCreate[x]);
+				var character = SpawnCharacter(charactersToCreate[x], spawnPositions[x]);
 
 				if(character.Stats.IsPlayerCharacter)
                 {
@@ -53,18 +57,21 @@ namespace FaffLatest.scripts.state
 			Array.Resize(ref characters, pc);
 
 			this.characters = characters;
+
+			var nodes = characters as Node[];
+
+			GD.Print($"{nodes.Length}");
+			EmitSignal(CHARACTERS_SPAWNED, this);
         }
 
-		public Character SpawnCharacter(CharacterCreationStats stats)
+		public Character SpawnCharacter(CharacterStats stats, Vector3 spawnPosition)
         {
             var newCharacter = characterBase.Instance<Character>();
 
-            newCharacter.Stats.CharacterName = stats.Name;
-			newCharacter.Stats.IsPlayerCharacter = stats.IsPlayerCharacter;
-			newCharacter.Stats.SetMaxMovementDistance(stats.MovementDistance);
+			newCharacter.Stats = stats;
 
             var newCharacterKinematicBody = newCharacter.GetNode<KinematicBody>("KinematicBody");
-            newCharacterKinematicBody.Transform = new Transform(newCharacterKinematicBody.Transform.basis, stats.StartPosition);
+            newCharacterKinematicBody.Transform = new Transform(newCharacterKinematicBody.Transform.basis, spawnPosition);
 
 			if (stats.IsPlayerCharacter)
 				playerCharactersRoot.AddChild(newCharacter);

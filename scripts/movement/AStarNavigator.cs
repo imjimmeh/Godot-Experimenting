@@ -27,7 +27,6 @@ namespace FaffLatest.scripts.movement
 
 		public AStarNavigator()
         {
-			CreatePointsForMap(50, 50, new Vector2[0]);
 		}
 
 		public override void _Ready()

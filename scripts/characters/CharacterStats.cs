@@ -27,13 +27,13 @@ public class CharacterStats : Resource
 	public bool FinishedTurnMovement => AmountMovedThisTurn >= MaxMovementDistancePerTurn;
 	public bool CanMove => !FinishedTurnMovement;
 
-	public CharacterStats(string name = null, int health = 0, bool isPlayerCharacter = false, Texture faceIcon = null, int movemetDistance = 10)
+	public CharacterStats(string name = null, int health = 0, bool isPlayerCharacter = false, Texture faceIcon = null, int movementDistance = 10)
 	{
 		CharacterName = name;
 		Health = health;
 		IsPlayerCharacter = isPlayerCharacter;
 		FaceIcon = faceIcon;
-		MaxMovementDistancePerTurn = movemetDistance;
+		MaxMovementDistancePerTurn = movementDistance;
 	}
 
 	public CharacterStats()

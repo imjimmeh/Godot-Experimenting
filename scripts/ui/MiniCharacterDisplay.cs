@@ -55,8 +55,6 @@ namespace FaffLatest.scripts.ui
 		private void ResizeTexture()
 		{
 			var div = MaxWidth / characterFaceIcon.Texture.GetWidth();
-
-			GD.Print("New scale would be " + div);
 			RectScale = new Vector2(div, div);
 		}
 

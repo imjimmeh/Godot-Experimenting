@@ -1,12 +1,7 @@
-[gd_resource type="Resource" load_steps=4 format=2]
+[gd_resource type="Resource" load_steps=3 format=2]
 
-[ext_resource path="res://art/sprites/playerfaceicons.png" type="Texture" id=1]
+[ext_resource path="res://art/sprites/characterfaces/1.tres" type="Texture" id=1]
 [ext_resource path="res://scripts/characters/CharacterStats.cs" type="Script" id=2]
-
-[sub_resource type="AtlasTexture" id=1]
-flags = 4
-atlas = ExtResource( 1 )
-region = Rect2( 0, 0, 128, 128 )
 
 [resource]
 resource_local_to_scene = true
@@ -14,5 +9,5 @@ script = ExtResource( 2 )
 CharacterName = "Instance"
 Health = 100
 IsPlayerCharacter = true
-FaceIcon = SubResource( 1 )
+FaceIcon = ExtResource( 1 )
 MaxMovementDistancePerTurn = 0
