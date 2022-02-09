@@ -40,7 +40,14 @@ namespace FaffLatest.scripts.input
 
 		private void _On_Character_Mouse_Pressed(Character character, InputEventMouseButton mouseButtonEvent)
 		{
+			GD.Print("Press");
+			if (mouseButtonEvent.ButtonIndex == 1 && gameStateManager.SelectedCharacter != null && !gameStateManager.SelectedCharacter.Stats.HasUsedActionThisTurn && !character.Stats.IsPlayerCharacter )
+			{
+				//GD.Print("yes");
+				GD.Print("$attack");
+				character._On_Character_ReceiveDamage(5, character);
 
+			}
 		}
 
 		private void _On_Character_Mouse_Released(Character character, InputEventMouseButton mouseButtonEvent)

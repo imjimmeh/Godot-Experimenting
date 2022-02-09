@@ -6,13 +6,23 @@ public class ColouredBox : CSGBox
 {
 	public override void _Ready()
 	{
-		var character = GetNode<Character>("../../");
-		var spatial = Material as ShaderMaterial;
-		var isPlayerCharacter = character.Stats.IsPlayerCharacter;
+		//spatial.SetShaderParam("colour", colour);
+		//spatial.SetShaderParam("alpha", "1.0f");
+		base._Ready();
+	}
 
-		var colour = isPlayerCharacter ? new Vector3(1.0f, 0.0f, 0.0f) : new Vector3(0.0f, 1.0f, 0.0f);
-		spatial.SetShaderParam("colour", colour);
-		spatial.SetShaderParam("alpha", "1.0f");
+	public void SetColour(CharacterStats stats)
+    {
+		GD.Print($"{stats}");
+		var material = Material as SpatialMaterial;
+		var isPlayerCharacter = stats.IsPlayerCharacter;
+
+		var colour = isPlayerCharacter ? new Color(1.0f, 0.0f, 0.0f, 1.0f) : new Color(0.0f, 1.0f, 0.0f, 1.0f);
+
+		GD.Print(colour);
+		material.AlbedoColor = colour;
+
+		GD.Print(material.AlbedoColor);
 
 	}
 }

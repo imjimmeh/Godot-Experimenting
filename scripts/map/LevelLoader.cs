@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.state;
 using Godot;
@@ -6,29 +6,28 @@ using Godot;
 
 namespace FaffLatest.scripts.map
 {
-    public class LevelLoader : Godot.Node
-    {
-        [Export]
-        public PackedScene BaseLevel;
+	public class LevelLoader : Godot.Node
+	{
+		[Export]
+		public PackedScene BaseLevel;
 
-        public void LoadLevel(MapInfo map)
-        {
+		public void LoadLevel(MapInfo map)
+		{
 
-            var baseLevel = BaseLevel.Instance() as BaseLevel;
+			var baseLevel = BaseLevel.Instance() as BaseLevel;
 
-            var root = GetNode("/root");
+			var root = GetNode("/root");
 
-            var currentScene = root.GetChild(0);
-            currentScene.QueueFree();
+			var currentScene = root.GetChild(0);
+			currentScene.QueueFree();
 
-            root.AddChild(baseLevel);
+			root.AddChild(baseLevel);
 
-            baseLevel.Map = map;
-            baseLevel.LoadMap(map); ;
+			baseLevel.LoadMap(map);
 
-            root.RemoveChild(currentScene);
+			root.RemoveChild(currentScene);
 
-            currentScene.Dispose();
-        }
-    }
+			currentScene.Dispose();
+		}
+	}
 }

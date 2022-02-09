@@ -16,7 +16,7 @@ namespace FaffLatest.scripts.constants
 			public const string CLICKED_ON_METHOD = SharedParts.ON + CLICKED_ON;
 
 			public const string MOVE_TO = prefix + SharedParts.MOVE_TO;
-			public const string MOVE_TO_METHOD = prefix + SharedParts.MOVE_TO;
+			public const string MOVE_TO_METHOD = SharedParts.ON + MOVE_TO;
 
 			public const string MOVEMENT_FINISHED = prefix + SharedParts.MOVEMENT_FINISHED;
 			public const string MOVEMENT_FINISHED_METHOD = SharedParts.ON + MOVEMENT_FINISHED;

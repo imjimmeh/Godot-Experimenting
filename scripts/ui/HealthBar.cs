@@ -16,7 +16,7 @@ public class HealthBar : TextureProgress
 			return;
 		}
 
-		Value = Character.Stats.Health;
+		Value = Character.Stats.MaxHealth;
 	}
 
 	

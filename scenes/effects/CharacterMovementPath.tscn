@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://materials/MovementPath.tres" type="Material" id=1]
+[ext_resource path="res://scripts/effects/movementpath/CharacterMovementPathManager.cs" type="Script" id=2]
+
+[node name="CharacterMovementPath" type="Spatial"]
+process_priority = 10
+script = ExtResource( 2 )
+MeshMaterial = ExtResource( 1 )

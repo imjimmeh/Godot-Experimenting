@@ -5,16 +5,16 @@ using System;
 public class CharacterStats : Resource
 {
 	[Export]
-	public string CharacterName { get; set; }
+	public string CharacterName { get; private set; }
 
 	[Export]
-	public int Health { get; set; }
+	public int MaxHealth { get; private set; }
 
 	[Export]
 	public bool IsPlayerCharacter { get; set; }
 
 	[Export]
-	public Texture FaceIcon { get; set; }
+	public Texture FaceIcon { get; private set; }
 
 	[Export]
 	public int MaxMovementDistancePerTurn { get; private set; }
@@ -27,16 +27,26 @@ public class CharacterStats : Resource
 	public bool FinishedTurnMovement => AmountMovedThisTurn >= MaxMovementDistancePerTurn;
 	public bool CanMove => !FinishedTurnMovement;
 
-	public CharacterStats(string name = null, int health = 0, bool isPlayerCharacter = false, Texture faceIcon = null, int movementDistance = 10)
-	{
-		CharacterName = name;
-		Health = health;
-		IsPlayerCharacter = isPlayerCharacter;
-		FaceIcon = faceIcon;
-		MaxMovementDistancePerTurn = movementDistance;
-	}
+	public int CurrentHealth { get; private set; }
 
-	public CharacterStats()
+	public bool HasUsedActionThisTurn { get; private set; }
+
+	public CharacterStats(string name = null, int maxHealth = 0, bool isPlayerCharacter = false, Texture faceIcon = null, int movementDistance = 10)
+    {
+        Initialise(name, maxHealth, isPlayerCharacter, faceIcon, movementDistance);
+    }
+
+    public void Initialise(string name, int maxHealth, bool isPlayerCharacter, Texture faceIcon, int movementDistance)
+    {
+        CharacterName = name;
+        MaxHealth = maxHealth;
+        IsPlayerCharacter = isPlayerCharacter;
+        FaceIcon = faceIcon;
+        MaxMovementDistancePerTurn = movementDistance;
+        CurrentHealth = maxHealth;
+    }
+
+    public CharacterStats()
 	{
 	}
 
@@ -65,8 +75,12 @@ public class CharacterStats : Resource
 		//GD.Print($"Now moved {AmountMovedThisTurn} out of {MaxMovementDistancePerTurn}");
     }
 
+	public void AddHealth(int health) => CurrentHealth += health;
+
 	private void _On_Character_ReachedPathPart(Node character, Vector3 part)
     {
 		IncrementMovement();
     }
+
+	public override string ToString() => $"{this.CharacterName}, health: {MaxHealth}, isPC: {IsPlayerCharacter}, movementLeft: {AmountLeftToMoveThisTurn}";
 }

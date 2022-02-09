@@ -6,4 +6,4 @@
 resource_local_to_scene = true
 shader = ExtResource( 1 )
 shader_param/colour = Vector3( 1, 0, 0 )
-shader_param/alpha = 0.8
+shader_param/alpha = 1.0

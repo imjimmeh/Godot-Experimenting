@@ -1,11 +1,16 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://scripts/effects/movementpath/CharacterMovementPathManager.cs" type="Script" id=1]
-[ext_resource path="res://materials/MovementPath.tres" type="Material" id=2]
+[ext_resource path="res://scenes/effects/CharacterMovementPath.tscn" type="PackedScene" id=1]
+[ext_resource path="res://shaders/SimpleColour.gdshader" type="Shader" id=2]
+
+[sub_resource type="ShaderMaterial" id=1]
+resource_local_to_scene = true
+shader = ExtResource( 2 )
+shader_param/colour = Vector3( 0, 0, 1 )
+shader_param/alpha = 0.5
 
 [node name="Effects" type="Node"]
 
-[node name="CharacterMovementPath" type="Spatial" parent="."]
-process_priority = 10
-script = ExtResource( 1 )
-MeshMaterial = ExtResource( 2 )
+[node name="CharacterMovementPath" parent="." instance=ExtResource( 1 )]
+MeshMaterial = SubResource( 1 )
+HeightToDisplayAt = 0.04

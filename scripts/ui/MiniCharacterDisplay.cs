@@ -10,6 +10,9 @@ namespace FaffLatest.scripts.ui
 {
 	public class MiniCharacterDisplay : Control
 	{
+		[Signal]
+		public delegate void _FaceIcon_Clicked(Node character);
+
 		[Export]
 		public DynamicFont FontToUse { get; set; }
 
@@ -45,6 +48,8 @@ namespace FaffLatest.scripts.ui
 			InitialiseFont();
 
 			characterName.AddFontOverride("font", FontToUse);
+
+			Connect("_FaceIcon_Clicked", GetNode("/root/Root/Cameras/MainCamera"), "_On_Character_FaceIconClicked");
 		}
 
 		private void InitialiseFont()
@@ -113,12 +118,16 @@ namespace FaffLatest.scripts.ui
 		public override void _Notification(int what)
 		{
 			base._Notification(what);
+			CheckMouseEnterOrExit(what);
+		}
+
+		private void CheckMouseEnterOrExit(int what)
+		{
 			switch (what)
 			{
 				case NotificationMouseEnter:
 					{
-						GD.Print($"Mouse over");
-							mouseIsOver = true;
+						mouseIsOver = true;
 						break;
 					}
 				case NotificationMouseExit:
@@ -126,6 +135,18 @@ namespace FaffLatest.scripts.ui
 						mouseIsOver = false;
 						break;
 					}
+			}
+		}
+
+		public override void _Input(InputEvent inputEvent)
+		{
+			base._Input(inputEvent);
+			if(mouseIsOver && inputEvent is InputEventMouseButton mouseButton)
+			{
+				if(mouseButton.ButtonIndex == 1)
+				{
+					EmitSignal("_FaceIcon_Clicked", character);
+				}
 			}
 		}
 	}

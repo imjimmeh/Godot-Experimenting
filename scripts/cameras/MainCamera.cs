@@ -68,5 +68,24 @@ namespace FaffLatest.scripts.cameras
 			var targetTransform = new Transform(Transform.basis, targetPos);
 			Transform = Transform.InterpolateWith(targetTransform, 1.0f);
 		}
-	}
+
+		private void _On_Character_FaceIconClicked(Node character)
+        {
+			if(character is Spatial spatial)
+            {
+				var body = spatial.GetNode<Spatial>("KinematicBody");
+				GD.Print($"Received camera move signal");
+                MoveToSpatialPostion(body);
+
+            }
+        }
+
+        private void MoveToSpatialPostion(Spatial spatial)
+        {
+            Vector3 target = new Vector3(spatial.GlobalTransform.origin.x, GlobalTransform.origin.y, spatial.GlobalTransform.origin.z);
+
+			//GD.Print($"Moving to {target}");
+            GlobalTransform = new Transform(GlobalTransform.basis, target);
+        }
+    }
 }
