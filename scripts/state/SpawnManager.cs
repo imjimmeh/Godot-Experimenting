@@ -1,3 +1,4 @@
+using FaffLatest.scripts.ai;
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
 using FaffLatest.scripts.effects;
@@ -41,8 +42,10 @@ namespace FaffLatest.scripts.state
 			Character[] characters = new Character[charactersToCreate.Length];
 
 			int pc = 0;
+			int nonPc = 0;
 
-			for(var x = 0; x < charactersToCreate.Length; x++)
+			var aiChars = new Character[charactersToCreate.Length];
+			for (var x = 0; x < charactersToCreate.Length; x++)
             {
 				var character = SpawnCharacter(charactersToCreate[x], spawnPositions[x]);
 
@@ -51,15 +54,22 @@ namespace FaffLatest.scripts.state
 					characters[pc] = character;
 					pc++;
                 }
+                else
+                {
+					aiChars[nonPc] = character;
+					nonPc++;
+                }
 
 			}
 
 			Array.Resize(ref characters, pc);
+			Array.Resize(ref aiChars, nonPc);
 
 			this.characters = characters;
 
 			var nodes = characters as Node[];
 
+			GetNode<AIManager>("../AIManager").SetCharacters(aiChars);
 			GD.Print($"{nodes.Length}");
 			EmitSignal(CHARACTERS_SPAWNED, this);
         }

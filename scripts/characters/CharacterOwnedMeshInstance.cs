@@ -13,7 +13,7 @@ namespace FaffLatest.characters
         public Node Parent => parentNode;
         public Node CharacterBody => characterBody;
 
-        public bool IsVisible => isHidden;
+        public bool IsHidden => isHidden;
 
         public void DisconnectAndDispose()
         {

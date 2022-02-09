@@ -1,4 +1,5 @@
 using System;
+using FaffLatest.scripts.ai;
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
 using FaffLatest.scripts.movement;
@@ -28,14 +29,17 @@ namespace FaffLatest.scripts.state
 
 		public bool CharacterIsActive => SelectedCharacter != null && SelectedCharacter.IsActive;
 
+
 		public override void _Ready()
 		{
 			base._Ready();
 
 			AStarNavigator = GetNode<AStarNavigator>("../AStarNavigator");
 			SpawnManager = GetNode<SpawnManager>("../SpawnManager");
-
+			var aiManager = GetNode<AIManager>("../AIManager");
 		   Connect("_Turn_Changed", GetNode("../UIManager"), "_On_Turn_Change");
+			Connect("_Turn_Changed", aiManager, "_On_Turn_Change");
+
 		}
 
 		public void InitialiseMap()
@@ -110,7 +114,6 @@ namespace FaffLatest.scripts.state
 
 			GD.Print($"next turn");
 			var nextTurn = c.Stats.IsPlayerCharacter ? Faction.ENEMY : Faction.PLAYER;
-
 			SetCurrentTurn(nextTurn);
 		}
 	}

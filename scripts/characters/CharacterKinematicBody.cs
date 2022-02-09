@@ -176,6 +176,12 @@ public class CharacterKinematicBody : KinematicBody
 			return;
         }
 
+		if(CurrentMovementNode == null)
+        {
+			ClearPath();
+			return;
+        }
+
 		//GD.Print($"Is it null? {Path[CurrentPathIndex] == null}");
 		haveRotated = Transform.CurrentRotationMatchesTarget(CurrentMovementNode.MovementVector);
 
@@ -217,11 +223,8 @@ public class CharacterKinematicBody : KinematicBody
 		GetNextPathPartIfAvailable();
 	}
 
-	private void _On_Character_MoveTo(Node character, MovementPathNode[] path)
-	{
-		if (character != Parent)
-			return;
-
+	public void MoveWithPath(MovementPathNode[] path)
+    {
 		//GD.Print($"received new path");
 
 		Path = path;
@@ -230,6 +233,15 @@ public class CharacterKinematicBody : KinematicBody
 		SetInitialMovementVariables();
 
 		//GD.Print($"Received movement command - moving to first part in path -  {Path[0].Destination}");
+
+	}
+
+	private void _On_Character_MoveTo(Node character, MovementPathNode[] path)
+	{
+		if (character != Parent)
+			return;
+
+		MoveWithPath(path);
 	}
 
 }

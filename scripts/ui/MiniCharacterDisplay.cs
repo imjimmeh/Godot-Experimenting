@@ -43,7 +43,7 @@ namespace FaffLatest.scripts.ui
 		public override void _Ready()
 		{
 			base._Ready();
-			GetChildren();
+			GetChildrenNodes();
 
 			InitialiseFont();
 
@@ -60,7 +60,7 @@ namespace FaffLatest.scripts.ui
 			FontToUse.UseFilter = true;
 		}
 
-		private void GetChildren()
+		private void GetChildrenNodes()
 		{
 			characterFaceIcon = GetNode<TextureRect>("Icon");
 			characterName = GetNode<Label>("CharacterName");

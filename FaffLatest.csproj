@@ -2,7 +2,4 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
-  <ItemGroup>
-    <Folder Include="scripts\ai\" />
-  </ItemGroup>
 </Project>

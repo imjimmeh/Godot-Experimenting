@@ -10,6 +10,8 @@ namespace FaffLatest.scripts.movement
 {
 	public class AStarNavigator : Node
 	{
+		public const string GLOBAL_SCENE_PATH = "/root/Root/Systems/AStarNavigator";
+
 		private readonly NonEuclideanAStar astar = new NonEuclideanAStar();
 		private Dictionary<Node, PointInfo> characterLocations;
 		private PointInfo[,] points;
@@ -124,29 +126,17 @@ namespace FaffLatest.scripts.movement
 					return null;
                 }
 
-				//GD.Print($"Nearest Start {s} vs {start} - End is {e} vs {end}");
 				var path = astar.GetPointPath(nearestStart.Id, nearestEnd.Id);
 
-				if(path == null)
+				return path == null ? null : NavigationHelper.GetMovementPathNodes(path, movementDistance);
+				if (path == null)
                 {
 					return null;
-					//GD.Print($"Could not find path from {nearestStart} to {nearestEnd}");
                 }
-				var converted = NavigationHelper.GetMovementPathNodes(path, movementDistance);
-				//GD.Print($"Going from {start} to {end}");
-				//GD.Print($"Start path is {path[0]} and is {path[path.Length - 1]}");
-
-				//GD.Print($"Path count is {path.Length}");
-				return converted;
 			}
 			catch(Exception ex)
 			{
-				//GD.Print($"Error getting path - {ex.Message}");
 				return null;
-				//
-				//GD.Print(ex.StackTrace);
-				//GD.Print($"Could not get movement path for {start} to {end}");
-				throw;
 			}
 		}
 

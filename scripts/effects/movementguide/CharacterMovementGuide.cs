@@ -15,8 +15,6 @@ namespace FaffLatest.scripts.effects.movementguide
 		[Signal]
 		public delegate void _Character_MoveOrder(Vector3 position);
 
-		private Node currentlyHighlightedNode;
-
 		private AStarNavigator astar;
 
 		private Dictionary<Vector2, CharacterMovementGuideCell> existingMovementGuide;
@@ -249,9 +247,5 @@ namespace FaffLatest.scripts.effects.movementguide
 			(var maxX, var maxZ) = (x + character.Stats.MaxMovementDistancePerTurn, z + character.Stats.MaxMovementDistancePerTurn);
 			return (maxX, maxZ);
 		}
-
-		private static float Clamp(float current, float max) => current > max ? max : current;
-		private static float Min(float current, float min) => current < min ? min : current;
-
 	}
 }

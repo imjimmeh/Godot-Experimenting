@@ -50,7 +50,7 @@ public class CharacterStats : Resource
 	{
 	}
 
-	public void SetName(string name)
+	public void SetCharacterName(string name)
 	{
 		this.CharacterName = name;
 		//GD.Print(this.CharacterName);
