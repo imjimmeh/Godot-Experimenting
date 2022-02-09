@@ -1,4 +1,5 @@
 ﻿using System;
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,10 @@ namespace FaffLatest.scripts.characters
 
         private static AtlasTexture faceIcon;
 
+        private const int minHealth = 5;
+
+        private const int maxHealth = 15;
+
         public static CharacterStats GenerateRandomCharacter()
         {
             if (!initialised)
@@ -31,7 +36,8 @@ namespace FaffLatest.scripts.characters
             stats.SetMaxMovementDistance(numberGenerator.RandiRange(4, 8));
             stats.SetPlayerCharacter(true);
             stats.FaceIcon = faceIcon;
-        
+            stats.Health = numberGenerator.RandiRange(minHealth, maxHealth);
+
             return stats;
         }
 

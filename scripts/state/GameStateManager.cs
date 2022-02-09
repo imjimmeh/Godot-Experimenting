@@ -102,11 +102,13 @@ namespace FaffLatest.scripts.state
 
 				if (asCharacter.Stats.CanMove)
 				{
+					GD.Print($"{asCharacter.Stats.CharacterName} can still move");
 					//GD.Print($"Turn not over - {asCharacter.Stats.CharacterName} still has {asCharacter.Stats.AmountLeftToMoveThisTurn} movement left");
 					return;
 				}
 			}
 
+			GD.Print($"next turn");
 			var nextTurn = c.Stats.IsPlayerCharacter ? Faction.ENEMY : Faction.PLAYER;
 
 			SetCurrentTurn(nextTurn);

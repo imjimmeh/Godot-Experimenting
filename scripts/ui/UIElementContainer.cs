@@ -14,6 +14,8 @@ namespace FaffLatest.scripts.ui
 		public Label CharacterName;
 
 		public CharacterSelector CharacterSelector { get; private set; }
+
+		public HealthBar HealthBar { get; private set; }
 		public override void _Ready()
 		{
 			selectedCharacterPart = GetNode<Control>("SelectedCharacter");
@@ -26,7 +28,7 @@ namespace FaffLatest.scripts.ui
 			CharacterName = CharacterFaceIcon.GetNode<Label>("Name");
 
 			CharacterSelector = GetNode<CharacterSelector>("CharacterSelector");
-
+			HealthBar = CharacterFaceIcon.GetNode<HealthBar>("HealthBar");
 			base._Ready();
 		}
 

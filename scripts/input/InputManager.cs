@@ -97,7 +97,8 @@ namespace FaffLatest.scripts.input
 
 		private void _On_Character_MoveOrder(Vector3 position)
 		{
-			if (gameStateManager.SelectedCharacter.Stats.CanMove)
+			var canMove = gameStateManager?.SelectedCharacter?.Stats?.CanMove;
+			if (canMove.HasValue && canMove.Value)
 			{
 				IssueMoveOrder(position);
 			}
