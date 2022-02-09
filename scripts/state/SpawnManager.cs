@@ -75,18 +75,25 @@ namespace FaffLatest.scripts.state
         }
 
 		public Character SpawnCharacter(CharacterStats stats, Vector3 spawnPosition)
-        {
-            var newCharacter = characterBase.Instance<Character>();
+		{
+			var newCharacter = characterBase.Instance<Character>();
 
 			newCharacter.Stats = stats;
 
-            var newCharacterKinematicBody = newCharacter.GetNode<KinematicBody>("KinematicBody");
-            newCharacterKinematicBody.Transform = new Transform(newCharacterKinematicBody.Transform.basis, spawnPosition);
+			var newCharacterKinematicBody = newCharacter.GetNode<KinematicBody>("KinematicBody");
+			newCharacterKinematicBody.Transform = new Transform(newCharacterKinematicBody.Transform.basis, spawnPosition);
 
 			if (stats.IsPlayerCharacter)
+			{
 				playerCharactersRoot.AddChild(newCharacter);
+				newCharacter.AddToGroup(GroupNames.PLAYER_CHARACTERS);
+			}
 			else
-				aiCharactersRoot.AddChild(newCharacter);
+			{ 
+			aiCharactersRoot.AddChild(newCharacter);
+				newCharacter.AddToGroup(GroupNames.AI_CHARACTERS);
+
+			}
 
 			AddCharacterSignals(newCharacterKinematicBody);
 

@@ -93,10 +93,13 @@ namespace FaffLatest.scripts.state
 		{
 			//GD.Print($"Character {c.Stats.CharacterName} has finished a movement");
 
-			var characterParentNode = c.Stats.IsPlayerCharacter ? "playerCharacters" : "aiCharacters";
+			var characterParentNode = c.Stats.IsPlayerCharacter ? GroupNames.PLAYER_CHARACTERS : GroupNames.AI_CHARACTERS;
 
+			GD.Print($"{c.Stats.CharacterName} has fin their turn");
+			GD.Print($"Checking for characters in {characterParentNode}");
 			var charactersInGroup = GetTree().GetNodesInGroup(characterParentNode);
 
+			GD.Print($"found {charactersInGroup.Count} chars in group");
 			for (var x = 0; x < charactersInGroup.Count; x++)
 			{
 				var asCharacter = charactersInGroup[x] as Character;

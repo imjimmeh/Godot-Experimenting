@@ -17,7 +17,7 @@ namespace FaffLatest.scripts.ai
 		private Character currentlyActioningCharacter;
 
 		private int currentArrayPos = 0;
-		private bool haveMoreCharacters => aiCharacters != null && aiCharacters.Length > currentArrayPos + 1;
+		private bool haveMoreCharacters => aiCharacters != null && aiCharacters.Length > currentArrayPos;
 
 		private AStarNavigator aStarNavigator;
 
@@ -47,47 +47,52 @@ namespace FaffLatest.scripts.ai
 
 			if(isOurTurn && currentlyActioningCharacter != null)
 			{
-				GD.Print($"trying to mvoe char");
 				MoveCharacterIfPossible();
 			}
 			else if(isOurTurn && currentlyActioningCharacter == null)
 			{
-				GD.Print($"Our turn, no char selected");
 				if (haveMoreCharacters)
 				{
-					GD.Print($"getting next char");
 					GetNextCharacter();
 				}
 				else
 				{
-					GD.Print($"reset");
 					ResetTurn();
 				}
 			}
+
 		}
 
 		private void MoveCharacterIfPossible()
 		{
 			if (!currentlyActioningCharacter.IsActive && currentlyActioningCharacter.Stats.AmountLeftToMoveThisTurn > 0)
-			{
-				var body = currentlyActioningCharacter.Body as CharacterKinematicBody;
-
-				var target = new Vector3(1, 1, 1);
-
-				var path = aStarNavigator.GetMovementPath(body.Transform.origin, target, currentlyActioningCharacter.Stats.AmountLeftToMoveThisTurn);
-
-				GD.Print($"issuing path movement command");
-				body.MoveWithPath(path);
-				currentlyActioningCharacter.IsActive = true;
-			}
-			else if (currentlyActioningCharacter.IsActive && currentlyActioningCharacter.Stats.AmountLeftToMoveThisTurn == 0)
+            {
+                MoveCharacter();
+            }
+            else if (currentlyActioningCharacter.IsActive && currentlyActioningCharacter.Stats.AmountLeftToMoveThisTurn <= 0)
 			{
 				currentlyActioningCharacter.IsActive = false;
 				currentlyActioningCharacter = null;
 			}
+			else if(currentlyActioningCharacter.Stats.AmountLeftToMoveThisTurn <= 0)
+            {
+				currentlyActioningCharacter = null;
+			}
 		}
 
-		private void ResetTurn()
+        private void MoveCharacter()
+        {
+			var body = currentlyActioningCharacter.Body as CharacterKinematicBody;
+
+			var target = GetNearestPCToCharacter(body.Transform.origin);
+			GD.Print($"{target.targetPosition}");
+            var path = aStarNavigator.GetMovementPath(body.Transform.origin, target.targetPosition, currentlyActioningCharacter.Stats.AmountLeftToMoveThisTurn);
+
+            body.MoveWithPath(path);
+            currentlyActioningCharacter.IsActive = true;
+        }
+
+        private void ResetTurn()
 		{
 			currentArrayPos = 0;
 			isOurTurn = false;
@@ -97,7 +102,6 @@ namespace FaffLatest.scripts.ai
 		{
 			currentlyActioningCharacter = aiCharacters[currentArrayPos];
 			currentArrayPos++;
-			GD.Print($"Characted is {currentlyActioningCharacter.Stats.CharacterName}");
 		}
 
 		public override void _Ready()
@@ -105,5 +109,37 @@ namespace FaffLatest.scripts.ai
 			aStarNavigator = GetNode<AStarNavigator>(AStarNavigator.GLOBAL_SCENE_PATH);
 			base._Ready();
 		}
-	}
+
+		public (Character closestChar, Vector3 targetPosition) GetNearestPCToCharacter(Vector3 ourCharPos)
+        {
+			Character closestCharacter = null;
+			CharacterKinematicBody body = null;
+
+			Vector3 targetPos = Vector3.Zero;
+
+			float closestDistance = 99999;
+
+			foreach(var character in aStarNavigator.CharacterLocations)
+            {
+				var asChar = character.Key as Character;
+
+				if (!asChar.Stats.IsPlayerCharacter)
+					continue;
+
+				body = asChar.Body as CharacterKinematicBody;
+
+				var vector = (body.Transform.origin - ourCharPos);
+				var distance = vector.Length();
+                if (distance < closestDistance)
+                {
+					var direction = vector.Normalized().Round();
+					targetPos = body.Transform.origin - direction;
+					closestDistance = distance;
+                    closestCharacter = asChar;
+				}
+			}
+
+			return (closestCharacter, targetPos);
+        }
+	}	
 }

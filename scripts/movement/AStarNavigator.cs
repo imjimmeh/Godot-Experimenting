@@ -27,6 +27,8 @@ namespace FaffLatest.scripts.movement
 		public long Length { get; private set; }
 		public long Width { get; private set; }
 
+		public Dictionary<Node, PointInfo> CharacterLocations => characterLocations;
+
 		public AStarNavigator()
         {
 		}
