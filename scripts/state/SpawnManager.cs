@@ -14,6 +14,8 @@ namespace FaffLatest.scripts.state
 {
 	public class SpawnManager : Node
 	{
+		public const string GLOBAL_SCENE_PATH = "root/Root/Systems/SpawnManager";
+
 		private RandomNumberGenerator random;
 
 		[Signal]

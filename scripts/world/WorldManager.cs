@@ -12,11 +12,23 @@ namespace FaffLatest.scripts.world
 
 	public class WorldManager : Spatial
 	{
+		private SpawnManager spawnManager;
 
+		public SpawnManager SpawnManager { get => GetSpawnManager(); private set => spawnManager = value; }
 		public override void _Ready()
 		{
 			base._Ready();
 		}
+
+		private SpawnManager GetSpawnManager()
+        {
+			if(spawnManager == null)
+            {
+				spawnManager = GetNode<SpawnManager>("/root/Root/Systems/SpawnManager");
+			}
+
+			return spawnManager;
+        }
 
 		public void InitialiseMap(MapInfo map)
 		{
@@ -25,24 +37,17 @@ namespace FaffLatest.scripts.world
 			InitialiseAStar(level);
 
 			if(map.Characters == null || map.Characters.Length == 0)
-				InitialiseCharacters();
+				InitialiseNewCharacters();
 			else
             {
-				Vector3[] pos = { new Vector3(1, 1, 1), new Vector3(3, 1, 3), new Vector3(3, 1, 1), new Vector3(5, 1, 3), new Vector3(3, 1, 5), new Vector3(9, 1, 9)};
-
-				var asList = pos.ToList();
-				var spawnArea = new SpawnableAreas(asList, asList);
-				var spawnManager = GetNode<SpawnManager>("/root/Root/Systems/SpawnManager");
-				spawnManager.SpawnCharacters(map.Characters, spawnArea);
-
+				GetSpawnLocationsAndSpawnCharacters(map.Characters);
 			}
 		}
 
-		private void InitialiseCharacters()
+		private void InitialiseNewCharacters()
 		{
 			var chars = new CharacterStats[9];
 
-			var spawnLocations = this.GetSpawnArea();
 
 			for (var x = 0; x < 9; x++)
 			{
@@ -53,13 +58,12 @@ namespace FaffLatest.scripts.world
 					chars[x].IsPlayerCharacter = false;
 			}
 
-			var spawnManager = GetNode<SpawnManager>("/root/Root/Systems/SpawnManager");
-			spawnManager.SpawnCharacters(chars, spawnLocations);
+			GetSpawnLocationsAndSpawnCharacters(chars);
 		}
 
 		private void InitialiseAStar(MeshInstance level)
 		{
-			var aStar = GetNode<AStarNavigator>("/root/Root/Systems/AStarNavigator");
+			var aStar = GetNode<AStarNavigator>(AStarNavigator.GLOBAL_SCENE_PATH);
 
 			var plane = level.Mesh as PlaneMesh;
 			var size = plane.Size;
@@ -74,6 +78,12 @@ namespace FaffLatest.scripts.world
 			AddChild(levelInstance);
 
 			return levelInstance as MeshInstance;
+		}
+
+		private void GetSpawnLocationsAndSpawnCharacters(CharacterStats[] characters)
+        {
+			var spawnLocations = this.GetSpawnArea();
+			SpawnManager.SpawnCharacters(characters, spawnLocations);
 		}
 	}
 }
