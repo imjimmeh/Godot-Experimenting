@@ -1,4 +1,5 @@
 using FaffLatest.scripts.characters;
+using FaffLatest.scripts.constants;
 using Godot;
 using System;
 
@@ -45,7 +46,7 @@ namespace FaffLatest.scripts.ui
 			var asChar = character as Character;
 
 			if(camera == null)
-				camera = GetNode<Camera>("/root/Root/Cameras/MainCamera");
+				camera = GetNode<Camera>(NodeReferences.BaseLevel.Cameras.MAIN_CAMERA);
 
 			SpawnExpiringLabel(camera.UnprojectPosition(asChar.ProperBody.GlobalTransform.origin), damage.ToString(), 5, true);
 		}

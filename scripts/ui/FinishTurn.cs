@@ -1,3 +1,4 @@
+using FaffLatest.scripts.constants;
 using FaffLatest.scripts.state;
 using Godot;
 using System;
@@ -26,7 +27,7 @@ public class FinishTurn : Button
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		gsm = GetNode<GameStateManager>("/root/Root/Systems/GameStateManager");
+		gsm = GetNode<GameStateManager>(NodeReferences.Systems.GAMESTATE_MANAGER);
 	}
 
 //  // Called every frame. 'delta' is the elapsed time since the previous frame.

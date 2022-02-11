@@ -15,11 +15,20 @@ namespace FaffLatest.scripts.constants
 			public const string CLICKED_ON = prefix + SharedParts.CLICKED_ON;
 			public const string CLICKED_ON_METHOD = SharedParts.ON + CLICKED_ON;
 
+			public const string MOVE_ORDER = prefix + SharedParts.MOVE_ORDER;
+			public const string MOVE_ORDER_METHOD = SharedParts.ON + MOVE_ORDER;
+
 			public const string MOVE_TO = prefix + SharedParts.MOVE_TO;
 			public const string MOVE_TO_METHOD = SharedParts.ON + MOVE_TO;
 
 			public const string MOVEMENT_FINISHED = prefix + SharedParts.MOVEMENT_FINISHED;
 			public const string MOVEMENT_FINISHED_METHOD = SharedParts.ON + MOVEMENT_FINISHED;
+
+			public const string READY = prefix + SharedParts.READY;
+			public const string READY_METHOD = SharedParts.ON + READY;
+
+			public const string RECEIVED_DAMAGE = prefix + SharedParts.RECEIVED_DAMAGE;
+			public const string RECEIVED_DAMAGE_METHOD = SharedParts.ON + RECEIVED_DAMAGE;
 
 			public const string REACHED_PATH_PART = prefix + SharedParts.REACHED_PATH_PART;
 			public const string REACHED_PATH_PART_METHOD = SharedParts.ON + REACHED_PATH_PART;
@@ -32,21 +41,43 @@ namespace FaffLatest.scripts.constants
 
 			public const string TURN_FINISHED = prefix + SharedParts.TURN_FINISHED;
 			public const string TURN_FINISHED_METHOD = SharedParts.ON + TURN_FINISHED;
+        }
+
+        public class Movement
+        {
+			private const string CELL_PREFIX = "_Cell";
+
+			public const string CELL_MOUSE_ENTERED = "_Mouse_Entered";
+			public const string CELL_MOUSE_ENTERED_METHOD = SharedParts.ON + CELL_PREFIX + CELL_MOUSE_ENTERED;
+
+			public const string CELL_MOUSE_EXITED = "_Mouse_Exited";
+			public const string CELL_MOUSE_EXITED_METHOD = SharedParts.ON + CELL_PREFIX + CELL_MOUSE_EXITED;
+
+        }
+
+        public class Loading
+        {
+			public const string CHARACTERS_SPAWNED = "_Characters_Spawned";
+			public const string CHARACTERS_SPAWNED_METHOD = SharedParts.ON + CHARACTERS_SPAWNED;
 		}
 
-		public class World
+        public class World
 		{
 			private const string prefix = "_World_";
 
 			public const string CLICKED_ON = prefix + SharedParts.CLICKED_ON;
+			public const string CLICKED_ON_METHOD = SharedParts.ON + CLICKED_ON;
 		}
 
 		public class SharedParts
 		{
 			public const string CLICKED_ON = "ClickedOn";
+			public const string MOVE_ORDER = "MoveOrder";
 			public const string MOVE_TO = "MoveTo";
 			public const string MOVEMENT_FINISHED = "FinishedMoving";
 			public const string REACHED_PATH_PART = "ReachedPathPart";
+			public const string READY = "Ready";
+			public const string RECEIVED_DAMAGE = "ReceivedDamage";
 			public const string SELECTED = "Selected";
 			public const string SELECTION_CLEARED = "SelectionCleared";
 			public const string TURN_FINISHED = "TurnFinished";

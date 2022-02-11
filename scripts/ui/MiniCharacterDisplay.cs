@@ -1,4 +1,5 @@
 using FaffLatest.scripts.characters;
+using FaffLatest.scripts.constants;
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -49,7 +50,7 @@ namespace FaffLatest.scripts.ui
 
 			characterName.AddFontOverride("font", FontToUse);
 
-			Connect("_FaceIcon_Clicked", GetNode("/root/Root/Cameras/MainCamera"), "_On_Character_FaceIconClicked");
+			Connect("_FaceIcon_Clicked", GetNode(NodeReferences.BaseLevel.Cameras.MAIN_CAMERA), "_On_Character_FaceIconClicked");
 		}
 
 		private void InitialiseFont()

@@ -12,7 +12,8 @@ namespace FaffLatest.scripts.characters
 		public delegate void _Character_ReceivedDamage(Node character, int damage, Node origin);
 
 		public Node Body;
-		public CharacterKinematicBody ProperBody;
+		public MovingKinematicBody ProperBody;
+
 		public Character()
 		{
 		}
@@ -29,11 +30,12 @@ namespace FaffLatest.scripts.characters
 			base._Ready();
 
 			Body = GetNode("KinematicBody");
-			ProperBody = Body as CharacterKinematicBody;
-			AddToGroup("playerCharacters");
-			EmitSignal("_Character_Ready", this);
+			ProperBody = Body as MovingKinematicBody;
 
-			Body.Connect(SignalNames.Characters.REACHED_PATH_PART, Stats, SignalNames.Characters.REACHED_PATH_PART_METHOD);
+			AddToGroup(GroupNames.CHARACTER);
+			EmitSignal(SignalNames.Characters.READY, this);
+
+			ProperBody.GetNode("PathMover").Connect(SignalNames.Characters.REACHED_PATH_PART, Stats, SignalNames.Characters.REACHED_PATH_PART_METHOD);
 			Body.GetNode<ColouredBox>("CSGBox").SetColour(Stats);
 		}
 
@@ -50,12 +52,17 @@ namespace FaffLatest.scripts.characters
 		{
 			Stats.AddHealth(-damage);
 
-			EmitSignal("_Character_ReceivedDamage", this, damage, origin);
+			EmitSignal(SignalNames.Characters.RECEIVED_DAMAGE, this, damage, origin);
 			GD.Print("Being attacked");
 			if (NoHealthLeft())
 			{
 				InitialiseDispose();
 			}
+		}
+
+		public void ConnectSignals(Node ui)
+		{
+			Connect(SignalNames.Characters.RECEIVED_DAMAGE, ui, SignalNames.Characters.RECEIVED_DAMAGE_METHOD);
 		}
 
 		private void InitialiseDispose()

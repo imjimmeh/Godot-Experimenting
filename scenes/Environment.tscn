@@ -2,6 +2,6 @@
 
 [ext_resource path="res://scripts/world/WorldManager.cs" type="Script" id=3]
 
-[node name="Environment" type="Spatial"]
+[node name="WorldManager" type="Spatial"]
 transform = Transform( 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
 script = ExtResource( 3 )

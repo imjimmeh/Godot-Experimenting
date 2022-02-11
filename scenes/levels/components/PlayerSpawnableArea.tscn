@@ -5,7 +5,7 @@ resource_local_to_scene = true
 size = Vector2( 10, 10 )
 
 [node name="PlayerSpawnableArea" type="MeshInstance" groups=["playerSpawnableArea"]]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 5 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, 5 )
 visible = false
 mesh = SubResource( 7 )
 material/0 = null

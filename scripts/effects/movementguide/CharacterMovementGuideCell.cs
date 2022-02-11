@@ -75,7 +75,9 @@ namespace FaffLatest.scripts.effects.movementguide
 		public void SetVisiblity(bool visible)
 		{
 			if (!visible)
+			{
 				Hide();
+			}
 			else
 			{
 				Show();
@@ -85,7 +87,6 @@ namespace FaffLatest.scripts.effects.movementguide
 		public void CalculateVisiblity(float movementDistanceLeft)
 		{
 			bool shouldHide = IsOutsideWorldBounds() || PositionIsOccupied() || IsOutsideMovementDistance(movementDistanceLeft);
-
 			SetVisiblity(!shouldHide);
 		}
 

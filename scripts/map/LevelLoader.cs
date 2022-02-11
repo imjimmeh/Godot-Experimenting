@@ -13,61 +13,67 @@ namespace FaffLatest.scripts.map
 
 		private bool currentLevelIsDisposing = false;
 
-        private Node currentScene { get; set; }
-        private Node root { get; set; }
-        private MapInfo loadingMap { get; set; 
-        }
-        public override void _Ready()
-        {
-            base._Ready();
-            Initialise();
-        }
+		private Node currentScene { get; set; }
+		private Node root { get; set; }
+		private MapInfo loadingMap { get; set; 
+		}
+		public override void _Ready()
+		{
+			base._Ready();
+			Initialise();
+		}
 
-        public override void _Process(float delta)
-        {
-            base._Process(delta);
+		public override void _Process(float delta)
+		{
+			base._Process(delta);
 
-            if(currentLevelIsDisposing)
-            {
-                DisposeLevel();
-            }
-        }
+			if(currentLevelIsDisposing)
+			{
+				DisposeLevel();
+			}
+		}
 
-        private void Initialise()
-        {
-            root = GetNode("/root");
-        }
+		private void Initialise()
+		{
+			root = GetNode("/root");
+		}
 
 
-        public void LoadLevel(MapInfo map)
-        {
-            ClearLevel();
-            loadingMap = map;
-        }
+		public void LoadLevel(MapInfo map)
+		{
+			ClearLevel();
+			loadingMap = map;
+		}
 
-        private void ClearLevel()
-        {
-            currentScene = root.GetChild(1);
-            currentScene.QueueFree();
-            currentLevelIsDisposing = true;
-        }
+		private void ClearLevel()
+		{
+			currentScene = root.GetChild(1);
+			currentScene.QueueFree();
+			currentLevelIsDisposing = true;
+		}
 
-        private void DisposeLevel()
-        {
-            //root.RemoveChild(currentScene);
-            //currentScene.Dispose();
+		private void DisposeLevel()
+		{
+			//root.RemoveChild(currentScene);
+			//currentScene.Dispose();
 
-            var baseLevel = BaseLevel.Instance() as BaseLevel;
-            root.AddChild(baseLevel);
-            baseLevel.LoadMap(loadingMap);
+			var baseLevel = BaseLevel.Instance() as BaseLevel;
+			root.AddChild(baseLevel);
+			baseLevel.LoadMap(loadingMap);
 
-            ClearVariables();
-        }
+			var children = root.GetChildren();
 
-        private void ClearVariables()
-        {
-            currentLevelIsDisposing = false;
-            loadingMap = null;
-        }
-    }
+			foreach(var child in children)
+			{
+				GD.Print(child);
+			}
+			ClearVariables();
+		}
+
+		private void ClearVariables()
+		{
+			currentLevelIsDisposing = false;
+			loadingMap = null;
+		}
+	}
 }

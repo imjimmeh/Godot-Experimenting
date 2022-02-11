@@ -1,4 +1,5 @@
 using FaffLatest.scripts.characters;
+using FaffLatest.scripts.constants;
 using FaffLatest.scripts.state;
 using Godot;
 
@@ -20,9 +21,8 @@ namespace FaffLatest.scripts.ui
 		public override void _Ready()
 		{
 			base._Ready();
-			var spawnManager = GetNode<SpawnManager>("/root/Root/Systems/SpawnManager");
-
-			spawnManager.Connect("_Characters_Spawned", this, "_Characters_Spawned");
+			GetNode(NodeReferences.Systems.SPAWN_MANAGER)
+				.Connect(SignalNames.Loading.CHARACTERS_SPAWNED, this, SignalNames.Loading.CHARACTERS_SPAWNED_METHOD);
 
 		}
 
@@ -34,20 +34,18 @@ namespace FaffLatest.scripts.ui
 			characterDisplays = new MiniCharacterDisplay[characters.Length];
 
 			var drawn = 0;
+
+			int spriteSize = 32;
 			for (int i = 0; i < characters.Length; i++)
 			{
-
-				var display = CreateDisplay(characters[i], MiniDisplay);
-				display.MarginTop = (Spacing * i) + (32 * i);
-				AddChild(display);
+				var display = CreateDisplay(characters[i], spriteSize, i);
 
 				characterDisplays[i] = display;
-
 				drawn++;
 			}
 		}
 
-		private void _Characters_Spawned(Node spawnManager)
+		private void _On_Characters_Spawned(Node spawnManager)
 		{
 			GD.Print(spawnManager);
 			if(spawnManager is SpawnManager sm)
@@ -58,12 +56,15 @@ namespace FaffLatest.scripts.ui
 			}
 		}
 
-		private MiniCharacterDisplay CreateDisplay(Character character, PackedScene miniDisplay)
+		private MiniCharacterDisplay CreateDisplay(Character character, int spriteSize, int currentIndex)
 		{
-			var newInstance = miniDisplay.Instance() as MiniCharacterDisplay;
+			var newInstance = MiniDisplay.Instance() as MiniCharacterDisplay;
 			newInstance.SetCharacter(character);
+			newInstance.MarginTop = CalculateMarginTop(Spacing, spriteSize, currentIndex);
 
 			return newInstance;
 		}
+
+		private static float CalculateMarginTop(float spacing, int spriteSize, int index) => (spacing * index) + (spriteSize * index);
 	}
 }

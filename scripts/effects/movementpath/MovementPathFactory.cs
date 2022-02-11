@@ -25,7 +25,7 @@ namespace FaffLatest.scripts.effects
             };
 
             meshInstance.Transform = new Transform(meshInstance.Transform.basis, point);
-
+            GD.Print($"Creating mesh instance at {point}");
 			return meshInstance;
 		}
 

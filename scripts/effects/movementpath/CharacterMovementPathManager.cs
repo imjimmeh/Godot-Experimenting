@@ -13,26 +13,28 @@ namespace FaffLatest.scripts.effects
 		public Material MeshMaterial;
 
 		[Export(PropertyHint.Length, "How high the path should be displayed")]
-		public float HeightToDisplayAt = 1f;
+		public float HeightToDisplayAt = 0.5f;
 
 		public override void _Ready()
 		{
 			base._Ready();
-			GetNode("/root/Root/Systems/InputManager").Connect(SignalNames.Characters.MOVE_TO, this, "_On_Character_MoveTo");
+			GetNode(NodeReferences.Systems.INPUT_MANAGER).Connect(SignalNames.Characters.MOVE_TO, this, SignalNames.Characters.MOVE_TO_METHOD);
 		}
 
-		private void _On_Character_MoveTo(Node character, MovementPathNode[] path)
+		private void _On_Character_MoveTo(Node character, Vector3[] path)
 		{
 			var body = character.GetNode("KinematicBody");
+			var pathMover = body.GetNode("PathMover");
 
 			InitialisePathArray(path);
 
 			for (var x = 0; x < path.Length; x++)
 			{
-				var newMesh = MovementPathFactory.CreateMeshInstanceForPoint(path[x].Destination, SetPlaneVariables());
+				var targetPosition = new Vector3(path[x].x, HeightToDisplayAt, path[x].z);
+				var newMesh = MovementPathFactory.CreateMeshInstanceForPoint(targetPosition, SetPlaneVariables());
 
 				SetMeshVariables(body, newMesh);
-				ConnectSignals(body, newMesh);
+				ConnectSignals(pathMover, newMesh);
 				AddChild(newMesh);
 
 				existingPath[x] = newMesh;
@@ -44,10 +46,10 @@ namespace FaffLatest.scripts.effects
 		};
 
 
-		private static void ConnectSignals(Node body, CharacterMovementPath newMesh)
+		private static void ConnectSignals(Node pathMover, CharacterMovementPath newMesh)
 		{
 			//GD.Print($"Connected mesh");
-			body.Connect(SignalNames.Characters.REACHED_PATH_PART, newMesh, SignalNames.Characters.REACHED_PATH_PART_METHOD);
+			pathMover.Connect(SignalNames.Characters.REACHED_PATH_PART, newMesh, SignalNames.Characters.REACHED_PATH_PART_METHOD);
 		}
 
 		private void SetMeshVariables(Node body, CharacterMovementPath newMesh)
@@ -56,7 +58,7 @@ namespace FaffLatest.scripts.effects
 			newMesh.SetCharacterBody(body);
 		}
 
-		private void InitialisePathArray(MovementPathNode[] path)
+		private void InitialisePathArray(Vector3[] path)
 		{
 			DisposeMesh();
 			existingPath = new CharacterMovementPath[path.Length];

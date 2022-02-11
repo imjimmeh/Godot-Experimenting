@@ -26,6 +26,7 @@ namespace FaffLatest.scripts.input
 
 		private void _On_Character_ClickedOn(Character character, InputEventMouseButton mouseButtonEvent)
 		{
+			GD.Print(character);
 			//GD.Print($"Mouse button {mouseButtonEvent.ButtonIndex} was {(mouseButtonEvent.Pressed ? "Pressed" : "Released")} on character {character.Stats.CharacterName}");
 
 			if(mouseButtonEvent.Pressed)	
@@ -39,22 +40,27 @@ namespace FaffLatest.scripts.input
 		}
 
 		private void _On_Character_Mouse_Pressed(Character character, InputEventMouseButton mouseButtonEvent)
-		{
-			GD.Print("Press");
-			if (mouseButtonEvent.ButtonIndex == 1 && gameStateManager.SelectedCharacter != null && !gameStateManager.SelectedCharacter.Stats.HasUsedActionThisTurn && !character.Stats.IsPlayerCharacter )
-			{
-				//GD.Print("yes");
-				GD.Print("$attack");
-				character._On_Character_ReceiveDamage(gameStateManager.SelectedCharacter.Stats.EquippedWeapon.MinDamage, character);
-			}
-			else
+        {
+            GD.Print("Press");
+            if (IsAttackCommand(character, mouseButtonEvent))
             {
-				GD.Print($"{mouseButtonEvent.ButtonIndex == 1} && {gameStateManager?.SelectedCharacter != null} && {!gameStateManager.SelectedCharacter?.Stats?.HasUsedActionThisTurn} && {!character.Stats?.IsPlayerCharacter}");
+                //GD.Print("yes");
+                GD.Print("$attack");
+                character._On_Character_ReceiveDamage(gameStateManager.SelectedCharacter.Stats.EquippedWeapon.MinDamage, character);
+            }
+            else
+            {
+                GD.Print($"{mouseButtonEvent.ButtonIndex == 1} && {gameStateManager?.SelectedCharacter != null} && {!gameStateManager.SelectedCharacter?.Stats?.HasUsedActionThisTurn} && {!character.Stats?.IsPlayerCharacter}");
 
-			}
-		}
+            }
+        }
 
-		private void _On_Character_Mouse_Released(Character character, InputEventMouseButton mouseButtonEvent)
+        private bool IsAttackCommand(Character character, InputEventMouseButton mouseButtonEvent)
+        {
+            return mouseButtonEvent.ButtonIndex == 1 && gameStateManager.SelectedCharacter != null && !gameStateManager.SelectedCharacter.Stats.HasUsedActionThisTurn && !character.Stats.IsPlayerCharacter;
+        }
+
+        private void _On_Character_Mouse_Released(Character character, InputEventMouseButton mouseButtonEvent)
 		{
 			if(mouseButtonEvent.ButtonIndex == 1 && character.Stats.IsPlayerCharacter && !gameStateManager.CharacterIsActive)
 			{
@@ -117,15 +123,15 @@ namespace FaffLatest.scripts.input
 
 		private void IssueMoveOrder(Vector3 position)
 		{
+			var body = gameStateManager.SelectedCharacter.GetNode<KinematicBody>("KinematicBody");
 			position = position.Round();
 
 			(var x, var y, var z) = (position.x, 1, position.z);
 			x = Mathf.Clamp(x, 1, 50);
 			z = Mathf.Clamp(z, 1, 50);
 
-			position = new Vector3(x, 1, z);
+			position = new Vector3(x, body.Transform.origin.y, z);
 
-			var body = gameStateManager.SelectedCharacter.GetNode<KinematicBody>("KinematicBody");
 
 			var distance = (position - body.Transform.origin).Length();
 
@@ -138,14 +144,14 @@ namespace FaffLatest.scripts.input
 				//GD.Print($"New position is {position}");
 			}
 
-			var convertedPath = aStarNavigator.GetMovementPath(body.Transform.origin, position, gameStateManager.SelectedCharacter.Stats.MaxMovementDistancePerTurn); // navigation.GetMovementPathNodes(body.Transform, position);
+			GD.Print($"Getting path from {body.Transform.origin} to {position}");
+			var convertedPath = aStarNavigator.GetMovementPathNew(body.Transform.origin, position, gameStateManager.SelectedCharacter.Stats.MaxMovementDistancePerTurn); // navigation.GetMovementPathNodes(body.Transform, position);
 
 			if(convertedPath == null)
 			{
 				//GD.Print("Cannot move here");
 				return;
 			}
-
 			//GD.Print($"We can move {gameStateManager.SelectedCharacter}");
 			if(convertedPath.Length > gameStateManager.SelectedCharacter.Stats.MaxMovementDistancePerTurn)
 			{

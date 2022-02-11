@@ -13,7 +13,7 @@ namespace FaffLatest.scripts.world
 		public override void _Ready()
 		{
 			base._Ready();
-			Connect("_World_ClickedOn", GetNode("/root/Root/Systems/InputManager"), "_On_World_ClickedOn");
+			Connect(SignalNames.World.CLICKED_ON, GetNode(NodeReferences.Systems.INPUT_MANAGER), SignalNames.World.CLICKED_ON_METHOD);
 		}
 
 		public override void _InputEvent(Godot.Object camera, InputEvent inputEvent, Vector3 position, Vector3 normal, int shapeIdx)

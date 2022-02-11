@@ -29,9 +29,7 @@ namespace FaffLatest.scripts.ui
         {
             base._Ready();
             targetDestination = new Vector2(this.RectPosition.x, this.RectPosition.y - 100);
-            GD.Print($"Target is {targetDestination}");
             RectScale = new Vector2(3.0f, 3.0f);
-
         }
 
         public override void _Process(float delta)

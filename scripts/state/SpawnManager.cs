@@ -14,35 +14,32 @@ namespace FaffLatest.scripts.state
 {
 	public class SpawnManager : Node
 	{
-		public const string GLOBAL_SCENE_PATH = "root/Root/Systems/SpawnManager";
-
-		private RandomNumberGenerator random;
-
 		[Signal]
 		public delegate void _Characters_Spawned(Node spawnManager);
 
 		[Export]
-		public Weapon ZombieWeapon { get; set; }
+		public Weapon ZombieWeapon { get; private set; }
 
 		[Export]
-		public Weapon[] PossibleInitialWeapons { get; set; }
+		public Weapon[] PossibleInitialWeapons { get; private set; }
 
-        private const string CHARACTERS_SPAWNED = "_Characters_Spawned";
-        private PackedScene characterBase;
+		[Export]
+		public PackedScene CharacterBase { get; private set; }
 
 		private Node aiCharactersRoot;
 		private AStarNavigator astarNavigator;
-		private Node inputManager;
-		private Node playerCharactersRoot;
 		private Node characterMovementPathManager;
-
+		private Node inputManager;
+		private Node gameStateManager;
+		private Node playerCharactersRoot;
 		private UIElementContainer ui;
 
 		private Character[] characters;
+		public Character[] Characters { get => characters; set => characters = value; }
 
-        public Character[] Characters { get => characters; set => characters = value; }
+		private RandomNumberGenerator random;
 
-        public override void _Ready()
+		public override void _Ready()
 		{
 			FindNeededNodes();
 			Preload();
@@ -55,15 +52,16 @@ namespace FaffLatest.scripts.state
 		}
 
 		public void SpawnCharacters(CharacterStats[] charactersToCreate, SpawnableAreas spawnArea)
-        {
-			Character[] characters = new Character[charactersToCreate.Length];
+		{
+			var playerCharacters = new Character[charactersToCreate.Length];
+			var aiChars = new Character[charactersToCreate.Length];
 
 			int pc = 0;
 			int nonPc = 0;
 
-			var aiChars = new Character[charactersToCreate.Length];
+
 			for (var x = 0; x < charactersToCreate.Length; x++)
-            {
+			{
 				if (charactersToCreate[x] == null)
 					break;
 
@@ -73,36 +71,37 @@ namespace FaffLatest.scripts.state
 				var character = SpawnCharacter(charactersToCreate[x], spawnPosition);
 
 				if(character.Stats.IsPlayerCharacter)
-                {
+				{
 					var weaponNumber = random.RandiRange(0, PossibleInitialWeapons.Length - 1);
 					character.Stats.SetWeapon(PossibleInitialWeapons[weaponNumber]);
 					GD.Print($"Setting character {character.Stats} weapon {PossibleInitialWeapons[weaponNumber].Name}");
-					characters[pc] = character;
+					playerCharacters[pc] = character;
 					pc++;
-                }
-                else
-                {
+				}
+				else
+				{
 					character.Stats.EquippedWeapon = ZombieWeapon;
 					aiChars[nonPc] = character;
 					nonPc++;
-                }
+				}
 				GD.Print($"Created {character}");
 			}
 
-			Array.Resize(ref characters, pc);
+			Array.Resize(ref playerCharacters, pc);
 			Array.Resize(ref aiChars, nonPc);
 
-			this.characters = characters;
+			this.characters = playerCharacters;
 
-			var nodes = characters as Node[];
+			var nodes = playerCharacters as Node[];
 
 			GetNode<AIManager>("../AIManager").SetCharacters(aiChars);
-			EmitSignal(CHARACTERS_SPAWNED, this);
-        }
+			EmitSignal(SignalNames.Loading.CHARACTERS_SPAWNED, this);
+		}
 
 		public Character SpawnCharacter(CharacterStats stats, Vector3 spawnPosition)
 		{
-			var newCharacter = characterBase.Instance<Character>();
+			GD.Print($"spawn positon is {spawnPosition}");
+			var newCharacter = CharacterBase.Instance<Character>();
 
 			newCharacter.Stats = stats;
 
@@ -130,44 +129,46 @@ namespace FaffLatest.scripts.state
 
 		private void AddCharacterSignals(Node newCharacterKinematicBody, Character character)
 		{
-			inputManager.Connect(SignalNames.Characters.MOVE_TO, newCharacterKinematicBody, SignalNames.Characters.MOVE_TO_METHOD);
+			inputManager.Connect(SignalNames.Characters.MOVE_TO, newCharacterKinematicBody.GetNode("PathMover"), SignalNames.Characters.MOVE_TO_METHOD);
 
 			newCharacterKinematicBody.Connect(SignalNames.Characters.CLICKED_ON, inputManager, SignalNames.Characters.CLICKED_ON_METHOD);
 			newCharacterKinematicBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, astarNavigator, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
 			newCharacterKinematicBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, characterMovementPathManager, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
-			newCharacterKinematicBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, GetNode("../GameStateManager"), SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
-			character.Connect("_Character_ReceivedDamage", GetNode<UIElementContainer>("/root/Root/UI"), "_On_Character_ReceiveDamage");
+			newCharacterKinematicBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, gameStateManager, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
+
+			character.ConnectSignals(ui);
 
 		}
 
 		private void FindNeededNodes()
 		{
-			aiCharactersRoot = GetNode<Node>("/root/Root/Characters/AI");
-			astarNavigator = GetNode<AStarNavigator>("../AStarNavigator");
-			characterMovementPathManager = GetNode<CharacterMovementPathManager>("/root/Root/Effects/CharacterMovementPath");
-			playerCharactersRoot = GetNode<Node>("/root/Root/Characters/Player");
-			inputManager = GetNode<Node>("../InputManager");
-			ui = GetNode<UIElementContainer>("/root/Root/UI");
+			aiCharactersRoot = GetNode(NodeReferences.BaseLevel.AI_ROOT);
+			astarNavigator = GetNode<AStarNavigator>(NodeReferences.Systems.ASTAR);
+			characterMovementPathManager = GetNode<CharacterMovementPathManager>(NodeReferences.BaseLevel.Effects.MOVEMENT_PATH);
+			gameStateManager = GetNode(NodeReferences.Systems.GAMESTATE_MANAGER);
+			inputManager = GetNode(NodeReferences.Systems.INPUT_MANAGER);
+			playerCharactersRoot = GetNode(NodeReferences.BaseLevel.PLAYER_ROOT);
+			ui = GetNode<UIElementContainer>(NodeReferences.BaseLevel.UI);
 		}
 
 		private void Preload()
 		{
-			characterBase = GD.Load<PackedScene>("res://scenes/characters/Character.tscn");
 		}
 
 		private static Vector3 GetSpawnPosition(List<Vector3> positions, RandomNumberGenerator random)
-        {
+		{
 			var posToGet = random.RandiRange(0, positions.Count - 1);
 
 			var position = positions[posToGet];
 
 			if(position != null)
-            {
+			{
 				positions.Remove(position);
+
 				return position;
-            }
+			}
 
 			return GetSpawnPosition(positions, random);
-        }
+		}
 	}
 }

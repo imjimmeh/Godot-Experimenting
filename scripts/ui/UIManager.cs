@@ -20,7 +20,7 @@ namespace FaffLatest.scripts.ui
 
 		private void FindChildren()
 		{
-			ElementContainer = GetNode<UIElementContainer>("/root/Root/UI");
+			ElementContainer = GetNode<UIElementContainer>(NodeReferences.BaseLevel.UI);
 		}
 
 		private void RegisterSignals()

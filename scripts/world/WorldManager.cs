@@ -1,16 +1,14 @@
 using FaffLatest.scripts.characters;
+using FaffLatest.scripts.constants;
 using FaffLatest.scripts.map;
 using FaffLatest.scripts.movement;
 using FaffLatest.scripts.state;
 using Godot;
-using System;
-using FaffLatest.scripts.map;
-using System.Linq;
 
 namespace FaffLatest.scripts.world
 {
 
-	public class WorldManager : Spatial
+    public class WorldManager : Spatial
 	{
 		private SpawnManager spawnManager;
 
@@ -21,14 +19,14 @@ namespace FaffLatest.scripts.world
 		}
 
 		private SpawnManager GetSpawnManager()
-        {
+		{
 			if(spawnManager == null)
-            {
-				spawnManager = GetNode<SpawnManager>("/root/Root/Systems/SpawnManager");
+			{
+				spawnManager = GetNode<SpawnManager>(NodeReferences.Systems.SPAWN_MANAGER);
 			}
 
 			return spawnManager;
-        }
+		}
 
 		public void InitialiseMap(MapInfo map)
 		{
@@ -39,7 +37,7 @@ namespace FaffLatest.scripts.world
 			if(map.Characters == null || map.Characters.Length == 0)
 				InitialiseNewCharacters();
 			else
-            {
+			{
 				GetSpawnLocationsAndSpawnCharacters(map.Characters);
 			}
 		}
@@ -81,7 +79,7 @@ namespace FaffLatest.scripts.world
 		}
 
 		private void GetSpawnLocationsAndSpawnCharacters(CharacterStats[] characters)
-        {
+		{
 			var spawnLocations = this.GetSpawnArea();
 			SpawnManager.SpawnCharacters(characters, spawnLocations);
 		}

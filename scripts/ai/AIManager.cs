@@ -82,13 +82,13 @@ namespace FaffLatest.scripts.ai
 
 		private void MoveCharacter()
 		{
-			var body = currentlyActioningCharacter.Body as CharacterKinematicBody;
+			var body = currentlyActioningCharacter.Body as MovingKinematicBody;
 
 			var target = GetNearestPCToCharacter(body.Transform.origin);
 			GD.Print($"{target.targetPosition}");
-			var path = aStarNavigator.GetMovementPath(body.Transform.origin, target.targetPosition, currentlyActioningCharacter.Stats.AmountLeftToMoveThisTurn);
+			var path = aStarNavigator.GetMovementPathNew(body.Transform.origin, target.targetPosition, currentlyActioningCharacter.Stats.AmountLeftToMoveThisTurn);
 
-			body.MoveWithPath(path);
+			body.GetNode<PathMover>("PathMover").MoveWithPath(path);
 			currentlyActioningCharacter.IsActive = true;
 		}
 
@@ -113,7 +113,7 @@ namespace FaffLatest.scripts.ai
 		public (Character closestChar, Vector3 targetPosition) GetNearestPCToCharacter(Vector3 ourCharPos)
 		{
 			Character closestCharacter = null;
-			CharacterKinematicBody body = null;
+			MovingKinematicBody body = null;
 
 			Vector3 targetPos = Vector3.Zero;
 
@@ -126,7 +126,7 @@ namespace FaffLatest.scripts.ai
 				if (!asChar.Stats.IsPlayerCharacter)
 					continue;
 
-				body = asChar.Body as CharacterKinematicBody;
+				body = asChar.Body as MovingKinematicBody;
 
 				var vector = (body.Transform.origin - ourCharPos);
 				var distance = vector.Length();

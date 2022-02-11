@@ -1,4 +1,5 @@
 using FaffLatest.scripts.characters;
+using FaffLatest.scripts.constants;
 using FaffLatest.scripts.map;
 using FaffLatest.scripts.movement;
 using FaffLatest.scripts.state;
@@ -19,7 +20,7 @@ public class BaseLevel : Spatial
 
 	public void LoadMap(MapInfo map)
 	{
-		var worldManager = GetNode<WorldManager>("/root/Root/Environment");
+		var worldManager = GetNode<WorldManager>(NodeReferences.BaseLevel.WORLD_MANAGER);
 
 		worldManager.InitialiseMap(map);
 

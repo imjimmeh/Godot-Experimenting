@@ -1,4 +1,5 @@
 using FaffLatest.scripts.characters;
+using FaffLatest.scripts.constants;
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace FaffLatest.scripts.movement
 {
 	public class AStarNavigator : Node
 	{
-		public const string GLOBAL_SCENE_PATH = "/root/Root/Systems/AStarNavigator";
+		public const string GLOBAL_SCENE_PATH = NodeReferences.Systems.ASTAR;
 
 		private readonly NonEuclideanAStar astar = new NonEuclideanAStar();
 		private Dictionary<Node, PointInfo> characterLocations;
@@ -20,7 +21,7 @@ namespace FaffLatest.scripts.movement
 		public int GridSize { get; private set; } = 1;
 
 		[Export]
-		public float YValue { get; private set; } = 1.0f;
+		public float YValue { get; private set; } = 0.0f;
 
 		public PointInfo[,] Points { get => points; private set => points = value; }
 
@@ -111,7 +112,35 @@ namespace FaffLatest.scripts.movement
 			Width = width;
         }
 
-        public MovementPathNode[] GetMovementPath(Vector3 start, Vector3 end, float movementDistance)
+		public Vector3[] GetMovementPathNew(Vector3 start, Vector3 end, float movementDistance)
+		{
+			try
+			{
+				(var startX, var startY) = ((int)start.x, (int)start.z);
+				(var endX, var endY) = ((int)end.x, (int)end.z);
+
+				PointInfo nearestStart = Points[startX, startY]; // astar.GetClosestPoint(start);
+				PointInfo nearestEnd = Points[endX, endY];
+
+				var s = astar.GetPointPosition(nearestStart.Id);
+				var e = astar.GetPointPosition(nearestEnd.Id);
+
+				if (nearestEnd.OccupyingNode != null)
+				{
+					return null;
+				}
+
+				var path = astar.GetPointPath(nearestStart.Id, nearestEnd.Id);
+
+				return path;
+			}
+			catch (Exception ex)
+			{
+				return null;
+			}
+		}
+
+		public MovementPathNode[] GetMovementPath(Vector3 start, Vector3 end, float movementDistance)
 		{
 			try
 			{
@@ -148,14 +177,14 @@ namespace FaffLatest.scripts.movement
             var asCharacter = character as Character;
             //GD.Print($"AStarNavigator received _OnCharacterCreated for character {asCharacter.Stats.CharacterName}");
 
-            var body = asCharacter.Body as CharacterKinematicBody;
+            var body = asCharacter.Body as MovingKinematicBody;
             var point = astar.GetClosestPoint(body.Transform.origin);
 
             astar.SetPointDisabled(point);
             CreatePointInfos(character, body);
         }
 
-        private void CreatePointInfos(Node character, CharacterKinematicBody body)
+        private void CreatePointInfos(Node character, MovingKinematicBody body)
         {	
             var pointInfo = GetPointInfoForVector3(body.Transform.origin);
             pointInfo.SetOccupier(character);

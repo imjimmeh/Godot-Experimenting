@@ -1,0 +1,13 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://scripts/movement/MovementStats.cs" type="Script" id=1]
+
+[resource]
+resource_local_to_scene = true
+script = ExtResource( 1 )
+RotationSpeedInterval = 0.1
+CurrentRotationSpeed = 0.0
+MaxRotationSpeed = 0.9
+MaxMovementSpeed = 2.0
+Velocity = Vector3( 0, 0, 0 )
+Acceleration = 0.2
