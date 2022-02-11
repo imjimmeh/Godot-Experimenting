@@ -100,6 +100,7 @@ namespace FaffLatest.scripts.movement
         private void InitialiseComponents(int length, int width)
         {
             var numberOfNodes = length * width;
+
             astar.ReserveSpace(numberOfNodes);
             astar.Clear();
 

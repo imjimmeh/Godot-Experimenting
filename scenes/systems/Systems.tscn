@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://scripts/state/GameStateManager.cs" type="Script" id=1]
 [ext_resource path="res://scripts/ui/UIManager.cs" type="Script" id=2]
@@ -9,6 +9,7 @@
 [ext_resource path="res://resources/weapons/ZombieBite.tres" type="Resource" id=7]
 [ext_resource path="res://resources/weapons/AK47.tres" type="Resource" id=8]
 [ext_resource path="res://resources/weapons/FourByFour.tres" type="Resource" id=9]
+[ext_resource path="res://scenes/systems/PersistenceManager.tscn" type="PackedScene" id=10]
 
 [node name="Systems" type="Node"]
 
@@ -35,6 +36,8 @@ script = ExtResource( 2 )
 [node name="AStarNavigator" type="Node" parent="."]
 process_priority = 5
 script = ExtResource( 5 )
+
+[node name="PersistenceManager" parent="." instance=ExtResource( 10 )]
 
 [connection signal="_Character_Selected" from="GameStateManager" to="UIManager" method="_On_Character_Selected"]
 [connection signal="_Character_SelectionCleared" from="GameStateManager" to="UIManager" method="_On_Character_Unselected"]

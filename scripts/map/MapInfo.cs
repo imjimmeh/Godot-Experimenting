@@ -10,12 +10,16 @@ namespace FaffLatest.scripts.map
         {
         }
 
-        public MapInfo(PackedScene level = null)
+        public MapInfo(PackedScene level = null, CharacterStats[] characters = null)
         {
             Level = level;
+            Characters = characters;
         }
 
         [Export]
         public PackedScene Level { get; set; }
+
+        [Export]
+        public CharacterStats[] Characters { get; set; }
     }
 }

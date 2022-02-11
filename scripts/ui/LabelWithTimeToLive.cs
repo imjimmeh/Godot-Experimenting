@@ -14,6 +14,8 @@ namespace FaffLatest.scripts.ui
 
         private bool isDisposing = false;
 
+        private Vector2 targetDestination;
+
         public LabelWithTimeToLive(float secondsToLive)
         {
             SecondsToLive = secondsToLive;
@@ -26,15 +28,35 @@ namespace FaffLatest.scripts.ui
         public override void _Ready()
         {
             base._Ready();
+            targetDestination = new Vector2(this.RectPosition.x, this.RectPosition.y - 100);
+            GD.Print($"Target is {targetDestination}");
+            RectScale = new Vector2(3.0f, 3.0f);
+
         }
 
         public override void _Process(float delta)
         {
             secondsAlive += delta;
 
+            CheckExpired();
+
+            if(!isDisposing && !RectPosition.IsEqualApprox(targetDestination))
+            {
+                var direction = (targetDestination - RectPosition).Normalized();
+                var velocity = direction * delta;
+                var target = RectPosition + velocity;
+
+                var result = RectPosition.LinearInterpolate(target, 0.5f);
+                RectPosition = result;
+                RectScale *= 0.9f;
+            }
+        }
+
+        private void CheckExpired()
+        {
             if (secondsAlive > secondsToLive)
             {
-                if(isDisposing)
+                if (isDisposing)
                 {
                     GetParent().RemoveChild(this);
                     Dispose();
@@ -45,6 +67,5 @@ namespace FaffLatest.scripts.ui
                 isDisposing = true;
             }
         }
-
     }
 }

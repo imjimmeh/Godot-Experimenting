@@ -13,7 +13,7 @@ namespace FaffLatest.scripts.ui.mainmenu
 
         public override void _Ready()
         {
-            levelLoader = GetNode<LevelLoader>("LevelLoader");
+            levelLoader = GetNode<LevelLoader>("/root/LevelLoader");
             base._Ready();
 
             if (FirstLevel == null || FirstLevel.Level == null)

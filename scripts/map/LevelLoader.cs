@@ -9,25 +9,65 @@ namespace FaffLatest.scripts.map
 	public class LevelLoader : Godot.Node
 	{
 		[Export]
-		public PackedScene BaseLevel;
+		public PackedScene BaseLevel { get; set; }
 
-		public void LoadLevel(MapInfo map)
-		{
+		private bool currentLevelIsDisposing = false;
 
-			var baseLevel = BaseLevel.Instance() as BaseLevel;
+        private Node currentScene { get; set; }
+        private Node root { get; set; }
+        private MapInfo loadingMap { get; set; 
+        }
+        public override void _Ready()
+        {
+            base._Ready();
+            Initialise();
+        }
 
-			var root = GetNode("/root");
+        public override void _Process(float delta)
+        {
+            base._Process(delta);
 
-			var currentScene = root.GetChild(0);
-			currentScene.QueueFree();
+            if(currentLevelIsDisposing)
+            {
+                DisposeLevel();
+            }
+        }
 
-			root.AddChild(baseLevel);
+        private void Initialise()
+        {
+            root = GetNode("/root");
+        }
 
-			baseLevel.LoadMap(map);
 
-			root.RemoveChild(currentScene);
+        public void LoadLevel(MapInfo map)
+        {
+            ClearLevel();
+            loadingMap = map;
+        }
 
-			currentScene.Dispose();
-		}
-	}
+        private void ClearLevel()
+        {
+            currentScene = root.GetChild(1);
+            currentScene.QueueFree();
+            currentLevelIsDisposing = true;
+        }
+
+        private void DisposeLevel()
+        {
+            //root.RemoveChild(currentScene);
+            //currentScene.Dispose();
+
+            var baseLevel = BaseLevel.Instance() as BaseLevel;
+            root.AddChild(baseLevel);
+            baseLevel.LoadMap(loadingMap);
+
+            ClearVariables();
+        }
+
+        private void ClearVariables()
+        {
+            currentLevelIsDisposing = false;
+            loadingMap = null;
+        }
+    }
 }

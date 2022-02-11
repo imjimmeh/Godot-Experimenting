@@ -43,33 +43,32 @@ namespace FaffLatest.scripts.characters
 			if(IsDisposing)
 			{
 				GetParent().RemoveChild(this);
-				Dispose();
 			}
 		}
 
 		public void _On_Character_ReceiveDamage(int damage, Node origin)
-        {
-            Stats.AddHealth(-damage);
+		{
+			Stats.AddHealth(-damage);
 
 			EmitSignal("_Character_ReceivedDamage", this, damage, origin);
-            GD.Print("Being attacked");
-            if (NoHealthLeft())
-            {
-                InitialiseDispose();
-            }
-        }
+			GD.Print("Being attacked");
+			if (NoHealthLeft())
+			{
+				InitialiseDispose();
+			}
+		}
 
-        private void InitialiseDispose()
-        {
-            GD.Print($"No health - disposing");
-            IsDisposing = true;
-            QueueFree();
-        }
+		private void InitialiseDispose()
+		{
+			GD.Print($"No health - disposing");
+			IsDisposing = true;
+			QueueFree();
+		}
 
-        private bool NoHealthLeft()
-        {
-            return Stats.CurrentHealth <= 0;
-        }
-    }
+		private bool NoHealthLeft()
+		{
+			return Stats.CurrentHealth <= 0;
+		}
+	}
 }
 

@@ -14,6 +14,10 @@ config/name="FaffLatest"
 run/main_scene="res://scenes/menus/MainMenu.tscn"
 config/icon="res://icon.png"
 
+[autoload]
+
+LevelLoader="*res://scenes/systems/LevelLoader.tscn"
+
 [input]
 
 camera_left={

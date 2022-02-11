@@ -46,6 +46,10 @@ namespace FaffLatest.scripts.input
 				//GD.Print("yes");
 				GD.Print("$attack");
 				character._On_Character_ReceiveDamage(gameStateManager.SelectedCharacter.Stats.EquippedWeapon.MinDamage, character);
+			}
+			else
+            {
+				GD.Print($"{mouseButtonEvent.ButtonIndex == 1} && {gameStateManager?.SelectedCharacter != null} && {!gameStateManager.SelectedCharacter?.Stats?.HasUsedActionThisTurn} && {!character.Stats?.IsPlayerCharacter}");
 
 			}
 		}

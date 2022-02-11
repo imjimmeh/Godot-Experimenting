@@ -2,16 +2,20 @@ using FaffLatest.scripts.ai;
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
 using FaffLatest.scripts.effects;
+using FaffLatest.scripts.map;
 using FaffLatest.scripts.movement;
 using FaffLatest.scripts.ui;
 using FaffLatest.scripts.weapons;
 using Godot;
 using System;
+using System.Collections.Generic;
 
 namespace FaffLatest.scripts.state
 {
 	public class SpawnManager : Node
 	{
+		private RandomNumberGenerator random;
+
 		[Signal]
 		public delegate void _Characters_Spawned(Node spawnManager);
 
@@ -41,14 +45,15 @@ namespace FaffLatest.scripts.state
 			FindNeededNodes();
 			Preload();
 
+			random = new RandomNumberGenerator();
+			random.Randomize();
+
+
 			base._Ready();
 		}
 
-		public void SpawnCharacters(CharacterStats[] charactersToCreate, Vector3[] spawnPositions)
+		public void SpawnCharacters(CharacterStats[] charactersToCreate, SpawnableAreas spawnArea)
         {
-			var rng = new RandomNumberGenerator();
-			rng.Randomize();
-
 			Character[] characters = new Character[charactersToCreate.Length];
 
 			int pc = 0;
@@ -57,11 +62,17 @@ namespace FaffLatest.scripts.state
 			var aiChars = new Character[charactersToCreate.Length];
 			for (var x = 0; x < charactersToCreate.Length; x++)
             {
-				var character = SpawnCharacter(charactersToCreate[x], spawnPositions[x]);
+				if (charactersToCreate[x] == null)
+					break;
+
+				var areaToSpawnFrom = charactersToCreate[x].IsPlayerCharacter ? spawnArea.PlayerSpawnableAreas : spawnArea.EnemySpawnableAreas;
+				var spawnPosition = GetSpawnPosition(areaToSpawnFrom, random);
+
+				var character = SpawnCharacter(charactersToCreate[x], spawnPosition);
 
 				if(character.Stats.IsPlayerCharacter)
                 {
-					var weaponNumber = rng.RandiRange(0, PossibleInitialWeapons.Length - 1);
+					var weaponNumber = random.RandiRange(0, PossibleInitialWeapons.Length - 1);
 					character.Stats.SetWeapon(PossibleInitialWeapons[weaponNumber]);
 					GD.Print($"Setting character {character.Stats} weapon {PossibleInitialWeapons[weaponNumber].Name}");
 					characters[pc] = character;
@@ -141,5 +152,20 @@ namespace FaffLatest.scripts.state
 		{
 			characterBase = GD.Load<PackedScene>("res://scenes/characters/Character.tscn");
 		}
+
+		private static Vector3 GetSpawnPosition(List<Vector3> positions, RandomNumberGenerator random)
+        {
+			var posToGet = random.RandiRange(0, positions.Count - 1);
+
+			var position = positions[posToGet];
+
+			if(position != null)
+            {
+				positions.Remove(position);
+				return position;
+            }
+
+			return GetSpawnPosition(positions, random);
+        }
 	}
 }
