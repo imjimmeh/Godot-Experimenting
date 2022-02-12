@@ -17,17 +17,15 @@ namespace FaffLatest.scripts.effects
             return plane;
 		}
 
-		public static CharacterMovementPath CreateMeshInstanceForPoint(Vector3 point, Action<PlaneMesh> options = null)
-		{
+        public static CharacterMovementPath CreateMeshInstanceForPoint(Vector3 point, Action<PlaneMesh> options = null)
+        {
             var meshInstance = new CharacterMovementPath
             {
                 Mesh = CreatePlaneForPoint(point, options)
             };
 
             meshInstance.Transform = new Transform(meshInstance.Transform.basis, point);
-            GD.Print($"Creating mesh instance at {point}");
-			return meshInstance;
-		}
-
+            return meshInstance;
+        }
 	}
 }

@@ -132,41 +132,17 @@ namespace FaffLatest.scripts.movement
 
 				var path = astar.GetPointPath(nearestStart.Id, nearestEnd.Id);
 
+				if (path == null)
+					return path;
+
+				var newArray = new Vector3[path.Length - 1];
+
+				for (var x = 1; x < path.Length; x++)
+					newArray[x - 1] = path[x];
+
 				return path;
 			}
 			catch (Exception ex)
-			{
-				return null;
-			}
-		}
-
-		public MovementPathNode[] GetMovementPath(Vector3 start, Vector3 end, float movementDistance)
-		{
-			try
-			{
-				(var startX, var startY) = ((int)start.x, (int)start.z);
-				(var endX, var endY) = ((int)end.x, (int)end.z);
-
-				PointInfo nearestStart = Points[startX, startY]; // astar.GetClosestPoint(start);
-				PointInfo nearestEnd = Points[endX, endY];
-
-				var s = astar.GetPointPosition(nearestStart.Id);
-				var e = astar.GetPointPosition(nearestEnd.Id);
-
-				if(nearestEnd.OccupyingNode != null)
-                {
-					return null;
-                }
-
-				var path = astar.GetPointPath(nearestStart.Id, nearestEnd.Id);
-
-				return path == null ? null : NavigationHelper.GetMovementPathNodes(path, movementDistance);
-				if (path == null)
-                {
-					return null;
-                }
-			}
-			catch(Exception ex)
 			{
 				return null;
 			}
@@ -204,6 +180,7 @@ namespace FaffLatest.scripts.movement
 
 		private void _On_Character_FinishedMoving(Node character, Vector3 newPosition)
 		{
+			GD.Print($"Char finished moving - {newPosition}");
 			if (characterLocations.TryGetValue(character, out PointInfo oldLocationPointInfo))
 			{
 				astar.SetPointDisabled(oldLocationPointInfo.Id, false);
@@ -211,7 +188,7 @@ namespace FaffLatest.scripts.movement
 
 				astar.SetPointDisabled(newOccupyingNode.Id);
 
-				//GD.Print($"Found new node {newOccupyingNode} for {newPosition} which should be {astar.GetPointPosition(newOccupyingNode.Id)}");
+				GD.Print($"Found new node {newOccupyingNode} for {newPosition} which should be {astar.GetPointPosition(newOccupyingNode.Id)}");
 
 				oldLocationPointInfo.SetOccupier(null);
 				newOccupyingNode.SetOccupier(character);
@@ -220,7 +197,7 @@ namespace FaffLatest.scripts.movement
 			}
 			else
 			{
-				//GD.Print($"AStarNavigatorError - Could not find matching node for {character.Name}");
+				GD.Print($"AStarNavigatorError - Could not find matching node for {character.Name}");
 			}
 		}
 

@@ -8,6 +8,6 @@ script = ExtResource( 1 )
 RotationSpeedInterval = 0.1
 CurrentRotationSpeed = 0.0
 MaxRotationSpeed = 0.9
-MaxMovementSpeed = 2.0
+MaxMovementSpeed = 1.0
 Velocity = Vector3( 0, 0, 0 )
 Acceleration = 0.2

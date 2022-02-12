@@ -27,8 +27,7 @@ public class CharacterStats : Resource
 
 	public int AmountLeftToMoveThisTurn => MaxMovementDistancePerTurn - AmountMovedThisTurn;
 
-	public bool FinishedTurnMovement => AmountMovedThisTurn >= MaxMovementDistancePerTurn;
-	public bool CanMove => !FinishedTurnMovement;
+	public bool CanMove => AmountMovedThisTurn < MaxMovementDistancePerTurn;
 
 	public int CurrentHealth { get; private set; }
 

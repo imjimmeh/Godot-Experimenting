@@ -19,12 +19,13 @@ public class MovingKinematicBody : KinematicBody
     [Export]
     public MovementStats MovementStats { get; private set; }
 
+    private const float DISTANCE_MARGIN_ALLOWED = 0.1f;
 
     public Node Parent;
 
-    public Vector3 CurrentMovementDestination;
-    public Vector3 CurrentMovementVector;
-    public Transform TargetRotation;
+    public Vector3 CurrentMovementDestination { get; private set; }
+    public Vector3 CurrentMovementVector { get; private set; }
+    public Transform TargetRotation { get; private set; }
 
     public bool HaveDestination = false;
 
@@ -104,11 +105,27 @@ public class MovingKinematicBody : KinematicBody
 
         if (haveRotated)
         {
-            MovementStats.SetVelocity(Vector3.Zero);
+            Vector3 direction = (CurrentMovementDestination - Transform.origin).Normalized();
+
+            var dotProduct = MovementStats.Velocity.Normalized().Dot(direction);
+            var sameDirection = dotProduct == 1f;
+
+            if (!sameDirection)
+            {
+                MovementStats.SetVelocity(Vector3.Zero);
+                GD.Print($"Clearing velocity");
+            }
+
+            SnapRotation();
         }
 
 
         return haveRotated;
+    }
+
+    private void SnapRotation()
+    {
+        Transform = Transform.LookingAt(CurrentMovementDestination, Vector3.Up);
     }
 
     private void Move(float delta)
@@ -131,50 +148,63 @@ public class MovingKinematicBody : KinematicBody
     {
         if (!pathMover.HaveMoreInPath)
         {
-            pathMover.ClearPath();
             return false;
         }
         else
         {
+            if(CurrentMovementDestination != Vector3.Zero)
+                SnapToCurrentDestination();
+
             if (pathMover.TryGetNextPathPart(out Vector3 target))
             {
-                GD.Print($"Got new target destination of {target}");
-                CurrentMovementDestination = target;
-                HaveDestination = true;
-                
-                var newTargetMovementVector = (target - Transform.origin).Normalized();
-
-                haveRotated = CurrentMovementVector.IsEqualApprox(newTargetMovementVector);
-                CurrentMovementVector = newTargetMovementVector;
-                GD.Print($"new target is on same rotation is {haveRotated}");
+                SetVariables(target);
 
                 return true;
             }
             else
             {
-                CurrentMovementDestination = Vector3.Zero;
-                HaveDestination = false;
-                haveRotated = false;
-                CurrentMovementVector = Vector3.Zero;
-
+                ResetVariables();
+                EmitSignal(Characters.MOVEMENT_FINISHED, Parent, Transform.origin);
+                GD.Print($"Movement finished");
                 return false;
             }
         }
+    }
+
+    private void SnapToCurrentDestination()
+    {
+        Transform = new Transform(Transform.basis, CurrentMovementDestination);
+    }
+
+    private void ResetVariables()
+    {
+        CurrentMovementDestination = Vector3.Zero;
+        HaveDestination = false;
+        haveRotated = false;
+        CurrentMovementVector = Vector3.Zero;
+
+        MovementStats.SetVelocity(Vector3.Zero);
+        MovementStats.SetCurrentRotationSpeed(0f);
+    }
+
+    private void SetVariables(Vector3 target)
+    {
+        CurrentMovementDestination = target;
+        HaveDestination = true;
+
+        var newTargetMovementVector = (target - Transform.origin).Normalized();
+
+        CurrentMovementVector = newTargetMovementVector;
+        haveRotated = HaveRotated();
     }
 
     private bool ReachedCurrentDestination()
     {
         var withSameYOrigin = new Vector3(Transform.origin.x, CurrentMovementDestination.y, Transform.origin.z);
         var distance = CurrentMovementDestination.DistanceTo(withSameYOrigin);
-        var atSamePoint = distance <= 0.05f;
+        var atSamePoint = distance <= DISTANCE_MARGIN_ALLOWED;
+
 
         return atSamePoint;
-    }
-
-    private void SetInitialMovementVariables()
-    {
-        haveRotated = false;
-        MovementStats.SetVelocity(Vector3.Zero);
-        MovementStats.SetCurrentRotationSpeed(0.0f);
     }
 }

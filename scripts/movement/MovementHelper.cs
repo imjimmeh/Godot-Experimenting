@@ -56,6 +56,7 @@ namespace FaffLatest.scripts.movement
 		public static MovementStats CalculateAndSetNewVelocity(this MovementStats stats, Vector3 currentPosition, Vector3 target, float delta)
 		{
 			var movementVector = (target - currentPosition).Normalized();
+
 			var newVelocity = CalculateNewVelocity(delta, stats.Velocity, movementVector, stats.Acceleration);
 			stats.SetVelocity(newVelocity);
 

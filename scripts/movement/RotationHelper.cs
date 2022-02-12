@@ -23,24 +23,15 @@ namespace FaffLatest.scripts.movement
             return mover;
         }
 
-        public static (Transform newTransform, float newRotationSpeed) InterpolateAndRotate(this Transform transform, float delta, float currentRotationSpeed, float rotationSpeedInterval, float maxRotationSpeed, Transform rotationTarget)
-        { 
-            var newRotationSpeed = CalculateNewRotationSpeed(delta, currentRotationSpeed, rotationSpeedInterval, maxRotationSpeed);
-
-            var newTransform = transform.InterpolateWith(rotationTarget, newRotationSpeed);
-
-            return (newTransform, newRotationSpeed);
-        }
-
         public static MovingKinematicBody CalculateAndSetNewRotationSpeed(this MovingKinematicBody mover, float delta)
         {
-            var newSpeed = CalculateNewRotationSpeed(delta, mover.MovementStats.CurrentRotationSpeed, mover.MovementStats.RotationSpeedInterval, mover.MovementStats.MaxRotationSpeed);
+            var newSpeed = CalculateNewRotationSpeed(delta, mover.MovementStats.CurrentRotationSpeed, mover.MovementStats.RotationSpeedInterval);
             mover.MovementStats.SetCurrentRotationSpeed(newSpeed);
 
             return mover;
         }
 
-        public static float CalculateNewRotationSpeed(float delta, float currentRotationSpeed, float rotationSpeedInterval, float maxRotationSpeed)
+        public static float CalculateNewRotationSpeed(float delta, float currentRotationSpeed, float rotationSpeedInterval)
         {
             currentRotationSpeed += delta * rotationSpeedInterval;
 

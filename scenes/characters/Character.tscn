@@ -24,6 +24,12 @@ Stats = ExtResource( 1 )
 [node name="KinematicBody" type="KinematicBody" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0 )
 script = ExtResource( 2 )
+RotationSpeedInterval = null
+CurrentRotationSpeed = null
+MaxRotationSpeed = null
+MaxSpeed = null
+Velocity = null
+Acceleration = null
 
 [node name="CharacterMovementGuide" type="Spatial" parent="KinematicBody"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0 )

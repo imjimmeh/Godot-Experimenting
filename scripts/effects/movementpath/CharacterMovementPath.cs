@@ -36,9 +36,11 @@ namespace FaffLatest.scripts.effects
 			if (character == null)
 				return false;
 
-			var isThisPath = pathLocation.IsEqualApprox(Transform.origin);
+            var pathOnSameY = new Vector3(pathLocation.x, this.Transform.origin.y, pathLocation.z);
 
-			return isThisPath;
+            var isThisPath = (pathOnSameY - Transform.origin).Length() < 0.1f;
+
+            return isThisPath;
         }
     }
 }

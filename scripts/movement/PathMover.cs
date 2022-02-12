@@ -36,14 +36,15 @@ namespace FaffLatest.scripts.movement
 
         public bool TryGetNextPathPart(out Vector3 nextPath)
 		{
-			GD.Print($"Getting next path part");
 			CurrentPathIndex++;
 			nextPath = Vector3.Zero;
 
 			var pathFinished = CurrentPathIndex >= Path.Length;
 
 			if (pathFinished)
+			{
 				ClearPath();
+			}
 			else
 			{
 				nextPath = new Vector3(CurrentTarget.x, KinematicBody.Transform.origin.y, CurrentTarget.z);
@@ -54,13 +55,7 @@ namespace FaffLatest.scripts.movement
 			if (notFirstPart)
 			{
 				EmitSignal(Characters.REACHED_PATH_PART, this, KinematicBody.Transform.origin.Round());
-
-				if (nextPath == null)
-					EmitSignal("_Character_MovementFinished");
-
 			}
-
-			GD.Print($"Path is finished is {pathFinished} - not firste part is {notFirstPart} - current index is {CurrentPathIndex} current path is{nextPath} ");
 
 			return !pathFinished;
 		}
@@ -69,13 +64,13 @@ namespace FaffLatest.scripts.movement
 		{
 			//GD.Print($"Reached destination - we are at {Transform.origin}");
 			Path = null;
-			CurrentPathIndex = 0;
+			CurrentPathIndex = -1;
 			//GD.Print($"Snapepd to {snappedVector}");
 		}
 
 		private void SetInitialMovementVariables()
 		{
-			CurrentPathIndex = 0;
+			CurrentPathIndex = -1;
 			//TryGetNextPathPart(out Vector3 target);
 		}
 

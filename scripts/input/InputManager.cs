@@ -42,41 +42,36 @@ namespace FaffLatest.scripts.input
 		private void _On_Character_Mouse_Pressed(Character character, InputEventMouseButton mouseButtonEvent)
         {
             GD.Print("Press");
+
             if (IsAttackCommand(character, mouseButtonEvent))
             {
-                //GD.Print("yes");
-                GD.Print("$attack");
+                GD.Print("Attack");
                 character._On_Character_ReceiveDamage(gameStateManager.SelectedCharacter.Stats.EquippedWeapon.MinDamage, character);
             }
             else
             {
-                GD.Print($"{mouseButtonEvent.ButtonIndex == 1} && {gameStateManager?.SelectedCharacter != null} && {!gameStateManager.SelectedCharacter?.Stats?.HasUsedActionThisTurn} && {!character.Stats?.IsPlayerCharacter}");
 
             }
         }
 
         private bool IsAttackCommand(Character character, InputEventMouseButton mouseButtonEvent)
-        {
-            return mouseButtonEvent.ButtonIndex == 1 && gameStateManager.SelectedCharacter != null && !gameStateManager.SelectedCharacter.Stats.HasUsedActionThisTurn && !character.Stats.IsPlayerCharacter;
-        }
+			=> mouseButtonEvent.ButtonIndex == 1 && gameStateManager.SelectedCharacter != null && !gameStateManager.SelectedCharacter.Stats.HasUsedActionThisTurn && !character.Stats.IsPlayerCharacter;
 
         private void _On_Character_Mouse_Released(Character character, InputEventMouseButton mouseButtonEvent)
 		{
-			if(mouseButtonEvent.ButtonIndex == 1 && character.Stats.IsPlayerCharacter && !gameStateManager.CharacterIsActive)
+            bool isSelectChararacterAction = mouseButtonEvent.ButtonIndex == 1 && character.Stats.IsPlayerCharacter && !gameStateManager.CharacterIsActive;
+
+            if (isSelectChararacterAction)
 			{
-				//GD.Print("yes");
 				gameStateManager.SetCurrentlySelectedCharacter(character);
 			}
 			else
 			{
-				//GD.Print($"Unhandled character mouse released event Mb.i is {mouseButtonEvent.ButtonIndex} - playercharacter is {character.Stats.IsPlayerCharacter}");
 			}
 		}
 
 		private void _On_World_ClickedOn(ClickableWorldElement world, InputEventMouseButton mouseButtonEvent, Vector3 position)
 		{
-			//GD.Print($"Mouse button {mouseButtonEvent.ButtonIndex} was {(mouseButtonEvent.Pressed ? "Pressed" : "Released")} on world");
-
 			if (mouseButtonEvent.Pressed)
 			{
 				_On_World_Mouse_Pressed(world, mouseButtonEvent);
@@ -94,16 +89,14 @@ namespace FaffLatest.scripts.input
 
 		private void _On_World_Mouse_Released(ClickableWorldElement world, InputEventMouseButton mouseButtonEvent, Vector3 position)
 		{
-			if (mouseButtonEvent.ButtonIndex == 1 && gameStateManager.SelectedCharacter != null)
+            bool isClearSelectionAction = mouseButtonEvent.ButtonIndex == 1 && gameStateManager.SelectedCharacter != null;
+
+            if (isClearSelectionAction)
 			{
 				gameStateManager.ClearCurrentlySelectedCharacter();
 			}
 			else if (mouseButtonEvent.ButtonIndex == 2 && gameStateManager.SelectedCharacter != null)
 			{
-				if (gameStateManager.SelectedCharacter.Stats.CanMove)
-				{
-					//IssueMoveOrder(position);
-				}
 			}
 			else
 			{ 
@@ -115,6 +108,7 @@ namespace FaffLatest.scripts.input
 		private void _On_Character_MoveOrder(Vector3 position)
 		{
 			var canMove = gameStateManager?.SelectedCharacter?.Stats?.CanMove;
+
 			if (canMove.HasValue && canMove.Value)
 			{
 				IssueMoveOrder(position);
@@ -122,44 +116,44 @@ namespace FaffLatest.scripts.input
 		}
 
 		private void IssueMoveOrder(Vector3 position)
-		{
-			var body = gameStateManager.SelectedCharacter.GetNode<KinematicBody>("KinematicBody");
-			position = position.Round();
+        {
+            var body = gameStateManager.SelectedCharacter.GetNode<KinematicBody>("KinematicBody");
+            position = position.Round();
 
-			(var x, var y, var z) = (position.x, 1, position.z);
-			x = Mathf.Clamp(x, 1, 50);
-			z = Mathf.Clamp(z, 1, 50);
+            (var x, var y, var z) = (position.x, body.Transform.origin.y, position.z);
 
-			position = new Vector3(x, body.Transform.origin.y, z);
+            x = Mathf.Clamp(x, 1, 50);
+            z = Mathf.Clamp(z, 1, 50);
 
+            position = new Vector3(x, y, z);
 
-			var distance = (position - body.Transform.origin).Length();
+            position = GetTargetPositionClampedByMovementDistance(position, body);
 
-			if(distance > gameStateManager.SelectedCharacter.Stats.MaxMovementDistancePerTurn)
-			{
-				//GD.Print($"Distance is {distance} - original position is {position}");
-				position = body.Transform.origin.MoveToward(position, gameStateManager.SelectedCharacter.Stats.MaxMovementDistancePerTurn);
+            GD.Print($"Getting path from {body.Transform.origin} to {position}");
 
-				position = position.Round();
-				//GD.Print($"New position is {position}");
-			}
+            var convertedPath = aStarNavigator.GetMovementPathNew(body.Transform.origin, position, gameStateManager.SelectedCharacter.Stats.AmountLeftToMoveThisTurn); // navigation.GetMovementPathNodes(body.Transform, position);
 
-			GD.Print($"Getting path from {body.Transform.origin} to {position}");
-			var convertedPath = aStarNavigator.GetMovementPathNew(body.Transform.origin, position, gameStateManager.SelectedCharacter.Stats.MaxMovementDistancePerTurn); // navigation.GetMovementPathNodes(body.Transform, position);
+            if (convertedPath == null)
+            {
+                GD.Print($"Cannot move from {body.Transform.origin} to {position}");
+                return;
+            }
 
-			if(convertedPath == null)
-			{
-				//GD.Print("Cannot move here");
-				return;
-			}
-			//GD.Print($"We can move {gameStateManager.SelectedCharacter}");
-			if(convertedPath.Length > gameStateManager.SelectedCharacter.Stats.MaxMovementDistancePerTurn)
-			{
-				Array.Resize(ref convertedPath, gameStateManager.SelectedCharacter.Stats.MaxMovementDistancePerTurn);
-			}
+            EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.SelectedCharacter, convertedPath);
+            gameStateManager.SetCharacterActive(true);
+        }
 
-			EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.SelectedCharacter, convertedPath);
-			gameStateManager.SetCharacterActive(true);
-		}
-	}
+        private Vector3 GetTargetPositionClampedByMovementDistance(Vector3 position, KinematicBody body)
+        {
+            var distance = (position - body.Transform.origin).Length();
+
+            if (distance > gameStateManager.SelectedCharacter.Stats.AmountLeftToMoveThisTurn)
+            {
+				position = body.Transform.origin.MoveToward(position, gameStateManager.SelectedCharacter.Stats.AmountLeftToMoveThisTurn);
+                position = position.Round();
+            }
+
+            return position;
+        }
+    }
 }

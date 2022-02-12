@@ -17,7 +17,7 @@ resource_local_to_scene = true
 albedo_color = Color( 1, 0, 0, 1 )
 
 [node name="Character" type="Spatial"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0 )
 script = ExtResource( 3 )
 __meta__ = {
 "_editor_description_": "5"
@@ -29,7 +29,7 @@ script = ExtResource( 2 )
 MovementStats = ExtResource( 6 )
 
 [node name="CharacterMovementGuide" type="Spatial" parent="KinematicBody"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.45, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0 )
 script = ExtResource( 8 )
 MovementGuideCellScene = ExtResource( 4 )
 

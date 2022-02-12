@@ -8,11 +8,10 @@ namespace FaffLatest.scripts.shared
         {
             var dotProduct = movementVector.Dot(backwardsVector);
 
-            var lookingAtDestination = dotProduct < -0.9999f;
-            GD.Print(lookingAtDestination);
+            var lookingAtDestination = dotProduct < -0.99f;
+
             return lookingAtDestination;
         }
-
         public static Vector3 Clamp(this Vector3 current, Vector3 newVal, float max)
                 => newVal.Length() > max ? current : newVal;
 
