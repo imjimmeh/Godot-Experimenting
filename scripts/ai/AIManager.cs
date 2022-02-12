@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FaffLatest.scripts.characters;
+using FaffLatest.scripts.constants;
 using FaffLatest.scripts.movement;
 using Godot;
 
@@ -11,20 +12,22 @@ namespace FaffLatest.scripts.ai
 {
 	public class AIManager : Node
 	{
-		private Character[] aiCharacters;
+		private List<Character> aiCharacters;
 		private bool isOurTurn;
 
 		private Character currentlyActioningCharacter;
 
 		private int currentArrayPos = 0;
-		private bool haveMoreCharacters => aiCharacters != null && aiCharacters.Length > currentArrayPos;
+		private bool haveMoreCharacters => aiCharacters != null && aiCharacters.Count > currentArrayPos;
 
 		private AStarNavigator aStarNavigator;
 
 		public void SetCharacters(Character[] characters)
 		{
 			GD.Print($"Received {characters?.Length} AI players");
-			aiCharacters = characters;
+			aiCharacters = characters.ToList();
+
+			ConnectCharacterSignals();
 		}
 
 		public void SetAITurn(bool isTurn)
@@ -48,6 +51,7 @@ namespace FaffLatest.scripts.ai
 			if(isOurTurn && currentlyActioningCharacter != null)
 			{
 				MoveCharacterIfPossible();
+				//GD.Print("moving");
 			}
 			else if(isOurTurn && currentlyActioningCharacter == null)
 			{
@@ -60,40 +64,45 @@ namespace FaffLatest.scripts.ai
 					ResetTurn();
 				}
 			}
+			else
+			{
+
+			}
 
 		}
 
 		private void MoveCharacterIfPossible()
 		{
-			if (currentlyActioningCharacter == null)
-				return;
-
 			bool inactiveCurrentCharacterWithMovementLeft = !currentlyActioningCharacter.IsActive && currentlyActioningCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn > 0;
-            if (inactiveCurrentCharacterWithMovementLeft)
+			if (inactiveCurrentCharacterWithMovementLeft)
 			{
 				GD.Print("Moving AI");
 				MoveCharacter();
 			}
 			else if (currentlyActioningCharacter.IsActive && currentlyActioningCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn <= 0)
-            {
-                GD.Print($"SActive and etting AI char done");
-                ClearCurrentlyActiveCharacter();
-            }
-        }
+			{
+				GD.Print($"SActive and etting AI char done");
+				ClearCurrentlyActiveCharacter();
+			}
+			else
+			{
+				//GD.Print($"{currentlyActioningCharacter.ProperBody.Transform.origin} - {currentlyActioningCharacter?.IsActive} - {currentlyActioningCharacter?.ProperBody?.MovementStats}");
+			}
+		}
 
-        private void ClearCurrentlyActiveCharacter()
-        {
-            currentlyActioningCharacter.IsActive = false;
-            currentlyActioningCharacter = null;
-        }
+		private void ClearCurrentlyActiveCharacter()
+		{
+			currentlyActioningCharacter.IsActive = false;
+			currentlyActioningCharacter = null;
+		}
 
-        private void MoveCharacter()
+		private void MoveCharacter()
 		{
 			var body = currentlyActioningCharacter.Body as MovingKinematicBody;
 
 			var target = GetNearestPCToCharacter(body.Transform.origin);
 			GD.Print($"{target.targetPosition}");
-			var path = aStarNavigator.GetMovementPathNew(body.Transform.origin, target.targetPosition, currentlyActioningCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
+			var path = aStarNavigator.GetMovementPath(body.Transform.origin, target.targetPosition, currentlyActioningCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
 
 			body.GetNode<PathMover>("PathMover").MoveWithPath(path);
 			currentlyActioningCharacter.IsActive = true;
@@ -107,10 +116,27 @@ namespace FaffLatest.scripts.ai
 
 		private void GetNextCharacter()
 		{
+			GD.Print($"Getting next char");
+
+			if(currentArrayPos > aiCharacters.Count)
+            {
+				ClearCurrentlyActiveCharacter();
+				currentArrayPos = 0;
+				return;
+            }
+
 			currentlyActioningCharacter = aiCharacters[currentArrayPos];
 			currentArrayPos++;
 
-			GD.Print($"Getting next char");
+			if (currentlyActioningCharacter == null)
+			{
+				GD.Print($"Character null - processing next if possible");
+				if (haveMoreCharacters)
+					GetNextCharacter();
+				else
+					ClearCurrentlyActiveCharacter();
+			}
+
 		}
 
 		public override void _Ready()
@@ -150,5 +176,34 @@ namespace FaffLatest.scripts.ai
 
 			return (closestCharacter, targetPos);
 		}
+
+		private void ConnectCharacterSignals()
+		{
+			foreach(var character in aiCharacters)
+			{
+				var asCharacter = character as Character;
+
+				asCharacter.ProperBody.Connect("_Character_FinishedMoving", this, "_On_AICharacter_FinishedMoving");
+				asCharacter.Connect(SignalNames.Characters.DISPOSING, this, SignalNames.Characters.DISPOSING_METHOD);
+			}
+		}
+
+		private void _On_AICharacter_FinishedMoving(Node character, Vector3 newPosition)
+		{
+			GD.Print($"Char finished moving");
+			if (haveMoreCharacters)
+				GetNextCharacter();
+			else
+				ClearCurrentlyActiveCharacter();
+		}
+
+		private void _On_Character_Disposing(Node character)
+        {
+			if (character.Equals(currentlyActioningCharacter) && character is Character asChar)
+            {
+				aiCharacters.Remove(asChar);
+				GetNextCharacter();
+            }
+        }
 	}	
 }

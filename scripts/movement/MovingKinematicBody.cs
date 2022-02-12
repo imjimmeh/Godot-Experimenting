@@ -62,11 +62,11 @@ public class MovingKinematicBody : KinematicBody
 
         if (!HaveDestination)
         {
-            if(!GetNextDestination())
+            if (!GetNextDestination())
             {
                 return;
             }
-           
+
         }
 
         if (!haveRotated)
@@ -87,7 +87,7 @@ public class MovingKinematicBody : KinematicBody
         if (HaveRotated())
             return;
 
-        if(TargetRotation == null)
+        if (TargetRotation == null)
         {
             TargetRotation = Transform.LookingAt(CurrentMovementDestination, Vector3.Up);
         }
@@ -134,6 +134,14 @@ public class MovingKinematicBody : KinematicBody
         if (!HaveDestination)
             return;
 
+        if (MovementStats.AmountLeftToMoveThisTurn <= 0)
+        {
+            GD.Print("Can't move anymore this turn");
+            MovementFinished();
+            pathMover.ClearPath();
+            return;
+        }
+
         this.InterpolateAndMove(delta, CurrentMovementDestination);
 
         bool atSamePoint = ReachedCurrentDestination();
@@ -153,22 +161,26 @@ public class MovingKinematicBody : KinematicBody
         }
         else
         {
-            if(CurrentMovementDestination != Vector3.Zero)
+            if (CurrentMovementDestination != Vector3.Zero)
                 SnapToCurrentDestination();
 
             if (pathMover.TryGetNextPathPart(out Vector3 target))
             {
                 SetVariables(target);
-
                 return true;
             }
             else
             {
                 ResetVariables();
-                EmitSignal(Characters.MOVEMENT_FINISHED, Parent, Transform.origin);
                 return false;
             }
         }
+    }
+
+    private void MovementFinished()
+    {
+        ResetVariables();
+        EmitSignal(Characters.MOVEMENT_FINISHED, Parent, Transform.origin);
     }
 
     private void SnapToCurrentDestination()

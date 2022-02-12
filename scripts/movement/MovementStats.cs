@@ -80,7 +80,7 @@ namespace FaffLatest.scripts.movement
         public void IncrementMovement()
         {
             AmountMovedThisTurn++;
-            //GD.Print($"Now moved {AmountMovedThisTurn} out of {MaxMovementDistancePerTurn}");
+            GD.Print($"Now moved {AmountMovedThisTurn} out of {MaxMovementDistancePerTurn}");
         }
 
         private void _On_Character_ReachedPathPart(Node character, Vector3 part)

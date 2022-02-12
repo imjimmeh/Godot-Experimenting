@@ -26,7 +26,6 @@ namespace FaffLatest.scripts.input
 
 		private void _On_Character_ClickedOn(Character character, InputEventMouseButton mouseButtonEvent)
 		{
-			GD.Print(character);
 			//GD.Print($"Mouse button {mouseButtonEvent.ButtonIndex} was {(mouseButtonEvent.Pressed ? "Pressed" : "Released")} on character {character.Stats.CharacterName}");
 
 			if(mouseButtonEvent.Pressed)	
@@ -41,11 +40,8 @@ namespace FaffLatest.scripts.input
 
 		private void _On_Character_Mouse_Pressed(Character character, InputEventMouseButton mouseButtonEvent)
         {
-            GD.Print("Press");
-
             if (IsAttackCommand(character, mouseButtonEvent))
             {
-                GD.Print("Attack");
                 character._On_Character_ReceiveDamage(gameStateManager.SelectedCharacter.Stats.EquippedWeapon.MinDamage, character);
             }
             else
@@ -131,7 +127,7 @@ namespace FaffLatest.scripts.input
 
             GD.Print($"Getting path from {body.Transform.origin} to {position}");
 
-            var convertedPath = aStarNavigator.GetMovementPathNew(body.Transform.origin, position, gameStateManager.SelectedCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn); // navigation.GetMovementPathNodes(body.Transform, position);
+            var convertedPath = aStarNavigator.GetMovementPath(body.Transform.origin, position, gameStateManager.SelectedCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn); // navigation.GetMovementPathNodes(body.Transform, position);
 
             if (convertedPath == null)
             {
@@ -139,7 +135,7 @@ namespace FaffLatest.scripts.input
                 return;
             }
 
-            EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.SelectedCharacter, convertedPath);
+			EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.SelectedCharacter, convertedPath);
             gameStateManager.SetCharacterActive(true);
         }
 

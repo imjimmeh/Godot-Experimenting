@@ -149,28 +149,26 @@ namespace FaffLatest.scripts.effects.movementguide
             if (node is CharacterMovementGuideCell cell)
             {
                 //GD.Print($"cell");
-                var path = AStar.GetMovementPathNew(body.Transform.origin, cell.GlobalTransform.origin, parent.ProperBody.MovementStats.MaxMovementDistancePerTurn);
-
                 ClearExistingPath();
-
+                var path = AStar.GetMovementPath(body.Transform.origin, cell.GlobalTransform.origin, parent.ProperBody.MovementStats.MaxMovementDistancePerTurn);
                 if (path == null || path.Length == 0)
                     return;
 
                 currentPath = new CharacterMovementGuideCell[path.Length];
                 int pathCount = 0;
+
                 for (var x = 0; x < path.Length; x++)
                 {
-                    if (path[x] == null)
-                    {
-                        break;
-                    }
+                    var nextCell = GetCellAndSetAsPathPart(path[x] - body.Transform.origin);
 
-                    currentPath[pathCount] = GetCellAndSetAsPathPart(path[x] - body.Transform.origin);
+                    if (nextCell == null)
+                        continue;
+
+                    currentPath[x] = nextCell;
                     pathCount++;
                 }
 
                 System.Array.Resize(ref currentPath, pathCount);
-
             }
         }
 
@@ -178,8 +176,11 @@ namespace FaffLatest.scripts.effects.movementguide
         {
             var newPathCell = GetCellFromLocalTransform(targetVector);
 
+
             if (newPathCell == null)
-                throw new Exception($"Error - could not find cell for {targetVector}");
+            {
+                return null;
+            }
 
             newPathCell.SetPartOfPath(true);
 
@@ -206,6 +207,9 @@ namespace FaffLatest.scripts.effects.movementguide
                 //GD.Print($"Clearing path");
                 for (var x = 0; x < currentPath.Length; x++)
                 {
+                    if (currentPath[x] == null)
+                        continue;
+
                     currentPath[x].SetPartOfPath(false);
                 }
             }

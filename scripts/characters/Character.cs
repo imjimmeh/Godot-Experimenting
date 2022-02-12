@@ -6,6 +6,9 @@ namespace FaffLatest.scripts.characters
 	public class Character : Spatial
 	{
 		[Signal]
+		public delegate void _Character_Disposing(Node character);
+
+		[Signal]
 		public delegate void _Character_Ready(Node character);
 
 		[Signal]
@@ -61,7 +64,7 @@ namespace FaffLatest.scripts.characters
 
 			EmitSignal(SignalNames.Characters.RECEIVED_DAMAGE, this, damage, origin);
 			GD.Print("Being attacked");
-			if (NoHealthLeft())
+			if (!IsAlive())
 			{
 				InitialiseDispose();
 			}
@@ -74,15 +77,12 @@ namespace FaffLatest.scripts.characters
 
 		private void InitialiseDispose()
 		{
+			EmitSignal("_Character_Disposing", this);
 			GD.Print($"No health - disposing");
 			IsDisposing = true;
 			QueueFree();
 		}
 
-		private bool NoHealthLeft()
-		{
-			return Stats.CurrentHealth <= 0;
-		}
+		private bool IsAlive() => Stats.CurrentHealth > 0;
 	}
 }
-

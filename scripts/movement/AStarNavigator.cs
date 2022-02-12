@@ -112,7 +112,7 @@ namespace FaffLatest.scripts.movement
 			Width = width;
         }
 
-		public Vector3[] GetMovementPathNew(Vector3 start, Vector3 end, float movementDistance)
+		public Vector3[] GetMovementPath(Vector3 start, Vector3 end, float movementDistance)
 		{
 			try
 			{
@@ -131,14 +131,6 @@ namespace FaffLatest.scripts.movement
 				}
 
 				var path = astar.GetPointPath(nearestStart.Id, nearestEnd.Id);
-
-				if (path == null)
-					return path;
-
-				var newArray = new Vector3[path.Length - 1];
-
-				for (var x = 1; x < path.Length; x++)
-					newArray[x - 1] = path[x];
 
 				return path;
 			}

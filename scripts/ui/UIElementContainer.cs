@@ -41,7 +41,7 @@ namespace FaffLatest.scripts.ui
 			base._Ready();
 		}
 
-		private void _On_Character_ReceiveDamage(Node character, int damage, Node origin)
+		private void _On_Character_ReceivedDamage(Node character, int damage, Node origin)
 		{
 			var asChar = character as Character;
 

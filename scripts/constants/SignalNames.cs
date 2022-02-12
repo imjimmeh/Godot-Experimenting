@@ -15,6 +15,9 @@ namespace FaffLatest.scripts.constants
 			public const string CLICKED_ON = prefix + SharedParts.CLICKED_ON;
 			public const string CLICKED_ON_METHOD = SharedParts.ON + CLICKED_ON;
 
+			public const string DISPOSING = prefix + SharedParts.DISPOSING;
+			public const string DISPOSING_METHOD = SharedParts.ON + DISPOSING;
+
 			public const string MOVE_ORDER = prefix + SharedParts.MOVE_ORDER;
 			public const string MOVE_ORDER_METHOD = SharedParts.ON + MOVE_ORDER;
 
@@ -72,6 +75,7 @@ namespace FaffLatest.scripts.constants
 		public class SharedParts
 		{
 			public const string CLICKED_ON = "ClickedOn";
+			public const string DISPOSING = "Disposing";
 			public const string MOVE_ORDER = "MoveOrder";
 			public const string MOVE_TO = "MoveTo";
 			public const string MOVEMENT_FINISHED = "FinishedMoving";
