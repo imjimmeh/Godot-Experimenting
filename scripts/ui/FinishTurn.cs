@@ -15,7 +15,7 @@ public class FinishTurn : Button
 		{
 			if(button.ButtonIndex == 1)
 			{
-				gsm.SetCurrentTurn(Faction.ENEMY);
+				gsm.PlayerEndTurn();
 			}
 		}
 	}

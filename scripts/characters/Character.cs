@@ -33,20 +33,27 @@ namespace FaffLatest.scripts.characters
 			ProperBody = Body as MovingKinematicBody;
 
 			AddToGroup(GroupNames.CHARACTER);
-			EmitSignal(SignalNames.Characters.READY, this);
 
-			ProperBody.GetNode("PathMover").Connect(SignalNames.Characters.REACHED_PATH_PART, Stats, SignalNames.Characters.REACHED_PATH_PART_METHOD);
+			Connect(SignalNames.Characters.READY, Body.GetNode("CharacterMovementGuide"), SignalNames.Characters.READY_METHOD);
+			ProperBody.GetNode("PathMover").Connect(SignalNames.Characters.REACHED_PATH_PART, ProperBody.MovementStats, SignalNames.Characters.REACHED_PATH_PART_METHOD);
 			Body.GetNode<ColouredBox>("CSGBox").SetColour(Stats);
+
+			EmitSignal(SignalNames.Characters.READY, this);
 		}
 
 		public override void _Process(float delta)
 		{
 			base._Process(delta);
-			if(IsDisposing)
+
+			if (IsSetActiveButFinishedTurn())
+				IsActive = false;
+			if (IsDisposing)
 			{
 				GetParent().RemoveChild(this);
 			}
 		}
+
+		private bool IsSetActiveButFinishedTurn() => IsActive && ProperBody.MovementStats.AmountLeftToMoveThisTurn == 0;
 
 		public void _On_Character_ReceiveDamage(int damage, Node origin)
 		{

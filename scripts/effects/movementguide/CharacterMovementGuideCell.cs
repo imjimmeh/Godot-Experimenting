@@ -32,7 +32,6 @@ namespace FaffLatest.scripts.effects.movementguide
 			ConnectSignals();
 
 			material = Mesh.SurfaceGetMaterial(0) as ShaderMaterial;
-			Connect("_Clicked_On", GetNode("../"), "_On_Cell_Clicked");
 		}
 
 		public void SetPartOfPath(bool isPathPart)
@@ -70,6 +69,7 @@ namespace FaffLatest.scripts.effects.movementguide
 
 		private void ConnectSignals()
 		{
+			Connect("_Clicked_On", GetNode("../"), "_On_Cell_Clicked");
 		}
 
 		public void SetVisiblity(bool visible)

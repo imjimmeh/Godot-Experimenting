@@ -65,28 +65,35 @@ namespace FaffLatest.scripts.ai
 
 		private void MoveCharacterIfPossible()
 		{
-			if (!currentlyActioningCharacter.IsActive && currentlyActioningCharacter.Stats.AmountLeftToMoveThisTurn > 0)
+			if (currentlyActioningCharacter == null)
+				return;
+
+			bool inactiveCurrentCharacterWithMovementLeft = !currentlyActioningCharacter.IsActive && currentlyActioningCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn > 0;
+            if (inactiveCurrentCharacterWithMovementLeft)
 			{
+				GD.Print("Moving AI");
 				MoveCharacter();
 			}
-			else if (currentlyActioningCharacter.IsActive && currentlyActioningCharacter.Stats.AmountLeftToMoveThisTurn <= 0)
-			{
-				currentlyActioningCharacter.IsActive = false;
-				currentlyActioningCharacter = null;
-			}
-			else if(currentlyActioningCharacter.Stats.AmountLeftToMoveThisTurn <= 0)
-			{
-				currentlyActioningCharacter = null;
-			}
-		}
+			else if (currentlyActioningCharacter.IsActive && currentlyActioningCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn <= 0)
+            {
+                GD.Print($"SActive and etting AI char done");
+                ClearCurrentlyActiveCharacter();
+            }
+        }
 
-		private void MoveCharacter()
+        private void ClearCurrentlyActiveCharacter()
+        {
+            currentlyActioningCharacter.IsActive = false;
+            currentlyActioningCharacter = null;
+        }
+
+        private void MoveCharacter()
 		{
 			var body = currentlyActioningCharacter.Body as MovingKinematicBody;
 
 			var target = GetNearestPCToCharacter(body.Transform.origin);
 			GD.Print($"{target.targetPosition}");
-			var path = aStarNavigator.GetMovementPathNew(body.Transform.origin, target.targetPosition, currentlyActioningCharacter.Stats.AmountLeftToMoveThisTurn);
+			var path = aStarNavigator.GetMovementPathNew(body.Transform.origin, target.targetPosition, currentlyActioningCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
 
 			body.GetNode<PathMover>("PathMover").MoveWithPath(path);
 			currentlyActioningCharacter.IsActive = true;
@@ -102,6 +109,8 @@ namespace FaffLatest.scripts.ai
 		{
 			currentlyActioningCharacter = aiCharacters[currentArrayPos];
 			currentArrayPos++;
+
+			GD.Print($"Getting next char");
 		}
 
 		public override void _Ready()

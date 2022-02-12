@@ -10,4 +10,3 @@ CharacterName = "Instance"
 MaxHealth = 0
 IsPlayerCharacter = true
 FaceIcon = ExtResource( 1 )
-MaxMovementDistancePerTurn = 0

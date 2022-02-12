@@ -69,12 +69,12 @@ namespace FaffLatest.scripts.movement
 			return currentVelocity += movementVector * acceleration * delta;
 		}
 
-		public static bool IsCellWithinMovementDistance(this CharacterStats character, Vector3 pos, Vector3 currentVector)
+		public static bool IsCellWithinMovementDistance(this MovementStats movementStats, Vector3 pos, Vector3 currentVector)
 		{
 			var distanceToCharacter = (pos - currentVector).Abs();
 
 			var distanceCalc = distanceToCharacter.x + distanceToCharacter.z;
-			var withinDistance = character.MaxMovementDistancePerTurn >= distanceCalc;
+			var withinDistance = movementStats.MaxMovementDistancePerTurn >= distanceCalc;
 
 			return withinDistance;
 		}

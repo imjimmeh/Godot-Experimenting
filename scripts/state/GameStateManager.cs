@@ -61,8 +61,17 @@ namespace FaffLatest.scripts.state
 			//GD.Print("Character has been unselected");
 		}
 
+		public void PlayerEndTurn()
+        {
+			SetCurrentTurn(Faction.ENEMY);
+        }
+
 		public void SetCurrentTurn(Faction turn)
 		{
+			if (currentTurn == turn)
+				return;
+
+			GD.Print($"Setting signal");
 			currentTurn = turn;
 
 			EmitSignal("_Turn_Changed", currentTurn.ToString());
@@ -95,11 +104,8 @@ namespace FaffLatest.scripts.state
             //GD.Print($"Character {c.Stats.CharacterName} has finished a movement");
 
             var characterParentNode = c.Stats.IsPlayerCharacter ? GroupNames.PLAYER_CHARACTERS : GroupNames.AI_CHARACTERS;
-            GD.Print($"{c.Stats.CharacterName} has fin their turn");
-            GD.Print($"Checking for characters in {characterParentNode}");
             var charactersInGroup = GetTree().GetNodesInGroup(characterParentNode);
 
-            GD.Print($"found {charactersInGroup.Count} chars in group");
             for (var x = 0; x < charactersInGroup.Count; x++)
             {
                 var asCharacter = charactersInGroup[x] as Character;
@@ -107,10 +113,8 @@ namespace FaffLatest.scripts.state
                 if (asCharacter.Stats.IsPlayerCharacter != c.Stats.IsPlayerCharacter)
                     continue;
 
-                if (asCharacter.Stats.CanMove)
+                if (asCharacter.ProperBody.MovementStats.CanMove)
                 {
-                    GD.Print($"{asCharacter.Stats.CharacterName} can still move");
-                    //GD.Print($"Turn not over - {asCharacter.Stats.CharacterName} still has {asCharacter.Stats.AmountLeftToMoveThisTurn} movement left");
                     return;
                 }
             }
@@ -131,7 +135,7 @@ namespace FaffLatest.scripts.state
                 if (asCharacter.Stats.IsPlayerCharacter != c.Stats.IsPlayerCharacter)
                     continue;
 
-                asCharacter.Stats.ResetMovement();
+                asCharacter.ProperBody.MovementStats.ResetMovement();
             }
         }
     }

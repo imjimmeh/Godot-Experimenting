@@ -6,7 +6,7 @@ using System;
 public class MovementDisplayMeshInstance : MeshInstance
 {
 	private Character parent;
-	private KinematicBody body;
+	private MovingKinematicBody body;
 
 	private PlaneMesh mesh;
 
@@ -23,7 +23,7 @@ public class MovementDisplayMeshInstance : MeshInstance
 	private void GetNodes()
 	{
 		parent = GetNode<Character>("../../");
-		body = parent.GetNode<KinematicBody>("KinematicBody");
+		body = parent.GetNode<MovingKinematicBody>("KinematicBody");
 		mesh = Mesh as PlaneMesh;
 	}
 
@@ -36,7 +36,7 @@ public class MovementDisplayMeshInstance : MeshInstance
 
 	public void ChangeSize()
 	{
-		mesh.Size = new Vector2(parent.Stats.MaxMovementDistancePerTurn * 2, parent.Stats.MaxMovementDistancePerTurn * 2);
+		mesh.Size = new Vector2(body.MovementStats.MaxMovementDistancePerTurn * 2, body.MovementStats.MaxMovementDistancePerTurn * 2);
 	}
 
 	private void _On_Character_Selected(Character character)
@@ -46,7 +46,7 @@ public class MovementDisplayMeshInstance : MeshInstance
 			return;
 		}
 
-		if(!parent.Stats.CanMove)
+		if(!body.MovementStats.CanMove)
         {
 			return;
         }
@@ -74,6 +74,6 @@ public class MovementDisplayMeshInstance : MeshInstance
 		var playerPosition = body.Transform.origin;
 
 		currentMaterial.SetShaderParam("playerPosition", playerPosition);
-		currentMaterial.SetShaderParam("playerMovementDistance", parent.Stats.MaxMovementDistancePerTurn);
+		currentMaterial.SetShaderParam("playerMovementDistance", body.MovementStats.MaxMovementDistancePerTurn);
 	}
 }

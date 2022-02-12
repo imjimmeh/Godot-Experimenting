@@ -29,7 +29,10 @@ namespace FaffLatest.scripts.effects.movementguide
         public override void _Ready()
         {
             base._Ready();
+        }
 
+        public void Initialise()
+        {
             AStar = GetNode<AStarNavigator>(AStarNavigator.GLOBAL_SCENE_PATH);
 
             GetCharacterNode();
@@ -47,7 +50,6 @@ namespace FaffLatest.scripts.effects.movementguide
 
         private void GetBody()
         {
-            GD.Print($"Getting body");
             body = parent.Body as KinematicBody;
         }
 
@@ -55,15 +57,13 @@ namespace FaffLatest.scripts.effects.movementguide
         {
             var gsm = GetNode(NodeReferences.Systems.GAMESTATE_MANAGER);
             gsm.Connect(SignalNames.Characters.SELECTED, this, SignalNames.Characters.SELECTED_METHOD);
-            //gsm.Connect(SignalNames.Characters.SELECTION_CLEARED, this, SignalNames.Characters.SELECTION_CLEARED_METHOD);
-
-            parent.Connect(SignalNames.Characters.READY, this, SignalNames.Characters.READY_METHOD);
 
             Connect(SignalNames.Characters.MOVE_ORDER, GetNode(NodeReferences.Systems.INPUT_MANAGER), SignalNames.Characters.MOVE_ORDER_METHOD);
         }
 
         private void _On_Character_Ready(Node character)
         {
+            Initialise();
             CreateMeshes();
         }
 
@@ -75,23 +75,25 @@ namespace FaffLatest.scripts.effects.movementguide
                 return;
             }
 
+          
             if (body == null)
                 GetBody();
 
             if (body == null)
                 throw new Exception("Player body is null?");
+          
 
             RotationDegrees = body.RotationDegrees * -1;
 
             foreach (var cell in existingMovementGuide)
-                cell.Value.CalculateVisiblity(parent.Stats.AmountLeftToMoveThisTurn);
+                cell.Value.CalculateVisiblity(parent.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
 
             Show();
         }
 
         public void CreateMeshes()
         {
-            var halfMovementDistance = parent.Stats.MaxMovementDistancePerTurn / 2;
+            var halfMovementDistance = parent.ProperBody.MovementStats.MaxMovementDistancePerTurn / 2;
 
             var pos = Vector3.Zero;
 
@@ -118,7 +120,7 @@ namespace FaffLatest.scripts.effects.movementguide
         {
             var currentVector = new Vector3(a, pos.y, b);
 
-            bool withinMovementDistance = parent.Stats.IsCellWithinMovementDistance(pos, currentVector);
+            bool withinMovementDistance = parent.ProperBody.MovementStats.IsCellWithinMovementDistance(pos, currentVector);
 
             if (!withinMovementDistance)
             {
@@ -147,7 +149,7 @@ namespace FaffLatest.scripts.effects.movementguide
             if (node is CharacterMovementGuideCell cell)
             {
                 //GD.Print($"cell");
-                var path = AStar.GetMovementPathNew(body.Transform.origin, cell.GlobalTransform.origin, parent.Stats.MaxMovementDistancePerTurn);
+                var path = AStar.GetMovementPathNew(body.Transform.origin, cell.GlobalTransform.origin, parent.ProperBody.MovementStats.MaxMovementDistancePerTurn);
 
                 ClearExistingPath();
 
@@ -228,13 +230,13 @@ namespace FaffLatest.scripts.effects.movementguide
 
         private static (float x, float z) GetMinimumPossibleValues(Character character, float x, float z)
         {
-            (var minX, var minZ) = (x - character.Stats.MaxMovementDistancePerTurn, z - character.Stats.MaxMovementDistancePerTurn);
+            (var minX, var minZ) = (x - character.ProperBody.MovementStats.MaxMovementDistancePerTurn, z - character.ProperBody.MovementStats.MaxMovementDistancePerTurn);
             return (minX, minZ);
         }
 
         private static (float x, float z) GetMaxPossibleValues(Character character, float x, float z)
         {
-            (var maxX, var maxZ) = (x + character.Stats.MaxMovementDistancePerTurn, z + character.Stats.MaxMovementDistancePerTurn);
+            (var maxX, var maxZ) = (x + character.ProperBody.MovementStats.MaxMovementDistancePerTurn, z + character.ProperBody.MovementStats.MaxMovementDistancePerTurn);
             return (maxX, maxZ);
         }
 

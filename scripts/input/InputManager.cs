@@ -107,7 +107,7 @@ namespace FaffLatest.scripts.input
 
 		private void _On_Character_MoveOrder(Vector3 position)
 		{
-			var canMove = gameStateManager?.SelectedCharacter?.Stats?.CanMove;
+			var canMove = gameStateManager?.SelectedCharacter?.ProperBody.MovementStats.CanMove;
 
 			if (canMove.HasValue && canMove.Value)
 			{
@@ -131,7 +131,7 @@ namespace FaffLatest.scripts.input
 
             GD.Print($"Getting path from {body.Transform.origin} to {position}");
 
-            var convertedPath = aStarNavigator.GetMovementPathNew(body.Transform.origin, position, gameStateManager.SelectedCharacter.Stats.AmountLeftToMoveThisTurn); // navigation.GetMovementPathNodes(body.Transform, position);
+            var convertedPath = aStarNavigator.GetMovementPathNew(body.Transform.origin, position, gameStateManager.SelectedCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn); // navigation.GetMovementPathNodes(body.Transform, position);
 
             if (convertedPath == null)
             {
@@ -147,9 +147,9 @@ namespace FaffLatest.scripts.input
         {
             var distance = (position - body.Transform.origin).Length();
 
-            if (distance > gameStateManager.SelectedCharacter.Stats.AmountLeftToMoveThisTurn)
+            if (distance > gameStateManager.SelectedCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn)
             {
-				position = body.Transform.origin.MoveToward(position, gameStateManager.SelectedCharacter.Stats.AmountLeftToMoveThisTurn);
+				position = body.Transform.origin.MoveToward(position, gameStateManager.SelectedCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
                 position = position.Round();
             }
 

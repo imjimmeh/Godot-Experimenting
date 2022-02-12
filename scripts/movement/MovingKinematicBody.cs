@@ -7,6 +7,8 @@ using static FaffLatest.scripts.constants.SignalNames;
 
 public class MovingKinematicBody : KinematicBody
 {
+    private const float DISTANCE_MARGIN_ALLOWED = 0.15f;
+
     [Signal]
     public delegate void _Character_ClickedOn(Node character, InputEventMouseButton mouseButtonEvent);
 
@@ -19,7 +21,9 @@ public class MovingKinematicBody : KinematicBody
     [Export]
     public MovementStats MovementStats { get; private set; }
 
-    private const float DISTANCE_MARGIN_ALLOWED = 0.1f;
+
+    private bool haveRotated = false;
+    private PathMover pathMover;
 
     public Node Parent;
 
@@ -27,10 +31,8 @@ public class MovingKinematicBody : KinematicBody
     public Vector3 CurrentMovementVector { get; private set; }
     public Transform TargetRotation { get; private set; }
 
-    public bool HaveDestination = false;
 
-    private bool haveRotated = false;
-    private PathMover pathMover;
+    public bool HaveDestination = false;
 
     public override void _Ready()
     {
@@ -113,7 +115,6 @@ public class MovingKinematicBody : KinematicBody
             if (!sameDirection)
             {
                 MovementStats.SetVelocity(Vector3.Zero);
-                GD.Print($"Clearing velocity");
             }
 
             SnapRotation();
@@ -165,7 +166,6 @@ public class MovingKinematicBody : KinematicBody
             {
                 ResetVariables();
                 EmitSignal(Characters.MOVEMENT_FINISHED, Parent, Transform.origin);
-                GD.Print($"Movement finished");
                 return false;
             }
         }
