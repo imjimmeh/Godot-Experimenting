@@ -182,9 +182,11 @@ namespace FaffLatest.scripts.ai
 			foreach(var character in aiCharacters)
 			{
 				var asCharacter = character as Character;
+				GD.Print($"Connecting signals for {character}");
 
 				asCharacter.ProperBody.Connect("_Character_FinishedMoving", this, "_On_AICharacter_FinishedMoving");
 				asCharacter.Connect(SignalNames.Characters.DISPOSING, this, SignalNames.Characters.DISPOSING_METHOD);
+				GD.Print($"Connecting signals");
 			}
 		}
 
@@ -199,11 +201,22 @@ namespace FaffLatest.scripts.ai
 
 		private void _On_Character_Disposing(Node character)
         {
-			if (character.Equals(currentlyActioningCharacter) && character is Character asChar)
+			if (character is Character asChar)
             {
-				aiCharacters.Remove(asChar);
-				GetNextCharacter();
+                if (IsCurrentlySelectedCharacter(character))
+                {
+                    GetNextCharacter();
+                }
+
+                GD.Print($"Disposing character");
+                aiCharacters.Remove(asChar);
+            }
+            else
+            {
+				GD.Print($"not char - {character}");
             }
         }
-	}	
+
+        private bool IsCurrentlySelectedCharacter(Node character) => currentlyActioningCharacter != null && currentlyActioningCharacter.Equals(character);
+    }	
 }

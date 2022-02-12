@@ -48,11 +48,12 @@ namespace FaffLatest.scripts.characters
 		{
 			base._Process(delta);
 
-			if (IsSetActiveButFinishedTurn())
+			if (!IsDisposing && IsSetActiveButFinishedTurn())
 				IsActive = false;
 			if (IsDisposing)
 			{
 				GetParent().RemoveChild(this);
+				IsDisposing = false;
 			}
 		}
 

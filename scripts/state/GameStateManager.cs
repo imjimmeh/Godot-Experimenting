@@ -48,6 +48,8 @@ namespace FaffLatest.scripts.state
 
 		public void SetCurrentlySelectedCharacter(Character character)
 		{
+			ClearCurrentlySelectedCharacter();
+
 			GD.Print($"Selected");
 			selectedCharacter = character;
 			EmitSignal(SignalNames.Characters.SELECTED, character);
@@ -73,6 +75,7 @@ namespace FaffLatest.scripts.state
 
 			GD.Print($"Setting signal");
 			currentTurn = turn;
+			ClearCurrentlySelectedCharacter();
 
 			EmitSignal("_Turn_Changed", currentTurn.ToString());
 		}

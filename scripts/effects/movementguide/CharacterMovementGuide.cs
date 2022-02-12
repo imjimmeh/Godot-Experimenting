@@ -249,5 +249,10 @@ namespace FaffLatest.scripts.effects.movementguide
             existingMovementGuide[new Vector2(a, b)] = cell;
             movementGuideCount++;
         }
+
+        private void _On_Character_SelectionCleared()
+        {
+            Hide();
+        }
     }
 }

@@ -94,13 +94,13 @@ namespace FaffLatest.scripts.state
 
 			var nodes = playerCharacters as Node[];
 
+			GD.Print($"Setting AI Chars");
 			GetNode<AIManager>("../AIManager").SetCharacters(aiChars);
 			EmitSignal(SignalNames.Loading.CHARACTERS_SPAWNED, this);
 		}
 
 		public Character SpawnCharacter(CharacterStats stats, Vector3 spawnPosition)
 		{
-			GD.Print($"spawn positon is {spawnPosition}");
 			var newCharacter = CharacterBase.Instance<Character>();
 
 			newCharacter.Stats = stats;
@@ -130,7 +130,12 @@ namespace FaffLatest.scripts.state
 		private void AddCharacterSignals(Node newCharacterKinematicBody, Character character)
 		{
 			var pathMover = newCharacterKinematicBody.GetNode("PathMover");
+			var charMoveGuide = newCharacterKinematicBody.GetNode("CharacterMovementGuide");
+
+
 			inputManager.Connect(SignalNames.Characters.MOVE_TO, pathMover,  SignalNames.Characters.MOVE_TO_METHOD);
+
+			gameStateManager.Connect(SignalNames.Characters.SELECTION_CLEARED, charMoveGuide, SignalNames.Characters.SELECTION_CLEARED_METHOD);
 
 			newCharacterKinematicBody.Connect(SignalNames.Characters.CLICKED_ON, inputManager, SignalNames.Characters.CLICKED_ON_METHOD);
 

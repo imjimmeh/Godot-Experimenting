@@ -34,7 +34,6 @@ namespace FaffLatest.scripts.characters
             var stats = new CharacterStats();
             stats.Initialise(GetRandomName(numberGenerator.RandiRange(0, names.Length - 1)), numberGenerator.RandiRange(minHealth, maxHealth), true, faceIcon, null);
 
-            GD.Print($"Generated character {stats}");
             return stats;
         }
 
