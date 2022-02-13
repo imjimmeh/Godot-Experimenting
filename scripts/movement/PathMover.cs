@@ -36,6 +36,13 @@ namespace FaffLatest.scripts.movement
 
         public bool TryGetNextPathPart(out Vector3 nextPath)
 		{
+			var notFirstPart = CurrentPathIndex > -1;
+
+			if (notFirstPart)
+			{
+				EmitSignal(Characters.REACHED_PATH_PART, this, KinematicBody.Transform.origin.Round());
+			}
+
 			CurrentPathIndex++;
 			nextPath = Vector3.Zero;
 
@@ -48,13 +55,6 @@ namespace FaffLatest.scripts.movement
 			else
 			{
 				nextPath = new Vector3(CurrentTarget.x, KinematicBody.Transform.origin.y, CurrentTarget.z);
-			}
-
-			var notFirstPart = CurrentPathIndex > 0;
-
-			if (notFirstPart)
-			{
-				EmitSignal(Characters.REACHED_PATH_PART, this, KinematicBody.Transform.origin.Round());
 			}
 
 			return !pathFinished;

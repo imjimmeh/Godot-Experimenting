@@ -12,7 +12,7 @@ namespace FaffLatest.scripts.characters
 		public delegate void _Character_Ready(Node character);
 
 		[Signal]
-		public delegate void _Character_ReceivedDamage(Node character, int damage, Node origin);
+		public delegate void _Character_ReceivedDamage(Node character, int damage, Node origin, bool killingBlow);
 
 		public Node Body;
 		public MovingKinematicBody ProperBody;
@@ -36,10 +36,7 @@ namespace FaffLatest.scripts.characters
 			ProperBody = Body as MovingKinematicBody;
 
 			AddToGroup(GroupNames.CHARACTER);
-
-			Connect(SignalNames.Characters.READY, Body.GetNode("CharacterMovementGuide"), SignalNames.Characters.READY_METHOD);
-			ProperBody.GetNode("PathMover").Connect(SignalNames.Characters.REACHED_PATH_PART, ProperBody.MovementStats, SignalNames.Characters.REACHED_PATH_PART_METHOD);
-			Body.GetNode<ColouredBox>("CSGBox").SetColour(Stats);
+			ConnectSignals();
 
 			EmitSignal(SignalNames.Characters.READY, this);
 		}
@@ -63,23 +60,29 @@ namespace FaffLatest.scripts.characters
 		{
 			Stats.AddHealth(-damage);
 
-			EmitSignal(SignalNames.Characters.RECEIVED_DAMAGE, this, damage, origin);
+			var characterStillAlive = IsAlive();
+
+			EmitSignal(SignalNames.Characters.RECEIVED_DAMAGE, this, damage, origin, !characterStillAlive);
 			GD.Print("Being attacked");
-			if (!IsAlive())
+
+			if (!characterStillAlive)
 			{
 				InitialiseDispose();
 			}
 		}
 
-		public void ConnectSignals(Node ui)
+		public void ConnectSignals()
 		{
-			Connect(SignalNames.Characters.RECEIVED_DAMAGE, ui, SignalNames.Characters.RECEIVED_DAMAGE_METHOD);
+			Connect(SignalNames.Characters.READY, Body.GetNode("CharacterMovementGuide"), SignalNames.Characters.READY_METHOD);
+			ProperBody.GetNode("PathMover").Connect(SignalNames.Characters.REACHED_PATH_PART, ProperBody.MovementStats, SignalNames.Characters.REACHED_PATH_PART_METHOD);
+			Body.GetNode<ColouredBox>("CSGBox").SetColour(Stats);
 		}
 
 		private void InitialiseDispose()
 		{
 			EmitSignal("_Character_Disposing", this);
 			GD.Print($"No health - disposing");
+
 			IsDisposing = true;
 			QueueFree();
 		}

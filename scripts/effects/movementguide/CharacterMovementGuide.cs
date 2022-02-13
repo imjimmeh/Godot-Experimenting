@@ -57,6 +57,7 @@ namespace FaffLatest.scripts.effects.movementguide
         {
             var gsm = GetNode(NodeReferences.Systems.GAMESTATE_MANAGER);
             gsm.Connect(SignalNames.Characters.SELECTED, this, SignalNames.Characters.SELECTED_METHOD);
+            gsm.Connect(SignalNames.Characters.SELECTION_CLEARED, this, SignalNames.Characters.SELECTION_CLEARED_METHOD);
 
             Connect(SignalNames.Characters.MOVE_ORDER, GetNode(NodeReferences.Systems.INPUT_MANAGER), SignalNames.Characters.MOVE_ORDER_METHOD);
         }
@@ -67,21 +68,22 @@ namespace FaffLatest.scripts.effects.movementguide
             CreateMeshes();
         }
 
-        private void _On_Character_Selected(Node character)
+        private void _On_Character_Selected(Character character)
         {
+            GD.Print("Char selected>");
             if (character != parent)
             {
                 Hide();
                 return;
             }
 
-          
+
             if (body == null)
                 GetBody();
 
             if (body == null)
                 throw new Exception("Player body is null?");
-          
+
 
             RotationDegrees = body.RotationDegrees * -1;
 
@@ -91,10 +93,13 @@ namespace FaffLatest.scripts.effects.movementguide
             Show();
         }
 
+        private void _On_Character_SelectonCleared()
+        {
+            Hide();
+        }
+
         public void CreateMeshes()
         {
-            var halfMovementDistance = parent.ProperBody.MovementStats.MaxMovementDistancePerTurn / 2;
-
             var pos = Vector3.Zero;
 
             (var x, var z) = (pos.x, pos.z);
@@ -102,8 +107,6 @@ namespace FaffLatest.scripts.effects.movementguide
             (var maxX, var maxZ) = GetMaxPossibleValues(parent, x, z);
 
             (var minX, var minZ) = GetMinimumPossibleValues(parent, x, z);
-
-            int totalPossibleMeshCount = (int)((maxX - minX) * (maxZ - minZ));
 
             existingMovementGuide = new Dictionary<Vector2, CharacterMovementGuideCell>();
 

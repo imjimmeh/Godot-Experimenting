@@ -41,28 +41,21 @@ namespace FaffLatest.scripts.input
 
 		private void _On_Character_Mouse_Pressed(Character character, InputEventMouseButton mouseButtonEvent)
         {
-            if (mouseButtonEvent.IsAttackCommand(gameStateManager, character))
-            {
-				gameStateManager
-					.SelectedCharacter
-					.TryIssueAttackCommand(character);
-			}
-            else
-            {
 
-            }
         }
 
         private void _On_Character_Mouse_Released(Character character, InputEventMouseButton mouseButtonEvent)
 		{
-            bool isSelectChararacterAction = mouseButtonEvent.IsLMB() && character.Stats.IsPlayerCharacter && !gameStateManager.CharacterIsActive;
-
-            if (isSelectChararacterAction)
+            if (mouseButtonEvent.IsSelectCharacterAction(gameStateManager, character))
 			{
-				gameStateManager.SetCurrentlySelectedCharacter(character);
+				gameStateManager
+					.SetCurrentlySelectedCharacter(character);
 			}
-			else
+			else if(mouseButtonEvent.IsAttackCommand(gameStateManager, character))
 			{
+				gameStateManager
+					.SelectedCharacter
+					.TryIssueAttackCommand(character);
 			}
 		}
 

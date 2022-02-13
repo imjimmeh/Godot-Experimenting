@@ -136,12 +136,11 @@ public class MovingKinematicBody : KinematicBody
 
         if (MovementStats.AmountLeftToMoveThisTurn <= 0)
         {
-            GD.Print("Can't move anymore this turn");
             MovementFinished();
             pathMover.ClearPath();
             return;
         }
-
+        
         this.InterpolateAndMove(delta, CurrentMovementDestination);
 
         bool atSamePoint = ReachedCurrentDestination();
@@ -171,6 +170,7 @@ public class MovingKinematicBody : KinematicBody
             }
             else
             {
+                MovementFinished();
                 ResetVariables();
                 return false;
             }

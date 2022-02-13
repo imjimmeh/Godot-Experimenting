@@ -4,11 +4,11 @@ using System;
 
 namespace FaffLatest.scripts.characters
 {
-    public class CharacterStatsGenerator
+    public class CharacterRandomiser
     {
         private CharacterGeneratorStats stats;
 
-        public CharacterStatsGenerator(CharacterGeneratorStats stats)
+        public CharacterRandomiser(CharacterGeneratorStats stats)
         {
             this.stats = stats ?? throw new ArgumentNullException(nameof(stats));
         }

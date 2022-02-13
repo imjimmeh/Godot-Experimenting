@@ -29,7 +29,7 @@ public class MovementDisplayMeshInstance : MeshInstance
 
 	private void ConnectSignals()
 	{
-		var gsm = GetNode("/root/Root/Systems/GameStateManager");
+		var gsm = GetNode(NodeReferences.Systems.GAMESTATE_MANAGER);
 		gsm.Connect(SignalNames.Characters.SELECTED, this, SignalNames.Characters.SELECTED_METHOD);
 		gsm.Connect(SignalNames.Characters.SELECTION_CLEARED, this, SignalNames.Characters.SELECTION_CLEARED_METHOD);
 	}

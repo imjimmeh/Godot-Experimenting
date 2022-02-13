@@ -128,21 +128,13 @@ namespace FaffLatest.scripts.state
 		private void AddCharacterSignals(Node newCharacterKinematicBody, Character character)
 		{
 			var pathMover = newCharacterKinematicBody.GetNode("PathMover");
-			var charMoveGuide = newCharacterKinematicBody.GetNode("CharacterMovementGuide");
-
 
 			inputManager.Connect(SignalNames.Characters.MOVE_TO, pathMover,  SignalNames.Characters.MOVE_TO_METHOD);
 
-			gameStateManager.Connect(SignalNames.Characters.SELECTION_CLEARED, charMoveGuide, SignalNames.Characters.SELECTION_CLEARED_METHOD);
-
 			newCharacterKinematicBody.Connect(SignalNames.Characters.CLICKED_ON, inputManager, SignalNames.Characters.CLICKED_ON_METHOD);
-
 			newCharacterKinematicBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, astarNavigator, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
 			newCharacterKinematicBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, characterMovementPathManager, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
 			newCharacterKinematicBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, gameStateManager, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
-
-			character.ConnectSignals(ui);
-
 		}
 
 		private void FindNeededNodes()

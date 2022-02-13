@@ -14,15 +14,15 @@ namespace FaffLatest.scripts.world
 		public SpawnManager SpawnManager { get => GetSpawnManager(); private set => spawnManager = value; }
 
 		[Export]
-		public CharacterGeneratorStats CharacterGeneratorStats { get; private set; }
+		public CharacterGeneratorStats StatsForCharacterRandomiser { get; private set; }
 
-		public CharacterStatsGenerator CharacterStatsGenerator { get; private set; }
+		public CharacterRandomiser CharacterRandomiser { get; private set; }
 
 
 		public override void _Ready()
 		{
 			base._Ready();
-			CharacterStatsGenerator = new CharacterStatsGenerator(CharacterGeneratorStats);
+			CharacterRandomiser = new CharacterRandomiser(StatsForCharacterRandomiser);
 		}
 
 		private SpawnManager GetSpawnManager()
@@ -55,11 +55,10 @@ namespace FaffLatest.scripts.world
 
 			for (var x = 0; x < 9; x++)
 			{
-				var newCharacter = CharacterStatsGenerator.GenerateRandomCharacter();
+				var newCharacter = CharacterRandomiser.GenerateRandomCharacter();
 				chars[x] = newCharacter;
-
-				if (x >= 5)
-					chars[x].IsPlayerCharacter = false;
+				chars[x].IsPlayerCharacter = x <= 5;
+				
 			}
 
 			GetSpawnLocationsAndSpawnCharacters(chars);

@@ -61,8 +61,6 @@ namespace FaffLatest.scripts.map
 			root.AddChild(baseLevel);
 			baseLevel.LoadMap(loadingMap);
 
-			var children = root.GetChildren();
-
 			ClearVariables();
 		}
 

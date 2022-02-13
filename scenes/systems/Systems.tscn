@@ -42,6 +42,3 @@ ZombieWeapon = SubResource( 1 )
 [node name="UIManager" type="Node" parent="."]
 process_priority = 5
 script = ExtResource( 2 )
-
-[connection signal="_Character_Selected" from="GameStateManager" to="UIManager" method="_On_Character_Selected"]
-[connection signal="_Character_SelectionCleared" from="GameStateManager" to="UIManager" method="_On_Character_Unselected"]

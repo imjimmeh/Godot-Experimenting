@@ -43,18 +43,16 @@ namespace FaffLatest.scripts.movement
             InitialiseComponents(length, width);
 
             int currentPointId = 0;
-			float x, y = 0;
-            for (x = 0; x < length; x += GridSize)
+
+            for (var x = 0; x < length; x += GridSize)
             {
-                for (y = 0; y < width; y += GridSize)
+                for (var y = 0; y < width; y += GridSize)
                 {
                     CreatePoint(currentPointId, x, y, length, width);
 
                     currentPointId++;
                 }
             }
-
-			//GD.Print($"Created {x} - {y} points");
 		}
 
 		private void CreatePoint(int currentPointId, float x, float y, int xLength, int yLength)
@@ -93,7 +91,7 @@ namespace FaffLatest.scripts.movement
 
             if (y > 0)
             {
-				var yAbove = y -GridSize;
+				var yAbove = y - GridSize;
 				GetAndConnectPoints(currentPointId, x, yAbove);
             }
         }
@@ -112,35 +110,83 @@ namespace FaffLatest.scripts.movement
 			Width = width;
         }
 
-		public Vector3[] GetMovementPath(Vector3 start, Vector3 end, float movementDistance)
+		public Vector3[] GetMovementPath(Vector3 start, Vector3 end, int movementDistance)
 		{
 			try
+            {
+                var(startPoint, endPoint) = GetStartAndEndPoints(start, end);
+
+                var s = astar.GetPointPosition(startPoint.Id);
+                var e = astar.GetPointPosition(endPoint.Id);
+
+                if (endPoint.OccupyingNode != null)
+                {
+                    return null;
+                }
+
+                var path = astar.GetPointPath(startPoint.Id, endPoint.Id);
+
+                if (path == null)
+                {
+                    GD.Print($"Could not find path for {start} to {end}");
+
+                    return null;
+                }
+
+                GD.Print($"found path {string.Join(",", path)}");
+                return TrimAndClampPath(path, start, movementDistance);
+            }
+            catch (Exception ex)
 			{
-				(var startX, var startY) = ((int)start.x, (int)start.z);
-				(var endX, var endY) = ((int)end.x, (int)end.z);
 
-				PointInfo nearestStart = Points[startX, startY]; // astar.GetClosestPoint(start);
-				PointInfo nearestEnd = Points[endX, endY];
-
-				var s = astar.GetPointPosition(nearestStart.Id);
-				var e = astar.GetPointPosition(nearestEnd.Id);
-
-				if (nearestEnd.OccupyingNode != null)
-				{
-					return null;
-				}
-
-				var path = astar.GetPointPath(nearestStart.Id, nearestEnd.Id);
-
-				return path;
-			}
-			catch (Exception ex)
-			{
+				GD.Print($"Error getting path from {start} to {end}- {ex.Message}");
 				return null;
 			}
 		}
 
-		public void _On_Character_Created(Node character)
+        private Vector3[] TrimAndClampPath(Vector3[] points, Vector3 start, int maxLength)
+        {
+            if(points == null || points.Length == 0)
+            {
+                throw new Exception("No path given");
+            }
+            else if(points.Length == 1)
+            {
+                throw new Exception("Only one point on path given");
+            }
+            else if(start.z != points[0].z || start.z != points[0].z)
+            {
+                GD.Print($"Already missing start point - initial is {points[0]}, start vector given was {start}");
+                return points;
+            }
+
+            var pointsCount = points.Count() - 1;
+
+            var pathLongerThanAllowed = pointsCount > maxLength;
+            var maxX = pathLongerThanAllowed ? maxLength + 1 : pointsCount;
+
+            var newArray = new Vector3[maxX];
+
+            for(var x = 0; x <= maxX; x++)
+            {
+                if (x == 0)
+                    continue;
+
+                newArray[x - 1] = points[x];
+            }
+
+            return newArray;
+        }
+
+        private (PointInfo start, PointInfo end) GetStartAndEndPoints(Vector3 start, Vector3 end)
+        {
+            (var startX, var startY) = ((int)start.x, (int)start.z);
+            (var endX, var endY) = ((int)end.x, (int)end.z);
+
+            return (start: Points[startX, startY], end: Points[endX, endY]);
+        }
+
+        public void _On_Character_Created(Node character)
         {
             var asCharacter = character as Character;
             //GD.Print($"AStarNavigator received _OnCharacterCreated for character {asCharacter.Stats.CharacterName}");
@@ -180,16 +226,10 @@ namespace FaffLatest.scripts.movement
 
 				astar.SetPointDisabled(newOccupyingNode.Id);
 
-				GD.Print($"Found new node {newOccupyingNode} for {newPosition} which should be {astar.GetPointPosition(newOccupyingNode.Id)}");
-
 				oldLocationPointInfo.SetOccupier(null);
 				newOccupyingNode.SetOccupier(character);
 
 				characterLocations[character] = GetPointInfoForVector3(newPosition);
-			}
-			else
-			{
-				GD.Print($"AStarNavigatorError - Could not find matching node for {character.Name}");
 			}
 		}
 

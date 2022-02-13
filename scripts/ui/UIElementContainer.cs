@@ -9,39 +9,40 @@ namespace FaffLatest.scripts.ui
 	{
 		private Camera camera;
 
-		private Control selectedCharacterPart;
-
-		private TextureRect characterFaceIcon;
-		public TextureRect CharacterFaceIcon {get =>characterFaceIcon; private set => characterFaceIcon = value;}
-
-		public Label CharacterName;
-
 		public CharacterSelector CharacterSelector { get; private set; }
+
+		public SelectedCharacter SelectedCharacter { get; private set; }
 
 		public HealthBar HealthBar { get; private set; }
 
 		public Control EffectLabelsParent { get; private set; }
 
 		public override void _Ready()
-		{
-			selectedCharacterPart = GetNode<Control>("SelectedCharacter");
+        {
+            GetUIChildrenNodes();
+			ConnectSignals();
 
-			var viewportSize = GetViewport().GetVisibleRect().Size;
+            var viewportSize = GetViewport().GetVisibleRect().Size;
+            SelectedCharacter.RectPosition = new Vector2(viewportSize.x - 200, viewportSize.y - 200);
 
-			selectedCharacterPart.RectPosition = new Vector2(viewportSize.x - 200, viewportSize.y - 200);
 
-			CharacterFaceIcon = selectedCharacterPart.	GetNode<TextureRect>("CharacterIcon");
-			CharacterName = CharacterFaceIcon.GetNode<Label>("Name");
+            base._Ready();
+        }
 
-			CharacterSelector = GetNode<CharacterSelector>("CharacterSelector");
-			HealthBar = CharacterFaceIcon.GetNode<HealthBar>("HealthBar");
+        private void GetUIChildrenNodes()
+        {
+			GD.Print("Getting children nodes");
+            CharacterSelector = GetNode<CharacterSelector>("CharacterSelector");
+            SelectedCharacter = GetNode<SelectedCharacter>("SelectedCharacter");
+            EffectLabelsParent = GetNode<Control>("EffectLabels");
+        }
 
-			EffectLabelsParent = GetNode<Control>("EffectLabels");
-
-			base._Ready();
+		private void ConnectSignals()
+        {
+			SelectedCharacter.ConnectSignals(GetNode(NodeReferences.Systems.GAMESTATE_MANAGER));
 		}
 
-		private void _On_Character_ReceivedDamage(Node character, int damage, Node origin)
+		private void _On_Character_ReceivedDamage(Node character, int damage, Node origin, bool killingBlow)
 		{
 			var asChar = character as Character;
 

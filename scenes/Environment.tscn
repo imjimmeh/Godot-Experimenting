@@ -6,4 +6,4 @@
 [node name="WorldManager" type="Spatial"]
 transform = Transform( 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
 script = ExtResource( 3 )
-CharacterGeneratorStats = ExtResource( 1 )
+StatsForCharacterRandomiser = ExtResource( 1 )
