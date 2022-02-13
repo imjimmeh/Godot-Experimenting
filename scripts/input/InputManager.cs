@@ -1,4 +1,5 @@
 using FaffLatest.scripts.characters;
+using FaffLatest.scripts.combat;
 using FaffLatest.scripts.constants;
 using FaffLatest.scripts.movement;
 using FaffLatest.scripts.state;
@@ -42,8 +43,8 @@ namespace FaffLatest.scripts.input
         {
             if (IsAttackCommand(character, mouseButtonEvent))
             {
-                character._On_Character_ReceiveDamage(gameStateManager.SelectedCharacter.Stats.EquippedWeapon.MinDamage, character);
-            }
+				gameStateManager.SelectedCharacter.TryIssueAttackCommand(character);
+			}
             else
             {
 
