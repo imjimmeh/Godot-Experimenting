@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=6 format=2]
+
+[ext_resource path="res://scripts/characters/CharacterGeneratorStats.cs" type="Script" id=1]
+[ext_resource path="res://art/sprites/characterfaces/1.tres" type="Texture" id=2]
+[ext_resource path="res://art/sprites/characterfaces/2.tres" type="Texture" id=3]
+[ext_resource path="res://resources/weapons/AK47.tres" type="Resource" id=4]
+[ext_resource path="res://resources/weapons/FourByFour.tres" type="Resource" id=5]
+
+[resource]
+script = ExtResource( 1 )
+PossibleCharacterNames = PoolStringArray( "Jim", "Kayla", "Pippa", "Clem", "Mimi", "Chloe", "Nadine", "Drake", "Sully", "Sam" )
+PossibleFaceIcons = [ ExtResource( 2 ), ExtResource( 3 ) ]
+PossibleStartWeapons = [ ExtResource( 4 ), ExtResource( 5 ) ]
+MinHealth = 5
+MaxHealth = 15

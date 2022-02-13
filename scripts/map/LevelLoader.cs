@@ -63,10 +63,6 @@ namespace FaffLatest.scripts.map
 
 			var children = root.GetChildren();
 
-			foreach(var child in children)
-			{
-				GD.Print(child);
-			}
 			ClearVariables();
 		}
 

@@ -32,9 +32,19 @@ namespace FaffLatest.scripts.characters
             }
 
             var stats = new CharacterStats();
-            stats.Initialise(GetRandomName(numberGenerator.RandiRange(0, names.Length - 1)), numberGenerator.RandiRange(minHealth, maxHealth), true, faceIcon, null);
+            stats.Initialise(GetRandomName(GetRandomNumberNumber()), GetRandomHealth(), true, faceIcon, null);
 
             return stats;
+        }
+
+        private static int GetRandomHealth()
+        {
+            return numberGenerator.RandiRange(minHealth, maxHealth);
+        }
+
+        private static int GetRandomNumberNumber()
+        {
+            return numberGenerator.RandiRange(0, names.Length - 1);
         }
 
         private static string GetRandomName(int toGet) => names[toGet];

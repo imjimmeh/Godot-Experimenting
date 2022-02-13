@@ -41,9 +41,11 @@ namespace FaffLatest.scripts.input
 
 		private void _On_Character_Mouse_Pressed(Character character, InputEventMouseButton mouseButtonEvent)
         {
-            if (IsAttackCommand(character, mouseButtonEvent))
+            if (mouseButtonEvent.IsAttackCommand(gameStateManager, character))
             {
-				gameStateManager.SelectedCharacter.TryIssueAttackCommand(character);
+				gameStateManager
+					.SelectedCharacter
+					.TryIssueAttackCommand(character);
 			}
             else
             {
@@ -51,12 +53,9 @@ namespace FaffLatest.scripts.input
             }
         }
 
-        private bool IsAttackCommand(Character character, InputEventMouseButton mouseButtonEvent)
-			=> mouseButtonEvent.ButtonIndex == 1 && gameStateManager.SelectedCharacter != null && !gameStateManager.SelectedCharacter.Stats.HasUsedActionThisTurn && !character.Stats.IsPlayerCharacter;
-
         private void _On_Character_Mouse_Released(Character character, InputEventMouseButton mouseButtonEvent)
 		{
-            bool isSelectChararacterAction = mouseButtonEvent.ButtonIndex == 1 && character.Stats.IsPlayerCharacter && !gameStateManager.CharacterIsActive;
+            bool isSelectChararacterAction = mouseButtonEvent.IsLMB() && character.Stats.IsPlayerCharacter && !gameStateManager.CharacterIsActive;
 
             if (isSelectChararacterAction)
 			{
@@ -86,7 +85,7 @@ namespace FaffLatest.scripts.input
 
 		private void _On_World_Mouse_Released(ClickableWorldElement world, InputEventMouseButton mouseButtonEvent, Vector3 position)
 		{
-            bool isClearSelectionAction = mouseButtonEvent.ButtonIndex == 1 && gameStateManager.SelectedCharacter != null;
+			bool isClearSelectionAction = mouseButtonEvent.IsLMB() && gameStateManager.HaveACharacterSelected;
 
             if (isClearSelectionAction)
 			{

@@ -27,22 +27,28 @@ namespace FaffLatest.scripts.state
 		public AStarNavigator AStarNavigator { get; private set; }
 		public SpawnManager SpawnManager { get; private set; }
 
-		public bool CharacterIsActive => SelectedCharacter != null && SelectedCharacter.IsActive;
+		public bool CharacterIsActive => HaveACharacterSelected && SelectedCharacter.IsActive;
 
+		public bool HaveACharacterSelected => SelectedCharacter != null;
+
+		public bool SelectedCharacterCanUseAction => HaveACharacterSelected && !SelectedCharacter.Stats.HasUsedActionThisTurn;
+
+		public bool SelectedCharacterCanMove => HaveACharacterSelected && !SelectedCharacter.ProperBody.MovementStats.CanMove;
 
 		public override void _Ready()
 		{
 			base._Ready();
 
-			AStarNavigator = GetNode<AStarNavigator>("../AStarNavigator");
-			SpawnManager = GetNode<SpawnManager>("../SpawnManager");
-			var aiManager = GetNode<AIManager>("../AIManager");
-		   Connect("_Turn_Changed", GetNode("../UIManager"), "_On_Turn_Change");
-			Connect("_Turn_Changed", aiManager, "_On_Turn_Change");
+            AStarNavigator = GetNode<AStarNavigator>("../AStarNavigator");
+            SpawnManager = GetNode<SpawnManager>("../SpawnManager");
 
-		}
+            var aiManager = GetNode<AIManager>("../AIManager");
 
-		public void InitialiseMap()
+            Connect("_Turn_Changed", GetNode("../UIManager"), "_On_Turn_Change");
+            Connect("_Turn_Changed", aiManager, "_On_Turn_Change");
+        }
+
+        public void InitialiseMap()
 		{
 		}
 
@@ -59,8 +65,6 @@ namespace FaffLatest.scripts.state
 		{
 			selectedCharacter = null;
 			EmitSignal(SignalNames.Characters.SELECTION_CLEARED);
-
-			//GD.Print("Character has been unselected");
 		}
 
 		public void PlayerEndTurn()

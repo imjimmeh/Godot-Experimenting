@@ -74,7 +74,6 @@ namespace FaffLatest.scripts.state
 				{
 					var weaponNumber = random.RandiRange(0, PossibleInitialWeapons.Length - 1);
 					character.Stats.SetWeapon(PossibleInitialWeapons[weaponNumber]);
-					GD.Print($"Setting character {character.Stats} weapon {PossibleInitialWeapons[weaponNumber].Name}");
 					playerCharacters[pc] = character;
 					pc++;
 				}
@@ -84,7 +83,6 @@ namespace FaffLatest.scripts.state
 					aiChars[nonPc] = character;
 					nonPc++;
 				}
-				GD.Print($"Created {character}");
 			}
 
 			Array.Resize(ref playerCharacters, pc);

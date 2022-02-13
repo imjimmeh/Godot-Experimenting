@@ -24,7 +24,6 @@ namespace FaffLatest.scripts.ai
 
 		public void SetCharacters(Character[] characters)
 		{
-			GD.Print($"Received {characters?.Length} AI players");
 			aiCharacters = characters.ToList();
 
 			ConnectCharacterSignals();
@@ -39,7 +38,6 @@ namespace FaffLatest.scripts.ai
 		private void _On_Turn_Change(string turn)
 		{
 			var ourTurn = turn.Equals("ENEMY");
-			GD.Print($"TUrn is {turn} our turn is {ourTurn}");
 
 			SetAITurn(ourTurn);
 		}
@@ -48,27 +46,21 @@ namespace FaffLatest.scripts.ai
 		{
 			base._Process(delta);
 
-			if(isOurTurn && currentlyActioningCharacter != null)
+			if (!isOurTurn)
+				return;
+
+			if (currentlyActioningCharacter != null)
 			{
 				MoveCharacterIfPossible();
-				//GD.Print("moving");
 			}
-			else if(isOurTurn && currentlyActioningCharacter == null)
+			else if (haveMoreCharacters)
 			{
-				if (haveMoreCharacters)
-				{
-					GetNextCharacter();
-				}
-				else
-				{
-					ResetTurn();
-				}
+				GetNextCharacter();
 			}
 			else
 			{
-
+				ResetTurn();
 			}
-
 		}
 
 		private void MoveCharacterIfPossible()
@@ -99,9 +91,7 @@ namespace FaffLatest.scripts.ai
 		private void MoveCharacter()
 		{
 			var body = currentlyActioningCharacter.Body as MovingKinematicBody;
-
 			var target = GetNearestPCToCharacter(body.Transform.origin);
-			GD.Print($"{target.targetPosition}");
 			var path = aStarNavigator.GetMovementPath(body.Transform.origin, target.targetPosition, currentlyActioningCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
 
 			body.GetNode<PathMover>("PathMover").MoveWithPath(path);
@@ -181,12 +171,8 @@ namespace FaffLatest.scripts.ai
 		{
 			foreach(var character in aiCharacters)
 			{
-				var asCharacter = character as Character;
-				GD.Print($"Connecting signals for {character}");
-
-				asCharacter.ProperBody.Connect("_Character_FinishedMoving", this, "_On_AICharacter_FinishedMoving");
-				asCharacter.Connect(SignalNames.Characters.DISPOSING, this, SignalNames.Characters.DISPOSING_METHOD);
-				GD.Print($"Connecting signals");
+				character.ProperBody.Connect("_Character_FinishedMoving", this, "_On_AICharacter_FinishedMoving");
+				character.Connect(SignalNames.Characters.DISPOSING, this, SignalNames.Characters.DISPOSING_METHOD);
 			}
 		}
 
@@ -208,12 +194,7 @@ namespace FaffLatest.scripts.ai
                     GetNextCharacter();
                 }
 
-                GD.Print($"Disposing character");
                 aiCharacters.Remove(asChar);
-            }
-            else
-            {
-				GD.Print($"not char - {character}");
             }
         }
 

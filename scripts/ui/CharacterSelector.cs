@@ -31,6 +31,7 @@ namespace FaffLatest.scripts.ui
 			if (characters == null || characters.Length == 0)
 				return;
 
+
 			characterDisplays = new MiniCharacterDisplay[characters.Length];
 
 			var drawn = 0;
@@ -41,17 +42,16 @@ namespace FaffLatest.scripts.ui
 				var display = CreateDisplay(characters[i], spriteSize, i);
 
 				characterDisplays[i] = display;
+
+				AddChild(display);
 				drawn++;
 			}
 		}
 
 		private void _On_Characters_Spawned(Node spawnManager)
 		{
-			GD.Print(spawnManager);
 			if(spawnManager is SpawnManager sm)
 			{
-				GD.Print(sm);
-
 				AddCharacters(sm.Characters);
 			}
 		}

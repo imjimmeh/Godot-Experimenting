@@ -46,7 +46,6 @@ namespace FaffLatest.scripts.world
 		{
 			var chars = new CharacterStats[9];
 
-
 			for (var x = 0; x < 9; x++)
 			{
 				var newCharacter = CharacterStatsGenerator.GenerateRandomCharacter();
