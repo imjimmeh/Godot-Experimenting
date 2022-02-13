@@ -1,52 +1,79 @@
-﻿using System;
-
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FaffLatest.scripts.weapons;
 using Godot;
+using System;
 
 namespace FaffLatest.scripts.characters
 {
-    public class CharacterStatsGenerator : Godot.Reference
+    public class CharacterStatsGenerator
     {
-        private const string faceIconResPath = "res://art/sprites/characterfaces/1.tres";
-        private static RandomNumberGenerator numberGenerator = new RandomNumberGenerator();
-        private static bool initialised = false;
+        private CharacterGeneratorStats stats;
 
-        private static string[] names = { "Jim", "Kayla", "Clem", "Pippa", "Mimi", "Chloe", "Nadine", "Drake", "Sully" };
-
-        private static AtlasTexture faceIcon;
-
-        private const int minHealth = 5;
-
-        private const int maxHealth = 15;
-
-        public static CharacterStats GenerateRandomCharacter()
+        public CharacterStatsGenerator(CharacterGeneratorStats stats)
         {
-            if (!initialised)
-            {
-                numberGenerator.Randomize();
-                faceIcon = ResourceLoader.Load(faceIconResPath, "AtlasTexture") as AtlasTexture;
-                initialised = true;
-            }
-
-            var stats = new CharacterStats();
-            stats.Initialise(GetRandomName(GetRandomNumberNumber()), GetRandomHealth(), true, faceIcon, null);
-
-            return stats;
+            this.stats = stats ?? throw new ArgumentNullException(nameof(stats));
         }
 
-        private static int GetRandomHealth()
+        public CharacterStats GenerateRandomCharacter()
         {
-            return numberGenerator.RandiRange(minHealth, maxHealth);
+            var newCharacter = new CharacterStats();
+
+            newCharacter.Initialise(
+                name: stats.GetRandomName(),
+                maxHealth: stats.GetRandomHealth(),
+                isPlayerCharacter: true,
+                faceIcon: stats.GetRandomFaceIcon(),
+                weapon: stats.GetRandomWeapon());
+
+            return newCharacter;
         }
 
-        private static int GetRandomNumberNumber()
+    }
+
+    public static class CharacterGeneratorStatsExtensions
+    {
+        public static int GetRandomHealth(this CharacterGeneratorStats stats) => Random.RandomNumberGenerator.RandiRange(stats.MinHealth, stats.MaxHealth);
+
+        public static string GetRandomName(this CharacterGeneratorStats stats) => stats.PossibleCharacterNames.GetRandomFromArray();
+
+        public static AtlasTexture GetRandomFaceIcon(this CharacterGeneratorStats stats) => stats.PossibleFaceIcons.GetRandomFromArray();
+
+        public static Weapon GetRandomWeapon(this CharacterGeneratorStats stats) => stats.PossibleStartWeapons.GetRandomFromArray();
+    }
+
+    public static class Random
+    {
+        private static bool isInitialised = false;
+        private static RandomNumberGenerator rng;
+
+        public static RandomNumberGenerator RandomNumberGenerator { get => GetRNG(); }
+        
+        private static RandomNumberGenerator GetRNG()
         {
-            return numberGenerator.RandiRange(0, names.Length - 1);
+            if (rng == null)
+                InitialiseRNG();
+
+            return rng;
         }
 
-        private static string GetRandomName(int toGet) => names[toGet];
+        private static void InitialiseRNG()
+        {
+            rng = new RandomNumberGenerator();
+            RandomNumberGenerator.Randomize();
+            isInitialised = true;
+        }
+
+        public static T GetRandomFromArray<T>(this T[] array)
+        {
+            int indexToGet = array.GetRandomIndexForArray();
+            return array[indexToGet];
+        }
+
+        public static int GetRandomIndexForArray<T>(this T[] array)
+        {
+            if (array == null || array.Length == 0)
+                throw new Exception("Array is null or empty");
+
+            return RandomNumberGenerator.RandiRange(0, array.Length - 1);
+        }
     }
 }

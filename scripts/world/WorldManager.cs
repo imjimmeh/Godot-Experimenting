@@ -8,14 +8,21 @@ using Godot;
 namespace FaffLatest.scripts.world
 {
 
-    public class WorldManager : Spatial
+	public class WorldManager : Spatial
 	{
 		private SpawnManager spawnManager;
-
 		public SpawnManager SpawnManager { get => GetSpawnManager(); private set => spawnManager = value; }
+
+		[Export]
+		public CharacterGeneratorStats CharacterGeneratorStats { get; private set; }
+
+		public CharacterStatsGenerator CharacterStatsGenerator { get; private set; }
+
+
 		public override void _Ready()
 		{
 			base._Ready();
+			CharacterStatsGenerator = new CharacterStatsGenerator(CharacterGeneratorStats);
 		}
 
 		private SpawnManager GetSpawnManager()

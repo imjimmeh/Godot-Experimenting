@@ -109,11 +109,11 @@ namespace FaffLatest.scripts.ai
 			GD.Print($"Getting next char");
 
 			if(currentArrayPos > aiCharacters.Count)
-            {
+			{
 				ClearCurrentlyActiveCharacter();
 				currentArrayPos = 0;
 				return;
-            }
+			}
 
 			currentlyActioningCharacter = aiCharacters[currentArrayPos];
 			currentArrayPos++;
@@ -186,18 +186,18 @@ namespace FaffLatest.scripts.ai
 		}
 
 		private void _On_Character_Disposing(Node character)
-        {
+		{
 			if (character is Character asChar)
-            {
-                if (IsCurrentlySelectedCharacter(character))
-                {
-                    GetNextCharacter();
-                }
+			{
+				if (IsCurrentlySelectedCharacter(character))
+				{
+					GetNextCharacter();
+				}
 
-                aiCharacters.Remove(asChar);
-            }
-        }
+				aiCharacters.Remove(asChar);
+			}
+		}
 
-        private bool IsCurrentlySelectedCharacter(Node character) => currentlyActioningCharacter != null && currentlyActioningCharacter.Equals(character);
-    }	
+		private bool IsCurrentlySelectedCharacter(Node character) => currentlyActioningCharacter != null && currentlyActioningCharacter.Equals(character);
+	}	
 }

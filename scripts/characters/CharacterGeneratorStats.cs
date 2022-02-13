@@ -1,18 +1,10 @@
 ﻿using FaffLatest.scripts.weapons;
 using Godot;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FaffLatest.scripts.characters
 {
     public class CharacterGeneratorStats : Resource
     {
-        private RandomNumberGenerator numberGenerator;
-        private bool initialised = false;
-
         public CharacterGeneratorStats(string[] possibleCharacterNames = null, AtlasTexture[] possibleFaceIcons = null, Weapon[] possibleStartWeapons = null, int minHealth = 5, int maxHealth = 10)
         {
             Initialise();
@@ -35,8 +27,6 @@ namespace FaffLatest.scripts.characters
 
         private void Initialise()
         {
-            numberGenerator = new RandomNumberGenerator();
-            initialised = true;
         }
 
         [Export]

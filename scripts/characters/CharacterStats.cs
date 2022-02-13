@@ -31,7 +31,7 @@ public class CharacterStats : Resource
         Initialise(name, maxHealth, isPlayerCharacter, faceIcon, weapon);
     }
 
-    public void Initialise(string name, int maxHealth, bool isPlayerCharacter, Texture faceIcon, Weapon weapon)
+    public CharacterStats Initialise(string name, int maxHealth, bool isPlayerCharacter, Texture faceIcon, Weapon weapon)
     {
         CharacterName = name;
         MaxHealth = maxHealth;
@@ -39,6 +39,8 @@ public class CharacterStats : Resource
         FaceIcon = faceIcon;
         CurrentHealth = maxHealth;
 		EquippedWeapon = weapon;
+
+		return this;
     }
 
     public CharacterStats()
