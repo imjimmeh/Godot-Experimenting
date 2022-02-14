@@ -84,7 +84,7 @@ namespace FaffLatest.scripts.effects.movementguide
 			}
 		}
 
-		public void CalculateVisiblity(float movementDistanceLeft)
+		private void CalculateVisiblity(float movementDistanceLeft)
 		{
 			bool shouldHide = IsOutsideWorldBounds() || PositionIsOccupied() || IsOutsideMovementDistance(movementDistanceLeft);
 			SetVisiblity(!shouldHide);

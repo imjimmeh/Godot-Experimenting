@@ -15,6 +15,8 @@ namespace FaffLatest.scripts.effects.movementguide
         [Signal]
         public delegate void _Character_MoveOrder(Vector3 position);
 
+        [Signal]
+        public delegate void _Character_MoveGuide_CalculateCellVisiblity(int amountLeftToMoveThisTurn);
 
         private Dictionary<Vector2, CharacterMovementGuideCell> existingMovementGuide;
 
@@ -59,6 +61,7 @@ namespace FaffLatest.scripts.effects.movementguide
             gsm.Connect(SignalNames.Characters.SELECTION_CLEARED, this, SignalNames.Characters.SELECTION_CLEARED_METHOD);
 
             Connect(SignalNames.Characters.MOVE_ORDER, GetNode(NodeReferences.Systems.INPUT_MANAGER), SignalNames.Characters.MOVE_ORDER_METHOD);
+
         }
 
         private void _On_Character_Ready(Node character)
@@ -74,7 +77,6 @@ namespace FaffLatest.scripts.effects.movementguide
                 Hide();
                 return;
             }
-            GD.Print("Selected");
 
             if (body == null)
                 GetBody();
@@ -85,8 +87,7 @@ namespace FaffLatest.scripts.effects.movementguide
 
             RotationDegrees = body.RotationDegrees * -1;
 
-            foreach (var cell in existingMovementGuide)
-                cell.Value.CalculateVisiblity(parent.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
+            EmitSignal("_Character_MoveGuide_CalculateCellVisiblity", parent.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
 
             Show();
         }
@@ -140,6 +141,7 @@ namespace FaffLatest.scripts.effects.movementguide
             this.ConnectCellSignals(mesh)
                 .AddCellToArray(mesh, a, b);
 
+            Connect("_Character_MoveGuide_CalculateCellVisiblity", mesh, "CalculateVisiblity");
             AddChild(mesh);
         }
 
