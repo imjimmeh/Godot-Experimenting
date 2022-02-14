@@ -71,17 +71,12 @@ namespace FaffLatest.scripts.movement
 		private void SetInitialMovementVariables()
 		{
 			CurrentPathIndex = -1;
-			//TryGetNextPathPart(out Vector3 target);
 		}
 
 		public void MoveWithPath(Vector3[] path)
 		{
 			Path = path;
-			GD.Print($"Setting path as {string.Join(",", path)}");
-			//GD.Print($"Path length is {path.Length}");
 			SetInitialMovementVariables();
-
-			//GD.Print($"Received movement command - moving to first part in path -  {Path[0].Destination}");
 		}
 
         private void _On_Character_MoveTo(Node character, Vector3[] path)

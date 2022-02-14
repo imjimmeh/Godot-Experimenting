@@ -51,7 +51,7 @@ namespace FaffLatest.scripts.effects.movementguide
 
         private void GetBody()
         {
-            body = parent.Body as KinematicBody;
+            body = parent.ProperBody;
         }
 
         private void ConnectSignals()

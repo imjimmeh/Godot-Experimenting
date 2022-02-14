@@ -102,10 +102,11 @@ namespace FaffLatest.scripts.effects.movementguide
 			}
 
 			var start = parent.Transform.origin;
+			
             var path = AStar.GetMovementPath(start, GlobalTransform.origin, movementDistanceLeft);
-            isVisible = path == null || path.Length > movementDistanceLeft;
+            isVisible = path != null && path.Length <= movementDistanceLeft;
 
-            SetVisiblity(!isVisible);
+			SetVisiblity(isVisible);
         }
 
 		private bool IsOutsideWorldBounds()

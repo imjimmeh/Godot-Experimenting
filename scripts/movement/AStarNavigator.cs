@@ -14,7 +14,7 @@ namespace FaffLatest.scripts.movement
         public const string GLOBAL_SCENE_PATH = NodeReferences.Systems.ASTAR;
 
         private readonly NonEuclideanAStar astar = new NonEuclideanAStar();
-        private Dictionary<Node, PointInfo> characterLocations;
+        private Dictionary<Character, PointInfo> characterLocations;
         private PointInfo[,] points;
 
         [Export]
@@ -28,7 +28,7 @@ namespace FaffLatest.scripts.movement
         public long Length { get; private set; }
         public long Width { get; private set; }
 
-        public Dictionary<Node, PointInfo> CharacterLocations => characterLocations;
+        public Dictionary<Character, PointInfo> CharacterLocations => characterLocations;
 
         public AStarNavigator()
         {
@@ -104,7 +104,7 @@ namespace FaffLatest.scripts.movement
             astar.Clear();
 
             Points = new PointInfo[length, width];
-            characterLocations = new Dictionary<Node, PointInfo>(50);
+            characterLocations = new Dictionary<Character, PointInfo>(50);
 
             Length = length;
             Width = width;
@@ -114,8 +114,6 @@ namespace FaffLatest.scripts.movement
 
         public bool TryGetNearestEmptyPointToLocation(Vector3 target, Vector3 origin, out Vector3 point, int tryCount = 0)
         {
-            GD.Print($"Trying to find nearest empty position to {target}");
-
             if (!IsPointDisabled(target, out point))
                 return true;
 
@@ -129,25 +127,24 @@ namespace FaffLatest.scripts.movement
             {
                 for (int y = start; y <= end; y += end)
                 {
-                    foundPoint = IsValidPositionAndIsFree(tryCount, x, y, target, this, out Vector3 newPoint);
+                    foundPoint = IsLocationValidAndFree(target, ref point, tryCount, ref closestDistance, x, y);
 
-                    if (!foundPoint)
-                        continue;
-
-                    if (IsPointCloserToTargetThanCurrent(target, newPoint, point, closestDistance, out float newDistance))
-                    {
-                        point = newPoint;
-                        closestDistance = newDistance;
-
-                        if (newDistance < 1.001f)
-                            break;
-                    }
+                    if (closestDistance <= 1.001f)
+                        break;
                 }
             }
 
-            while (foundPoint == false && tryCount <= 5)
+            return foundPoint;
+        }
+
+        private bool IsLocationValidAndFree(Vector3 target, ref Vector3 point, int tryCount, ref float closestDistance, int x, int y)
+        {
+            bool foundPoint = IsValidPositionAndIsFree(tryCount, x, y, target, this, out Vector3 newPoint);
+
+            if (IsPointCloserToTargetThanCurrent(target, newPoint, point, closestDistance, out float newDistance))
             {
-                GD.Print($"Not found point - {target}, {origin}, {point}, {tryCount}");
+                point = newPoint;
+                closestDistance = newDistance;
             }
 
             return foundPoint;
@@ -196,11 +193,9 @@ namespace FaffLatest.scripts.movement
         {
             var vectorDistance = (target - newPoint).Abs();
             distance = vectorDistance.x + vectorDistance.z;
-            GD.Print($"Poinit {newPoint} is not disabled, with a distance of {distance}");
 
             if (distance < currentClosestDistance)
             {
-                GD.Print($"it is the new closest point");
                 return true;
             }
 
@@ -213,9 +208,6 @@ namespace FaffLatest.scripts.movement
             var point = astar.GetPointPosition(pointInfo.Id);
             matchingPoint = point;
             var disabled = astar.IsPointDisabled(pointInfo.Id);
-
-            GD.Print($"Found {pointInfo} for {point} which disabled is {disabled}");
-
             return disabled;
         }
 
@@ -229,17 +221,14 @@ namespace FaffLatest.scripts.movement
                 var e = astar.GetPointPosition(endPoint.Id);
 
                 var path = astar.GetPointPath(startPoint.Id, endPoint.Id);
+
                 if (path == null)
-                {
-                    GD.Print($"Could not find path for {start} to {end}");
                     return null;
-                }
 
                 return TrimAndClampPath(path, start, movementDistance);
             }
             catch (Exception ex)
             {
-
                 GD.Print($"Error getting path from {start} to {end}- {ex.Message}");
                 return null;
             }
@@ -248,18 +237,9 @@ namespace FaffLatest.scripts.movement
         private Vector3[] TrimAndClampPath(Vector3[] points, Vector3 start, int maxLength)
         {
             if (points == null || points.Length == 0)
-            {
                 return null;
-            }
             else if (points.Length == 1)
-            {
                 return points;
-            }
-            else if (start.z != points[0].z || start.z != points[0].z)
-            {
-                GD.Print($"Already missing start point - initial is {points[0]}, start vector given was {start}");
-                return points;
-            }
 
             var pointsCount = points.Count() - 1;
 
@@ -269,9 +249,7 @@ namespace FaffLatest.scripts.movement
             var newArray = new Vector3[maxX];
 
             for (var x = 1; x <= maxX; x++)
-            {
                 newArray[x - 1] = points[x];
-            }
 
             return newArray;
         }
@@ -284,15 +262,11 @@ namespace FaffLatest.scripts.movement
             return (start: Points[startX, startY], end: Points[endX, endY]);
         }
 
-        public void _On_Character_Created(Node character)
+        public void _On_Character_Created(Character character)
         {
-            var asCharacter = character as Character;
-            //GD.Print($"AStarNavigator received _OnCharacterCreated for character {asCharacter.Stats.CharacterName}");
-
-            var body = asCharacter.Body as MovingKinematicBody;
-            var point = astar.GetClosestPoint(body.Transform.origin);
+            var point = astar.GetClosestPoint(character.ProperBody.Transform.origin);
             astar.SetPointDisabled(point);
-            CreatePointInfos(character, body);
+            CreatePointInfos(character, character.ProperBody);
         }
 
 
@@ -302,7 +276,8 @@ namespace FaffLatest.scripts.movement
 
             astar.SetPointDisabled(point);
         }
-        private void CreatePointInfos(Node character, MovingKinematicBody body)
+
+        private void CreatePointInfos(Character character, MovingKinematicBody body)
         {
             var pointInfo = GetPointInfoForVector3(body.Transform.origin);
             pointInfo.SetOccupier(character);
@@ -320,14 +295,13 @@ namespace FaffLatest.scripts.movement
             return true;
         }
 
-        private void _On_Character_FinishedMoving(Node character, Vector3 newPosition)
+        private void _On_Character_FinishedMoving(Character character, Vector3 newPosition)
         {
-            GD.Print($"Char finished moving - {newPosition}");
             if (characterLocations.TryGetValue(character, out PointInfo oldLocationPointInfo))
             {
                 astar.SetPointDisabled(oldLocationPointInfo.Id, false);
-                var newOccupyingNode = GetPointInfoForVector3(newPosition);
 
+                var newOccupyingNode = GetPointInfoForVector3(newPosition);
                 astar.SetPointDisabled(newOccupyingNode.Id);
 
                 oldLocationPointInfo.SetOccupier(null);
