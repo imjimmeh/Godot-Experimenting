@@ -19,7 +19,7 @@ namespace FaffLatest.scripts.cameras
 		{
 			NegativeSpeed = Speed;
 
-			GetNode(NodeReferences.Systems.INPUT_MANAGER).Connect("_Camera_MoveToPosition", this, "_On_Camera_MoveToPosition");
+			GetNode(NodeReferences.Systems.INPUT_MANAGER).Connect(SignalNames.Cameras.MOVE_TO_POSITION, this, SignalNames.Cameras.MOVE_TO_POSITION_METHOD);
 			base._Ready();
 		}
 

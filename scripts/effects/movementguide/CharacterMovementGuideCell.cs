@@ -13,7 +13,7 @@ namespace FaffLatest.scripts.effects.movementguide
 		private ShaderMaterial material;
 
 		[Signal]
-		public delegate void _Clicked_On(Node cell);
+		public delegate void _ClickedOn(Node cell);
 
 		[Signal]
 		public delegate void _Mouse_Entered(Node node);
@@ -45,7 +45,7 @@ namespace FaffLatest.scripts.effects.movementguide
 		private void _On_Mouse_Entered()
 		{
 			MouseIsOver = true;
-			EmitSignal("_Mouse_Entered", this);
+			EmitSignal(SignalNames.MovementGuide.CELL_MOUSE_ENTERED, this);
 
 			material.SetShaderParam(SHADER_TARGETCELL_PARAM, true);
 		}
@@ -53,7 +53,7 @@ namespace FaffLatest.scripts.effects.movementguide
 		private void _On_Mouse_Exited()
 		{
 			MouseIsOver = false;
-			EmitSignal("_Mouse_Exited", this);
+			EmitSignal(SignalNames.MovementGuide.CELL_MOUSE_EXITED, this);
 
 			material.SetShaderParam("isTargetCell", false);
 		}
@@ -63,13 +63,13 @@ namespace FaffLatest.scripts.effects.movementguide
 			if (inputEvent is InputEventMouseButton mouseButtonEvent)
 			{
 				//GD.Print("World clicked on - emitting signal");
-				EmitSignal("_Clicked_On", this, mouseButtonEvent);
+				EmitSignal(SignalNames.MovementGuide.CLICKED_ON, this, mouseButtonEvent);
 			}
 		}
 
 		private void ConnectSignals()
 		{
-			Connect("_Clicked_On", GetNode("../"), "_On_Cell_Clicked");
+			Connect(SignalNames.MovementGuide.CLICKED_ON, GetNode("../"), SignalNames.MovementGuide.CLICKED_ON_METHOD);
 		}
 
 		public void SetVisiblity(bool visible)

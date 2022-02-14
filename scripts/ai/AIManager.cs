@@ -175,7 +175,7 @@ namespace FaffLatest.scripts.ai
 		{
 			foreach(var character in aiCharacters)
 			{
-				character.ProperBody.Connect("_Character_FinishedMoving", this, "_On_AICharacter_FinishedMoving");
+				character.ProperBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, this, "_On_AICharacter_FinishedMoving");
 				character.Connect(SignalNames.Characters.DISPOSING, this, SignalNames.Characters.DISPOSING_METHOD);
 			}
 		}

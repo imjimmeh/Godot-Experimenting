@@ -66,5 +66,7 @@ public class CharacterStats : Resource
 
 	public void AddHealth(int health) => CurrentHealth += health;
 
+	public void SetHealthAsMax() => CurrentHealth = MaxHealth;
+
 	public override string ToString() => $"{this.CharacterName}, max health: {MaxHealth}, currentHealth: {CurrentHealth}, isPC: {IsPlayerCharacter}, Weapon: {EquippedWeapon?.Name} ";
 }

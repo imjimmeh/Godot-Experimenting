@@ -8,6 +8,13 @@ namespace FaffLatest.scripts.constants
 {
 	public class SignalNames
 	{
+		public class Cameras
+        {
+			private const string prefix = "_Camera_";
+
+			public const string MOVE_TO_POSITION = prefix + "MoveToPosition";
+			public const string MOVE_TO_POSITION_METHOD = SharedParts.ON + MOVE_TO_POSITION;
+        }
 		public class Characters
 		{
 			private const string prefix = "_Character_";
@@ -46,15 +53,21 @@ namespace FaffLatest.scripts.constants
 			public const string TURN_FINISHED_METHOD = SharedParts.ON + TURN_FINISHED;
         }
 
-        public class Movement
+        public class MovementGuide
         {
 			private const string CELL_PREFIX = "_Cell";
+
+			public const string CELL_CALCULATE_VISIBLITY = "_Character_MoveGuide_CalculateCellVisiblity";
+
+			public const string CLICKED_ON = "_" + SharedParts.CLICKED_ON;
+			public const string CLICKED_ON_METHOD = SharedParts.ON + "_Cell_Clicked";
 
 			public const string CELL_MOUSE_ENTERED = "_Mouse_Entered";
 			public const string CELL_MOUSE_ENTERED_METHOD = SharedParts.ON + CELL_PREFIX + CELL_MOUSE_ENTERED;
 
 			public const string CELL_MOUSE_EXITED = "_Mouse_Exited";
 			public const string CELL_MOUSE_EXITED_METHOD = SharedParts.ON + CELL_PREFIX + CELL_MOUSE_EXITED;
+
 
         }
 
@@ -64,6 +77,12 @@ namespace FaffLatest.scripts.constants
 			public const string CHARACTERS_SPAWNED_METHOD = SharedParts.ON + CHARACTERS_SPAWNED;
 		}
 
+		public class State
+        {
+			public const string TURN_CHANGE = "_Turn_Changed";
+			public const string TURN_CHANGE_METHOD = "_On_Turn_Change";
+
+		}
         public class World
 		{
 			private const string prefix = "_World_";

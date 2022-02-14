@@ -141,7 +141,7 @@ namespace FaffLatest.scripts.effects.movementguide
             this.ConnectCellSignals(mesh)
                 .AddCellToArray(mesh, a, b);
 
-            Connect("_Character_MoveGuide_CalculateCellVisiblity", mesh, "CalculateVisiblity");
+            Connect(SignalNames.MovementGuide.CELL_CALCULATE_VISIBLITY, mesh, "CalculateVisiblity");
             AddChild(mesh);
         }
 

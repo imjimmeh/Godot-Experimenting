@@ -47,8 +47,8 @@ namespace FaffLatest.scripts.state
 
             var aiManager = GetNode<AIManager>("../AIManager");
 
-            Connect("_Turn_Changed", GetNode("../UIManager"), "_On_Turn_Change");
-            Connect("_Turn_Changed", aiManager, "_On_Turn_Change");
+            Connect(SignalNames.State.TURN_CHANGE, GetNode("../UIManager"), SignalNames.State.TURN_CHANGE_METHOD);
+            Connect(SignalNames.State.TURN_CHANGE, aiManager, SignalNames.State.TURN_CHANGE_METHOD);
         }
 
         public void InitialiseMap()
@@ -113,16 +113,11 @@ namespace FaffLatest.scripts.state
 
 		private void _On_Character_FinishedMoving(Character character, Vector3 newPosition)
         {
-            SetCharacterActive(false);
+            SetCharacterActive(character, false);
 			CheckTurnFinishedAndProcess();
         }
 
-        public void SetCharacterActive(bool isActive = true)
-		{
-			SetCharacterActive(SelectedCharacter, isActive);
-		}
-
-		public static void SetCharacterActive(Character character, bool isActive = true)
+		public void SetCharacterActive(Character character, bool isActive = true)
 		{
 			if(character == null)
 				return;

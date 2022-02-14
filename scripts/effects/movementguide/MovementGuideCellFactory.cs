@@ -28,8 +28,8 @@ namespace FaffLatest.scripts.effects.movementguide
 
 		public static CharacterMovementGuide ConnectCellSignals(this CharacterMovementGuide guide, CharacterMovementGuideCell cell)
         {
-			cell.Connect(SignalNames.Movement.CELL_MOUSE_ENTERED, guide, SignalNames.Movement.CELL_MOUSE_ENTERED_METHOD);
-			cell.Connect(SignalNames.Movement.CELL_MOUSE_EXITED, guide, SignalNames.Movement.CELL_MOUSE_EXITED_METHOD);
+			cell.Connect(SignalNames.MovementGuide.CELL_MOUSE_ENTERED, guide, SignalNames.MovementGuide.CELL_MOUSE_ENTERED_METHOD);
+			cell.Connect(SignalNames.MovementGuide.CELL_MOUSE_EXITED, guide, SignalNames.MovementGuide.CELL_MOUSE_EXITED_METHOD);
 
 			return guide;
 		}

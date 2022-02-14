@@ -63,7 +63,6 @@ namespace FaffLatest.scripts.characters
 			var characterStillAlive = IsAlive();
 
 			EmitSignal(SignalNames.Characters.RECEIVED_DAMAGE, this, damage, origin, !characterStillAlive);
-			GD.Print("Being attacked");
 
 			if (!characterStillAlive)
 			{

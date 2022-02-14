@@ -72,8 +72,6 @@ namespace FaffLatest.scripts.state
 
 				if(character.Stats.IsPlayerCharacter)
 				{
-					var weaponNumber = random.RandiRange(0, PossibleInitialWeapons.Length - 1);
-					character.Stats.SetWeapon(PossibleInitialWeapons[weaponNumber]);
 					playerCharacters[pc] = character;
 					pc++;
 				}
@@ -102,7 +100,6 @@ namespace FaffLatest.scripts.state
 			var newCharacter = CharacterBase.Instance<Character>();
 
 			newCharacter.Stats = stats;
-
 			var newCharacterKinematicBody = newCharacter.GetNode<KinematicBody>("KinematicBody");
 			newCharacterKinematicBody.Transform = new Transform(newCharacterKinematicBody.Transform.basis, spawnPosition);
 

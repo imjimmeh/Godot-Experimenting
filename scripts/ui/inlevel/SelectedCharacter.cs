@@ -11,12 +11,13 @@ namespace FaffLatest.scripts.ui
 {
 	public class SelectedCharacter : Panel
 	{
-		private TextureRect faceIcon;
+		private TextureRect portrait;
 		private HealthBar healthbar;
 		private Label name;
+		private Label movementText;
 
 		private Character selectedCharacter;
-
+		
 		public override void _Ready()
 		{
 			GetChildrenNodes();
@@ -33,9 +34,10 @@ namespace FaffLatest.scripts.ui
 
 		private void GetChildrenNodes()
 		{
-			faceIcon = GetNode<TextureRect>("CharacterIcon");
-			healthbar = faceIcon.GetNode<HealthBar>("HealthBar");
-			name = faceIcon.GetNode<Label>("Name");
+			portrait = GetNode<TextureRect>("CharacterIcon");
+			healthbar = portrait.GetNode<HealthBar>("HealthBar");
+			movementText = portrait.GetNode<Label>("MovementIcon/MovementText");
+			name = portrait.GetNode<Label>("Name");
 		}
 
 
@@ -44,9 +46,9 @@ namespace FaffLatest.scripts.ui
 			selectedCharacter = character;
 
 			healthbar.SetValuesToCharacterValues(character);
-			faceIcon.Texture = character.Stats.FaceIcon;
+			portrait.Texture = character.Stats.FaceIcon;
 			name.Text = character.Stats.CharacterName;
-
+			movementText.Text = $"{character.ProperBody.MovementStats.AmountLeftToMoveThisTurn}/{character.ProperBody.MovementStats.MaxMovementDistancePerTurn}";
 			Show();
 		}
 

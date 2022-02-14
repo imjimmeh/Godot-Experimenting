@@ -31,9 +31,6 @@ namespace FaffLatest.scripts.ui
 			var newPosition = GetUnprojectedPosition();
 			newPosition = new Vector2(newPosition.x, newPosition.y - 20);
 
-			if(!newPosition.Equals(RectPosition))
-				GD.Print($"Setting position as {RectPosition}");
-
 			RectPosition = newPosition;
 		}
 
@@ -49,7 +46,6 @@ namespace FaffLatest.scripts.ui
 
         private void _On_WorldObject_Disposing(Spatial worldObject)
         {
-			GD.Print($"Disposing label");
             DisposeThis();
         }
     }

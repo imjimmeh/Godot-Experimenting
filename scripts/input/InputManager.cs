@@ -30,8 +30,6 @@ namespace FaffLatest.scripts.input
 
 		private void _On_Character_ClickedOn(Character character, InputEventMouseButton mouseButtonEvent)
 		{
-			//GD.Print($"Mouse button {mouseButtonEvent.ButtonIndex} was {(mouseButtonEvent.Pressed ? "Pressed" : "Released")} on character {character.Stats.CharacterName}");
-
 			if(mouseButtonEvent.Pressed)	
 			{
 				_On_Character_Mouse_Pressed(character, mouseButtonEvent);
@@ -54,7 +52,7 @@ namespace FaffLatest.scripts.input
 
             if (gameStateManager.HaveACharacterSelected && character == gameStateManager.SelectedCharacter)
             {
-                EmitSignal("_Camera_MoveToPosition", gameStateManager.SelectedCharacter.ProperBody.GlobalTransform.origin);
+                EmitSignal(SignalNames.Cameras.MOVE_TO_POSITION, gameStateManager.SelectedCharacter.ProperBody.GlobalTransform.origin);
             }
             else
             {
@@ -128,8 +126,8 @@ namespace FaffLatest.scripts.input
 		}
 
 		private void IssueMoveOrder(Vector3 position)
-        {
-            var body = gameStateManager.SelectedCharacter.GetNode<KinematicBody>("KinematicBody");
+		{
+			var body = gameStateManager.SelectedCharacter.GetNode<KinematicBody>("KinematicBody");
             position = position.Round();
 
             (var x, var y, var z) = (position.x, body.Transform.origin.y, position.z);
@@ -152,10 +150,10 @@ namespace FaffLatest.scripts.input
             }
 
 			EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.SelectedCharacter, convertedPath);
-            gameStateManager.SetCharacterActive(true);
-        }
+			gameStateManager.SetCharacterActive(gameStateManager.SelectedCharacter);
+		}
 
-        private Vector3 GetTargetPositionClampedByMovementDistance(Vector3 position, KinematicBody body)
+		private Vector3 GetTargetPositionClampedByMovementDistance(Vector3 position, KinematicBody body)
         {
             var distance = (position - body.Transform.origin).Length();
 
