@@ -1,11 +1,30 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://scripts/ui/inlevel/MiniCharacterDisplay.cs" type="Script" id=1]
 [ext_resource path="res://resources/fonts/TitilliumWeb-s32.tres" type="DynamicFont" id=2]
+[ext_resource path="res://scenes/ui/ingame/icons/MovementIcon.tscn" type="PackedScene" id=3]
 
 [sub_resource type="Theme" id=1]
 default_font = ExtResource( 2 )
 Fonts/fonts/normal = null
+
+[sub_resource type="Shader" id=2]
+code = "shader_type canvas_item;
+uniform vec3 colour;
+
+void fragment() {
+
+	COLOR = texture(TEXTURE, UV);
+	if(COLOR.a > 0.0)
+	{
+		COLOR.rgb = colour;
+	}
+}"
+
+[sub_resource type="ShaderMaterial" id=3]
+resource_local_to_scene = true
+shader = SubResource( 2 )
+shader_param/colour = Vector3( 1, 1, 1 )
 
 [node name="MiniCharacterDisplay" type="Control"]
 margin_right = 40.0
@@ -17,7 +36,7 @@ __meta__ = {
 FontToUse = ExtResource( 2 )
 FontSize = 72
 
-[node name="Icon" type="TextureRect" parent="."]
+[node name="Portrait" type="TextureRect" parent="."]
 margin_right = 40.0
 margin_bottom = 40.0
 __meta__ = {
@@ -28,3 +47,10 @@ __meta__ = {
 margin_right = 40.0
 margin_bottom = 14.0
 theme = SubResource( 1 )
+
+[node name="MovementIcon" parent="." instance=ExtResource( 3 )]
+material = SubResource( 3 )
+margin_left = 150.0
+margin_top = 60.0
+margin_right = 200.0
+margin_bottom = 110.0

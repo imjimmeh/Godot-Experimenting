@@ -177,5 +177,14 @@ namespace FaffLatest.scripts.state
 
 			return Faction.PLAYER;
         }
+
+		private void _On_Character_Disposing(Character character)
+        {
+			if (this.ActiveCharacter == character)
+				activeCharacter = null;
+
+			if (this.SelectedCharacter == character)
+				selectedCharacter = null;
+        }
     }
 }

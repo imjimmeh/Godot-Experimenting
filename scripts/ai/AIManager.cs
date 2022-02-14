@@ -189,7 +189,7 @@ namespace FaffLatest.scripts.ai
 				ClearCurrentlyActiveCharacter();
 		}
 
-		private void _On_Character_Disposing(Node character)
+		private void _On_Character_Disposing(Character character)
 		{
 			if (character is Character asChar)
 			{
@@ -202,6 +202,6 @@ namespace FaffLatest.scripts.ai
 			}
 		}
 
-		private bool IsCurrentlySelectedCharacter(Node character) => currentlyActioningCharacter != null && currentlyActioningCharacter.Equals(character);
+		private bool IsCurrentlySelectedCharacter(Node character) => currentlyActioningCharacter != null && currentlyActioningCharacter == character;
 	}	
 }

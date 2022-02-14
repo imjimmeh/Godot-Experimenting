@@ -129,6 +129,7 @@ namespace FaffLatest.scripts.state
 			inputManager.Connect(SignalNames.Characters.MOVE_TO, pathMover,  SignalNames.Characters.MOVE_TO_METHOD);
 
 			character.Connect(SignalNames.Characters.RECEIVED_DAMAGE, ui, SignalNames.Characters.RECEIVED_DAMAGE_METHOD);
+			character.Connect("_Character_Disposing", gameStateManager, "_On_WorldObject_Disposing");
 
 			newCharacterKinematicBody.Connect(SignalNames.Characters.CLICKED_ON, inputManager, SignalNames.Characters.CLICKED_ON_METHOD);
 			newCharacterKinematicBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, astarNavigator, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
@@ -139,6 +140,7 @@ namespace FaffLatest.scripts.state
 
 			gameStateManager.Connect(SignalNames.Characters.SELECTED, bodyMesh, SignalNames.Characters.SELECTED_METHOD);
 			gameStateManager.Connect(SignalNames.Characters.SELECTION_CLEARED, bodyMesh, SignalNames.Characters.SELECTION_CLEARED_METHOD);
+
 		}
 
 		private void FindNeededNodes()

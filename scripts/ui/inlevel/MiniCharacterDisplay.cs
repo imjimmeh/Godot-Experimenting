@@ -1,5 +1,6 @@
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
+using FaffLatest.scripts.state;
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,7 @@ namespace FaffLatest.scripts.ui
 		private TextureRect characterPortrait;
 		private Label characterName;
 		private Character character;
+		private Control movementIcon;
 
 
 		private bool mouseIsOver = false;
@@ -52,6 +54,8 @@ namespace FaffLatest.scripts.ui
 
 			
 			Connect("_Portrait_Clicked", GetNode(NodeReferences.Systems.INPUT_MANAGER), "_On_Character_PortraitClicked");
+
+			GetNode(NodeReferences.Systems.GAMESTATE_MANAGER).Connect("_Turn_Changed", this,"_On_Turn_Changed");
 		}
 
 		private void InitialiseFont()
@@ -64,18 +68,21 @@ namespace FaffLatest.scripts.ui
 
 		private void GetChildrenNodes()
 		{
-			characterPortrait = GetNode<TextureRect>("Icon");
+			characterPortrait = GetNode<TextureRect>("Portrait");
 			characterName = GetNode<Label>("CharacterName");
+			movementIcon = GetNode<Control>("MovementIcon");
 		}
 
 		public void SetCharacter(Character character)
 		{
 			this.character = character;
+			this.character.ProperBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, this, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
 		}
 
 		public override void _Process(float delta)
 		{
 			base._Process(delta);
+
 			if (TextureNotInitialisedButCharacterIs)
 			{
 				SetValues();
@@ -84,8 +91,6 @@ namespace FaffLatest.scripts.ui
 			if(mouseIsOver)
 			{
 				var mousePos = GetGlobalMousePosition();
-
-
 				characterName.RectGlobalPosition = new Vector2(mousePos.x + (characterName.Text.Length), mousePos.y + 10);
 				characterName.Show();
 			}
@@ -151,5 +156,28 @@ namespace FaffLatest.scripts.ui
 				}
 			}
 		}
+
+		private void _On_Character_FinishedMoving(Node character, Vector3 newPosition)
+        {
+			if (this.character != character)
+				return;
+
+			if(character is Character asChar)
+            {
+				if(!asChar.ProperBody.MovementStats.CanMove)
+                {
+					movementIcon.Hide();
+
+				}
+            }
+        }
+
+		private void _On_Turn_Changed(string whoseTurn)
+        {
+			if(whoseTurn == Faction.PLAYER.ToString() && character.ProperBody.MovementStats.CanMove)
+            {
+				movementIcon.Show();
+            }
+        }
 	}
 }

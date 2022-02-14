@@ -48,7 +48,7 @@ public class ColouredBox : CSGBox
 
     private void CalculateAndSetAttackRangeShaderParam(Character character)
     {
-        if (character.Stats.IsPlayerCharacter == character.Stats.IsPlayerCharacter)
+        if (parent.Stats.IsPlayerCharacter == character.Stats.IsPlayerCharacter)
             return;
 
         var distance = (character.ProperBody.GlobalTransform.origin - GlobalTransform.origin).Length();
