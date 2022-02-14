@@ -78,14 +78,14 @@ namespace FaffLatest.scripts.movement
             AmountMovedThisTurn = 0;
         }
 
-        public void IncrementMovement()
+        public void IncreaseAmountMovedThisTurn()
         {
             AmountMovedThisTurn++;
         }
 
         private void _On_Character_ReachedPathPart(Node character, Vector3 part)
         {
-            IncrementMovement();
+            IncreaseAmountMovedThisTurn();
         }
     }
 }

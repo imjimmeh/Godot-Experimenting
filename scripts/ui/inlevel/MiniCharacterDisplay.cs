@@ -122,29 +122,6 @@ namespace FaffLatest.scripts.ui
 
 		private bool TextureIsTooLarge() => characterPortrait.Texture.GetWidth() > MaxWidthOfIcon;
 
-		public override void _Notification(int what)
-		{
-			base._Notification(what);
-			CheckMouseEnterOrExit(what);
-		}
-
-		private void CheckMouseEnterOrExit(int what)
-		{
-			switch (what)
-			{
-				case NotificationMouseEnter:
-					{
-						mouseIsOver = true;
-						break;
-					}
-				case NotificationMouseExit:
-					{
-						mouseIsOver = false;
-						break;
-					}
-			}
-		}
-
 		public override void _Input(InputEvent inputEvent)
 		{
 			base._Input(inputEvent);
@@ -158,29 +135,26 @@ namespace FaffLatest.scripts.ui
 		}
 
 		private void _On_Character_FinishedMoving(Node character, Vector3 newPosition)
-        {
+		{
 			if (this.character != character)
 				return;
 
 			if(character is Character asChar)
-            {
-				GD.Print($"Received finished moving signal - {character} - {asChar.ProperBody.MovementStats.CanMove} - {asChar.ProperBody.MovementStats} - {asChar.ProperBody.MovementStats.AmountLeftToMoveThisTurn}");
-
+			{
 				if (!asChar.ProperBody.MovementStats.CanMove)
-                {
+				{
 					movementIcon.Hide();
-
 				}
 				
-            }
-        }
+			}
+		}
 
 		private void _On_Turn_Changed(string whoseTurn)
-        {
-			if(whoseTurn == Faction.PLAYER.ToString() && character.ProperBody.MovementStats.CanMove)
-            {
+		{
+			if(character.ProperBody.MovementStats.CanMove)
+			{
 				movementIcon.Show();
-            }
-        }
+			}
+		}
 	}
 }

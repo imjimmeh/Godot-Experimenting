@@ -83,7 +83,7 @@ namespace FaffLatest.scripts.state
             {
                 var asCharacter = characters[x] as Character;
 
-                Task.Run(() => asCharacter.ResetTurnStats());
+				asCharacter.ResetTurnStats();
             }
         }
 
@@ -104,17 +104,18 @@ namespace FaffLatest.scripts.state
 			if (currentTurn == nextTurn)
 				return;
 
-			var nextFactionCharacters = GetFactionCharacters(nextTurn);
-			ResetTurnStats(nextFactionCharacters);
+            var nextFactionCharacters = GetFactionCharacters(nextTurn);
+            ResetTurnStats(nextFactionCharacters);
 
-			ClearCurrentlySelectedCharacter();
+            ClearCurrentlySelectedCharacter();
 
-			currentTurn = nextTurn;
+            currentTurn = nextTurn;
 
-			EmitSignal(SignalNames.State.TURN_CHANGE, currentTurn.ToString());
-		}
+            EmitSignal(SignalNames.State.TURN_CHANGE, currentTurn.ToString());
 
-		private void _On_Character_FinishedMoving(Character character, Vector3 newPosition)
+        }
+
+        private void _On_Character_FinishedMoving(Character character, Vector3 newPosition)
         {
             SetCharacterActive(character, false);
 			CheckTurnFinishedAndProcess();
@@ -157,9 +158,7 @@ namespace FaffLatest.scripts.state
                 var asCharacter = characters[x] as Character;
 
                 if (asCharacter.ProperBody.MovementStats.CanMove)
-                {
 					return false;
-                }
             }
 
 			return true;

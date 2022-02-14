@@ -1,0 +1,31 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://scripts/world/WorldObject.cs" type="Script" id=1]
+
+[sub_resource type="BoxShape" id=9]
+extents = Vector3( 3.25, 1, 2.25 )
+
+[node name="Car" type="StaticBody"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1, 17 )
+input_ray_pickable = false
+script = ExtResource( 1 )
+
+[node name="CollisionShape" type="CollisionShape" parent="."]
+shape = SubResource( 9 )
+
+[node name="Body" type="CSGBox" parent="CollisionShape"]
+width = 7.0
+height = 1.5
+depth = 3.0
+
+[node name="Wheel" type="CSGCylinder" parent="CollisionShape"]
+transform = Transform( 1.91069e-15, 4.37114e-08, 1, 1, -4.37114e-08, 0, 4.37114e-08, 1, -4.37114e-08, -2.00672, -1.11086, 1.52748 )
+
+[node name="Wheel2" type="CSGCylinder" parent="CollisionShape"]
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 1.82355, -0.940536, 1.52748 )
+
+[node name="Wheel3" type="CSGCylinder" parent="CollisionShape"]
+transform = Transform( 1.91069e-15, 4.37114e-08, 1, 1, -4.37114e-08, 0, 4.37114e-08, 1, -4.37114e-08, -2, -1, -1.5 )
+
+[node name="Wheel4" type="CSGCylinder" parent="CollisionShape"]
+transform = Transform( 1.91069e-15, 4.37114e-08, 1, 1, -4.37114e-08, 0, 4.37114e-08, 1, -4.37114e-08, 1.8, -1, -1.5 )

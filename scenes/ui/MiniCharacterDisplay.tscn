@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://scripts/ui/inlevel/MiniCharacterDisplay.cs" type="Script" id=1]
 [ext_resource path="res://resources/fonts/TitilliumWeb-s32.tres" type="DynamicFont" id=2]
 [ext_resource path="res://scenes/ui/ingame/icons/MovementIcon.tscn" type="PackedScene" id=3]
+[ext_resource path="res://art/ui/action.png" type="Texture" id=4]
 
 [sub_resource type="Theme" id=1]
 default_font = ExtResource( 2 )
@@ -47,6 +48,9 @@ __meta__ = {
 margin_right = 40.0
 margin_bottom = 14.0
 theme = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="MovementIcon" parent="." instance=ExtResource( 3 )]
 material = SubResource( 3 )
@@ -54,3 +58,14 @@ margin_left = 150.0
 margin_top = 60.0
 margin_right = 200.0
 margin_bottom = 110.0
+
+[node name="AttackIcon" type="TextureRect" parent="."]
+margin_left = 240.0
+margin_top = 60.0
+margin_right = 290.0
+margin_bottom = 110.0
+texture = ExtResource( 4 )
+expand = true
+__meta__ = {
+"_edit_use_anchors_": false
+}

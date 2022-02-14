@@ -141,44 +141,41 @@ namespace FaffLatest.scripts.effects.movementguide
             this.ConnectCellSignals(mesh)
                 .AddCellToArray(mesh, a, b);
 
+            mesh.SetParentCharacterTransform(parent.ProperBody);
+
             Connect(SignalNames.MovementGuide.CELL_CALCULATE_VISIBLITY, mesh, "CalculateVisiblity");
+            
             AddChild(mesh);
         }
 
 
-        private void _On_Cell_Mouse_Entered(Node node)
+        private void _On_Cell_Mouse_Entered(CharacterMovementGuideCell node)
         {
-            //GD.Print($"Entered {node.Name}");
-            if (node is CharacterMovementGuideCell cell)
+            ClearExistingPath();
+            var path = AStar.GetMovementPath(body.Transform.origin, node.GlobalTransform.origin, parent.ProperBody.MovementStats.MaxMovementDistancePerTurn);
+            if (path == null || path.Length == 0)
+                return;
+
+            currentPath = new CharacterMovementGuideCell[path.Length];
+            int pathCount = 0;
+
+            for (var x = 0; x < path.Length; x++)
             {
-                //GD.Print($"cell");
-                ClearExistingPath();
-                var path = AStar.GetMovementPath(body.Transform.origin, cell.GlobalTransform.origin, parent.ProperBody.MovementStats.MaxMovementDistancePerTurn);
-                if (path == null || path.Length == 0)
-                    return;
+                var nextCell = GetCellAndSetAsPathPart(path[x] - body.Transform.origin);
 
-                currentPath = new CharacterMovementGuideCell[path.Length];
-                int pathCount = 0;
+                if (nextCell == null)
+                    continue;
 
-                for (var x = 0; x < path.Length; x++)
-                {
-                    var nextCell = GetCellAndSetAsPathPart(path[x] - body.Transform.origin);
-
-                    if (nextCell == null)
-                        continue;
-
-                    currentPath[x] = nextCell;
-                    pathCount++;
-                }
-
-                System.Array.Resize(ref currentPath, pathCount);
+                currentPath[x] = nextCell;
+                pathCount++;
             }
+
+            System.Array.Resize(ref currentPath, pathCount);
         }
 
         private CharacterMovementGuideCell GetCellAndSetAsPathPart(Vector3 targetVector)
         {
             var newPathCell = GetCellFromLocalTransform(targetVector);
-
 
             if (newPathCell == null)
             {

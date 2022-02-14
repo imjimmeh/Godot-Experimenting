@@ -10,6 +10,7 @@ namespace FaffLatest.scripts.world
 
 	public class WorldManager : Spatial
 	{
+		private AStarNavigator astar;
 		private SpawnManager spawnManager;
 		public SpawnManager SpawnManager { get => GetSpawnManager(); private set => spawnManager = value; }
 
@@ -47,6 +48,16 @@ namespace FaffLatest.scripts.world
 			{
 				GetSpawnLocationsAndSpawnCharacters(map.Characters);
 			}
+
+			var worldObjects = GetTree().GetNodesInGroup("worldObjects");
+
+			foreach(var worldObject in worldObjects)
+            {
+				if(worldObject is WorldObject wo)
+                {
+					wo.RegisterWithAStar(astar);
+                }
+            }
 		}
 
 		private void InitialiseNewCharacters()
@@ -66,13 +77,12 @@ namespace FaffLatest.scripts.world
 
 		private void InitialiseAStar(MeshInstance level)
 		{
-			var aStar = GetNode<AStarNavigator>(AStarNavigator.GLOBAL_SCENE_PATH);
+			astar = GetNode<AStarNavigator>(AStarNavigator.GLOBAL_SCENE_PATH);
 
 			var plane = level.Mesh as PlaneMesh;
 			var size = plane.Size;
 
-			GD.Print($"intialising world of size {size.x}, {size.y}");
-			aStar.CreatePointsForMap((int)size.x, (int)size.y, new Vector2[0]);
+			astar.CreatePointsForMap((int)size.x, (int)size.y, new Vector2[0]);
 		}
 
 		private MeshInstance GetLevelInstance(MapInfo map)

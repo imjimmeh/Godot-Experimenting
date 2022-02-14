@@ -26,6 +26,8 @@ namespace FaffLatest.scripts.effects.movementguide
 
 		public AStarNavigator AStar;
 
+		private Spatial parent;
+
 		public override void _Ready()
 		{
 			base._Ready();
@@ -33,6 +35,11 @@ namespace FaffLatest.scripts.effects.movementguide
 
 			material = Mesh.SurfaceGetMaterial(0) as ShaderMaterial;
 		}
+
+		public void SetParentCharacterTransform(Spatial parent)
+        {
+			this.parent = parent;
+        }
 
 		public void SetPartOfPath(bool isPathPart)
 		{
@@ -44,7 +51,6 @@ namespace FaffLatest.scripts.effects.movementguide
 
 		private void _On_Mouse_Entered()
 		{
-			GD.Print("Enter");
 			MouseIsOver = true;
 			EmitSignal(SignalNames.MovementGuide.CELL_MOUSE_ENTERED, this);
 
@@ -87,37 +93,23 @@ namespace FaffLatest.scripts.effects.movementguide
 
 		private void CalculateVisiblity(int movementDistanceLeft)
 		{
-			bool shouldHide = true;
+			bool isVisible = false;
 
 			if (IsOutsideWorldBounds())
 			{
-
+				SetVisiblity(isVisible);
+				return;
 			}
-			else
-			{
-				var start = GetParent().GetParent<Spatial>().Transform.origin;
-				var path = AStar.GetMovementPath(start, GlobalTransform.origin, movementDistanceLeft);
-				//bool shouldHide = IsOutsideWorldBounds() || PositionIsOccupied() || IsOutsideMovementDistance(movementDistanceLeft);
-				shouldHide = path == null || path.Length > movementDistanceLeft;
-				var pathString = path != null ? string.Join(",", path) : "";
-			}
-			SetVisiblity(!shouldHide);
-		}
 
-		private bool IsOutsideMovementDistance(float movementDistanceLeft)
-			=> (Transform.origin).Length() > movementDistanceLeft;
+			var start = parent.Transform.origin;
+            var path = AStar.GetMovementPath(start, GlobalTransform.origin, movementDistanceLeft);
+            isVisible = path == null || path.Length > movementDistanceLeft;
 
+            SetVisiblity(!isVisible);
+        }
 
-		//TODO: Make static - move to Map/World manager
 		private bool IsOutsideWorldBounds()
-			=> GlobalTransform.origin.x < 1 || GlobalTransform.origin.x >= 50 || GlobalTransform.origin.z < 1 || GlobalTransform.origin.z >= 50;
-
-		private bool PositionIsOccupied()
-		{
-			var astarPoint = AStar.GetPointInfoForVector3(GlobalTransform.origin);
-
-			return astarPoint.OccupyingNode != null;
-		}
+			=> GlobalTransform.origin.x < 1 || GlobalTransform.origin.x >= AStar.Width || GlobalTransform.origin.z < 1 || GlobalTransform.origin.z >= AStar.Length;
 	}
 }
 

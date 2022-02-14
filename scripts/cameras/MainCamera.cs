@@ -74,16 +74,16 @@ namespace FaffLatest.scripts.cameras
 		}
 
 		private void _On_Camera_MoveToPosition(Vector3 position)
-        {
+		{
 			MoveToSpatialPostion(position);
 		}
 
-        private void MoveToSpatialPostion(Vector3 position)
-        {
-            Vector3 target = new Vector3(position.x, GlobalTransform.origin.y, position.z);
+		private void MoveToSpatialPostion(Vector3 position)
+		{
+			Vector3 target = new Vector3(position.x, GlobalTransform.origin.y, position.z);
 
 			//GD.Print($"Moving to {target}");
-            GlobalTransform = new Transform(GlobalTransform.basis, target);
-        }
-    }
+			GlobalTransform = new Transform(GlobalTransform.basis, target);
+		}
+	}
 }

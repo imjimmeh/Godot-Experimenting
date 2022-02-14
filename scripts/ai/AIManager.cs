@@ -6,12 +6,16 @@ using System.Threading.Tasks;
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
 using FaffLatest.scripts.movement;
+using FaffLatest.scripts.state;
 using Godot;
 
 namespace FaffLatest.scripts.ai
 {
 	public class AIManager : Node
 	{
+		[Signal]
+		public delegate void _Change_Turn(Faction faction);
+
 		private List<Character> aiCharacters;
 		private bool isOurTurn;
 
@@ -78,7 +82,17 @@ namespace FaffLatest.scripts.ai
 			}
 			else
 			{
-				//GD.Print($"{currentlyActioningCharacter.ProperBody.Transform.origin} - {currentlyActioningCharacter?.IsActive} - {currentlyActioningCharacter?.ProperBody?.MovementStats}");
+				GD.Print($"{currentlyActioningCharacter}, {currentlyActioningCharacter.IsActive}, {currentlyActioningCharacter.ProperBody.MovementStats}");
+				if (!currentlyActioningCharacter.ProperBody.HaveDestination)
+				{
+					ClearCharacterForTurn();
+
+					GD.Print($"HERE");
+					if (haveMoreCharacters)
+						GetNextCharacter();
+					else
+						ResetTurn();
+				}
 			}
 		}
 
@@ -92,29 +106,77 @@ namespace FaffLatest.scripts.ai
 		{
 			var (_, targetPosition) = GetNearestPCToCharacter(currentlyActioningCharacter.ProperBody.Transform.origin);
 
-			var path = aStarNavigator.GetMovementPath(
+			var vector = (currentlyActioningCharacter.ProperBody.Transform.origin - targetPosition).Abs();
+			var distance = vector.x + vector.z;
+
+            if (distance < 1.00001f)
+            {
+				GD.Print($"Next to player - clearing");
+				ClearCharacterForTurn();
+				return;
+            }
+
+			var foundEmptyPosition = aStarNavigator.TryGetNearestEmptyPointToLocationWithLoop(targetPosition, currentlyActioningCharacter.ProperBody.Transform.origin, out Vector3 foundPoint, 5);
+
+			if(!foundEmptyPosition)
+            {
+				CantMoveCharacterFurther(targetPosition);
+				return;
+            }
+
+			GD.Print($"Found {foundPoint} for {targetPosition}");
+
+            var path = aStarNavigator.GetMovementPath(
 				start: currentlyActioningCharacter.ProperBody.Transform.origin, 
-				end:targetPosition, 
+				end:foundPoint, 
 				character: currentlyActioningCharacter);
 
 			if(path == null)
-			{
-				while (currentlyActioningCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn > 0)
-                {
-					currentlyActioningCharacter.ProperBody.MovementStats.IncrementMovement();
-					GetNextCharacter();
-					return;
-				}
-			}
+            {
+                CantMoveCharacterFurther(targetPosition);
+                return;
+            }
 
+            GD.Print($"Moving with path {string.Join(",", path)}");
 			currentlyActioningCharacter.ProperBody.GetNode<PathMover>("PathMover").MoveWithPath(path);
 			currentlyActioningCharacter.IsActive = true;
 		}
 
-		private void ResetTurn()
+        private void CantMoveCharacterFurther(Vector3 targetPosition)
+        {
+            GD.Print($" could not find any path for {targetPosition} - we are {targetPosition - currentlyActioningCharacter.ProperBody.Transform.origin} far away");
+            ClearCharacterForTurn();
+
+            if (haveMoreCharacters)
+                GetNextCharacter();
+        }
+
+        private void ClearCharacterForTurn()
+        {
+            while (currentlyActioningCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn > 0)
+            {
+                currentlyActioningCharacter.ProperBody.MovementStats.IncreaseAmountMovedThisTurn();
+                GD.Print($"Decreased movement to {currentlyActioningCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn}");
+            }
+
+			ClearCurrentlyActiveCharacter();
+
+			GD.Print($"OUT");
+		}
+
+        private void ResetTurn()
 		{
+			GD.Print($"Ressetting turn");
+
+			foreach(var character in aiCharacters)
+            {
+				character.ResetTurnStats();
+            }
+				
 			currentArrayPos = 0;
 			isOurTurn = false;
+
+			EmitSignal("_Change_Turn", Faction.PLAYER);
 		}
 
 		private void GetNextCharacter()
@@ -144,7 +206,8 @@ namespace FaffLatest.scripts.ai
 
 		public override void _Ready()
 		{
-			aStarNavigator = GetNode<AStarNavigator>(AStarNavigator.GLOBAL_SCENE_PATH);
+			aStarNavigator = GetNode<AStarNavigator>(NodeReferences.Systems.ASTAR);
+			Connect("_Change_Turn", GetNode(NodeReferences.Systems.GAMESTATE_MANAGER), "SetTurn");
 			base._Ready();
 		}
 
@@ -172,6 +235,8 @@ namespace FaffLatest.scripts.ai
 					targetPos = body.Transform.origin - direction;
 					closestDistance = distance;
 					closestCharacter = asChar;
+
+					GD.Print($"{asChar.Stats.CharacterName} is new closest player at -{body.Transform.origin} - our target pos is {targetPos}, distance is {closestDistance}, direction {direction}, vector {vector}") ;
 				}
 			}
 
