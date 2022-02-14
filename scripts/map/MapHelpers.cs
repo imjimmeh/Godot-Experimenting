@@ -55,8 +55,10 @@ namespace FaffLatest.scripts.map
             {
                 for (var z = negativeHalfZ; z <= halfZ; z++)
                 {
-                    var vector = new Vector3(x + position.x, position.y, position.z + z);
-                    yield return vector;
+                    yield return new Vector3(
+                                    position.x + x,
+                                    position.y,
+                                    position.z + z);
                 }
             }
         }

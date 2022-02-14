@@ -8,20 +8,21 @@ namespace FaffLatest.scripts.shared
         private static bool isInitialised = false;
         private static RandomNumberGenerator rng;
 
-        public static RandomNumberGenerator RNG { get => GetRNG(); }
-
-        private static RandomNumberGenerator GetRNG()
+        public static RandomNumberGenerator RNG
         {
-            if (rng == null)
-                InitialiseRNG();
+            get
+            {
+                if (rng == null || !isInitialised)
+                    InitialiseRNG();
 
-            return rng;
+                return rng;
+            }
         }
 
         private static void InitialiseRNG()
         {
             rng = new RandomNumberGenerator();
-            RNG.Randomize();
+            rng.Randomize();
             isInitialised = true;
         }
 

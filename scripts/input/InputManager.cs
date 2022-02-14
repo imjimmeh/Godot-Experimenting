@@ -141,15 +141,10 @@ namespace FaffLatest.scripts.input
 
             position = GetTargetPositionClampedByMovementDistance(position, body);
 
-            GD.Print($"Getting path from {body.Transform.origin} to {position}");
-
             var convertedPath = aStarNavigator.GetMovementPath(body.Transform.origin, position, gameStateManager.SelectedCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn); // navigation.GetMovementPathNodes(body.Transform, position);
 
             if (convertedPath == null)
-            {
-                GD.Print($"Cannot move from {body.Transform.origin} to {position}");
                 return;
-            }
 
 			gameStateManager.SetCharacterActive(gameStateManager.SelectedCharacter, true);
 			EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.SelectedCharacter, convertedPath);

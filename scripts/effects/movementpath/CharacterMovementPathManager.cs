@@ -1,5 +1,6 @@
 using FaffLatest.scripts.constants;
 using FaffLatest.scripts.movement;
+using FaffLatest.scripts.shared;
 using Godot;
 using System;
 
@@ -30,7 +31,7 @@ namespace FaffLatest.scripts.effects
 
 			for (var x = 0; x < path.Length; x++)
 			{
-				var targetPosition = new Vector3(path[x].x, HeightToDisplayAt, path[x].z);
+				var targetPosition = path[x].WithValues(y: HeightToDisplayAt);
 				var newMesh = MovementPathFactory.CreateMeshInstanceForPoint(targetPosition, SetPlaneVariables());
 
 				SetMeshVariables(body, newMesh);

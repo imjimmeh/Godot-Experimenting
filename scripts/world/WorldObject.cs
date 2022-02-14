@@ -58,8 +58,10 @@ namespace FaffLatest.scripts.world
 			{
 				for (var y = 0; y < fullSize.z; y++)
 				{
-					var point = new Vector3(topLeft.x + x, 0, topLeft.z + y);
-					yield return point;
+					yield return new Vector3(
+						x: topLeft.x + x,
+						y: 0, 
+						z: topLeft.z + y);
 				}
 			}
 		}

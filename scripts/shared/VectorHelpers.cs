@@ -17,5 +17,36 @@ namespace FaffLatest.scripts.shared
 
         public static Vector3 ClampMax(Vector3 newVal, float max) => newVal.Normalized() * max;
 
+        public static Vector3 CopyValues(this Vector3 vector, Vector3 target, bool copyX, bool copyY, bool copyZ)
+            => new Vector3(
+                x: copyX ? target.x : vector.x,
+                y: copyY ? target.y : vector.y,
+                z: copyZ ? target.z : vector.z);
+
+        public static Vector3 CopyXValue(this Vector3 vector, Vector3 target)
+            => vector.CopyValues(target, true, false, false);
+
+        public static Vector3 CopyYValue(this Vector3 vector, Vector3 target)
+            => vector.CopyValues(target, false, true, false);
+
+        public static Vector3 CopyZValue(this Vector3 vector, Vector3 target)
+            => vector.CopyValues(target, false, false, true);
+
+        public static float DistanceToIgnoringHeight(this Vector3 origin, Vector3 target)
+        {
+            var distance = (target - origin).Abs();
+
+            return distance.x + distance.z;
+        }
+
+        public static Vector3 MovementVectorTo(this Vector3 origin, Vector3 target)
+            => (target - origin).Normalized();
+
+        public static Vector3 WithValues(this Vector3 vector, float? x = null, float? y = null, float? z = null)
+            => new Vector3(
+                x ?? vector.x,
+                y ?? vector.y,
+                z ?? vector.z);
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using Godot;
+﻿using FaffLatest.scripts.shared;
+using Godot;
 using static FaffLatest.scripts.constants.SignalNames;
 
 namespace FaffLatest.scripts.movement
@@ -54,7 +55,7 @@ namespace FaffLatest.scripts.movement
 			}
 			else
 			{
-				nextPath = new Vector3(CurrentTarget.x, KinematicBody.Transform.origin.y, CurrentTarget.z);
+				nextPath = CurrentTarget.CopyYValue(KinematicBody.Transform.origin);
 			}
 
 			return !pathFinished;
@@ -62,10 +63,8 @@ namespace FaffLatest.scripts.movement
 
 		public void ClearPath()
 		{
-			//GD.Print($"Reached destination - we are at {Transform.origin}");
 			Path = null;
 			CurrentPathIndex = -1;
-			//GD.Print($"Snapepd to {snappedVector}");
 		}
 
 		private void SetInitialMovementVariables()

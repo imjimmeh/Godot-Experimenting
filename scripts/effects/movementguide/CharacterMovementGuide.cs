@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
 using FaffLatest.scripts.movement;
+using FaffLatest.scripts.shared;
 using Godot;
 using Godot.Collections;
 
@@ -120,7 +121,7 @@ namespace FaffLatest.scripts.effects.movementguide
 
         private void ProcessCoordinates(Vector3 pos, float a, float b)
         {
-            var currentVector = new Vector3(a, pos.y, b);
+            var currentVector = pos.WithValues(x: a, z: b);
 
             bool withinMovementDistance = parent.ProperBody.MovementStats.IsCellWithinMovementDistance(pos, currentVector);
 

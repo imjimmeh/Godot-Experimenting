@@ -1,5 +1,6 @@
 using FaffLatest.characters;
 using FaffLatest.scripts.constants;
+using FaffLatest.scripts.shared;
 using Godot;
 
 namespace FaffLatest.scripts.effects
@@ -36,9 +37,9 @@ namespace FaffLatest.scripts.effects
 			if (character == null)
 				return false;
 
-            var pathOnSameY = new Vector3(pathLocation.x, this.Transform.origin.y, pathLocation.z);
+            var pathOnSameY = pathLocation.CopyYValue(Transform.origin);
 
-            var isThisPath = (pathOnSameY - Transform.origin).Length() < 0.1f;
+            var isThisPath = (pathOnSameY - Transform.origin).Length() == 0.0f;
 
             return isThisPath;
         }

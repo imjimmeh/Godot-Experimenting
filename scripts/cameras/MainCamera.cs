@@ -1,4 +1,5 @@
 using FaffLatest.scripts.constants;
+using FaffLatest.scripts.shared;
 using Godot;
 using System;
 
@@ -63,7 +64,6 @@ namespace FaffLatest.scripts.cameras
 				z = 0;
 
 			Direction = new Vector3(x, y, z);
-
 		}
 
 		private void Move()
@@ -80,9 +80,7 @@ namespace FaffLatest.scripts.cameras
 
 		private void MoveToSpatialPostion(Vector3 position)
 		{
-			Vector3 target = new Vector3(position.x, GlobalTransform.origin.y, position.z);
-
-			//GD.Print($"Moving to {target}");
+			Vector3 target = position.CopyYValue(GlobalTransform.origin);
 			GlobalTransform = new Transform(GlobalTransform.basis, target);
 		}
 	}
