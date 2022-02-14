@@ -33,7 +33,7 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
 [node name="Lights" type="Node" parent="."]
 process_priority = 100
 
-[node name="DirectionalLight" type="DirectionalLight" parent="Lights"]
+[node name="Sun" type="DirectionalLight" parent="Lights"]
 transform = Transform( 1, 0, 0, 0, 0.707106, 0.707106, 0, -0.707106, 0.707106, 0, 100, 0 )
 light_energy = 5.0
 
