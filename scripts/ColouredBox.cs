@@ -17,7 +17,7 @@ public class ColouredBox : CSGBox
 
     private ShaderMaterial material;
 
-    private Node parent;
+    private Character parent;
 
     public override void _Ready()
     {
@@ -25,7 +25,7 @@ public class ColouredBox : CSGBox
         material = Material as ShaderMaterial;
     }
 
-    public void SetParent(Node parent)
+    public void SetParent(Character parent)
         => this.parent = parent;
 
     public void SetColour(CharacterStats stats)
@@ -48,6 +48,9 @@ public class ColouredBox : CSGBox
 
     private void CalculateAndSetAttackRangeShaderParam(Character character)
     {
+        if (character.Stats.IsPlayerCharacter == character.Stats.IsPlayerCharacter)
+            return;
+
         var distance = (character.ProperBody.GlobalTransform.origin - GlobalTransform.origin).Length();
 
         var isInRange = distance <= character.Stats.EquippedWeapon.Range;
@@ -69,10 +72,5 @@ public class ColouredBox : CSGBox
     private void _On_Character_MouseExited()
     {
         material.SetShaderParam(SHADER_PARAM_HIGHLIGHTED, false);
-    }
-
-    private void _On_Character_Selected()
-    {
-
     }
 }

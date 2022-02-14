@@ -122,13 +122,12 @@ namespace FaffLatest.scripts.state
 
 		public void SetCharacterActive(Character character, bool isActive = true)
 		{
-			if (activeCharacter != null)
-			{
-				activeCharacter = null;
-			}
+			GD.Print($"Setting character active");
+			activeCharacter = character;
 
 			if(character == null)
             {
+				GD.Print($"But character is null?");
 				return;
             }
 

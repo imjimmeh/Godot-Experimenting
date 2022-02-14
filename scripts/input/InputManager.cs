@@ -149,7 +149,7 @@ namespace FaffLatest.scripts.input
                 return;
             }
 
-			gameStateManager.SetCharacterActive(gameStateManager.SelectedCharacter);
+			gameStateManager.SetCharacterActive(gameStateManager.SelectedCharacter, true);
 			EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.SelectedCharacter, convertedPath);
 			gameStateManager.ClearCurrentlySelectedCharacter();
 		}
