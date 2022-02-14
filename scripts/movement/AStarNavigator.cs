@@ -291,7 +291,6 @@ namespace FaffLatest.scripts.movement
 
             var body = asCharacter.Body as MovingKinematicBody;
             var point = astar.GetClosestPoint(body.Transform.origin);
-            GD.Print($"Disabling point for {body.Transform.origin}");
             astar.SetPointDisabled(point);
             CreatePointInfos(character, body);
         }

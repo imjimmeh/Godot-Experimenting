@@ -42,21 +42,23 @@ namespace FaffLatest.scripts.input
 
 		private void _On_Character_PortraitClicked(Character character)
         {
+			GD.Print("Portrait clicked");
             ProcessCharacterClick(character);
         }
 
         private void ProcessCharacterClick(Character character)
         {
-            if (!gameStateManager.IsPlayerTurn || gameStateManager.CharacterIsActive)
+			if (!gameStateManager.IsPlayerTurn || gameStateManager.CharacterIsActive)
                 return;
 
             if (gameStateManager.HaveACharacterSelected && character == gameStateManager.SelectedCharacter)
             {
-                EmitSignal(SignalNames.Cameras.MOVE_TO_POSITION, gameStateManager.SelectedCharacter.ProperBody.GlobalTransform.origin);
+				GD.Print($"Move camera");
+				EmitSignal(SignalNames.Cameras.MOVE_TO_POSITION, gameStateManager.SelectedCharacter.ProperBody.GlobalTransform.origin);
             }
             else
             {
-                gameStateManager.SetCurrentlySelectedCharacter(character);
+				gameStateManager.SetCurrentlySelectedCharacter(character);
             }
         }
 

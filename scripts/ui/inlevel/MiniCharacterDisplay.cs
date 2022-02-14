@@ -54,6 +54,8 @@ namespace FaffLatest.scripts.ui
 
 			
 			Connect("_Portrait_Clicked", GetNode(NodeReferences.Systems.INPUT_MANAGER), "_On_Character_PortraitClicked");
+			Connect("mouse_entered", this, "_MouseEntered");
+			Connect("mouse_exited", this, "_MouseExited");
 
 			GetNode(NodeReferences.Systems.GAMESTATE_MANAGER).Connect(SignalNames.State.TURN_CHANGE, this, SignalNames.State.TURN_CHANGE_METHOD);
 		}
@@ -92,11 +94,6 @@ namespace FaffLatest.scripts.ui
 			{
 				var mousePos = GetGlobalMousePosition();
 				characterName.RectGlobalPosition = new Vector2(mousePos.x + (characterName.Text.Length), mousePos.y + 10);
-				characterName.Show();
-			}
-			else
-			{
-				characterName.Hide();
 			}
 		}
 
@@ -124,7 +121,6 @@ namespace FaffLatest.scripts.ui
 
 		public override void _Input(InputEvent inputEvent)
 		{
-			base._Input(inputEvent);
 			if(mouseIsOver && inputEvent is InputEventMouseButton mouseButton)
 			{
 				if(mouseButton.ButtonIndex == 1 && !mouseButton.Pressed)
@@ -132,7 +128,11 @@ namespace FaffLatest.scripts.ui
 					EmitSignal("_Portrait_Clicked", character);
 				}
 			}
+
+			base._Input(inputEvent);
 		}
+
+
 
 		private void _On_Character_FinishedMoving(Node character, Vector3 newPosition)
 		{
@@ -145,7 +145,6 @@ namespace FaffLatest.scripts.ui
 				{
 					movementIcon.Hide();
 				}
-				
 			}
 		}
 
@@ -155,6 +154,20 @@ namespace FaffLatest.scripts.ui
 			{
 				movementIcon.Show();
 			}
+		}
+
+		private void _MouseEntered()
+		{
+			mouseIsOver = true;
+			characterName.Show();
+			GD.Print("Mouse is over");
+		}
+
+		private void _MouseExited()
+		{
+			mouseIsOver = false;
+			characterName.Hide();
+			GD.Print("Mouse left");
 		}
 	}
 }

@@ -53,18 +53,12 @@ namespace FaffLatest.scripts.world
 			var topLeft = (GlobalTransform.origin - extents).Ceil();
 
 			extents = extents.Ceil();
-			//var rect = new Rect2(new Vector2(topLeft.x, topLeft.z), new Vector2(fullSize.x, fullSize.z));
 
-			//float upperX = Mathf.Ceil(rect.Position.x + rect.Size.x);
-			//float upperY = Mathf.Ceil(rect.Position.y + rect.Size.y);
-
-			//GD.Print($"{extents} - {fullSize} - {topLeft} - {rect} - {upperX}");
 			for (var x = 0; x < fullSize.x; x++)
 			{
 				for (var y = 0; y < fullSize.z; y++)
 				{
 					var point = new Vector3(topLeft.x + x, 0, topLeft.z + y);
-					GD.Print($"Disabling point for world object {Name} at {point}");
 					yield return point;
 				}
 			}
