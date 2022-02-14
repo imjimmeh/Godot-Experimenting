@@ -78,6 +78,7 @@ namespace FaffLatest.scripts.effects.movementguide
                 Hide();
                 return;
             }
+            GD.Print("MoveGuide");
 
             if (body == null)
                 GetBody();
@@ -89,7 +90,7 @@ namespace FaffLatest.scripts.effects.movementguide
             RotationDegrees = body.RotationDegrees * -1;
 
             EmitSignal("_Character_MoveGuide_CalculateCellVisiblity", parent.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
-
+            GD.Print("Show");
             Show();
         }
 
@@ -154,15 +155,15 @@ namespace FaffLatest.scripts.effects.movementguide
         {
             ClearExistingPath();
             var path = AStar.GetMovementPath(body.Transform.origin, node.GlobalTransform.origin, parent.ProperBody.MovementStats.MaxMovementDistancePerTurn);
-            if (path == null || path.Length == 0)
+            if (path == null || path.Path == null ||  path.Path.Length == 0 || !path.IsSuccess)
                 return;
 
-            currentPath = new CharacterMovementGuideCell[path.Length];
+            currentPath = new CharacterMovementGuideCell[path.Path.Length];
             int pathCount = 0;
 
-            for (var x = 0; x < path.Length; x++)
+            for (var x = 0; x < path.Path.Length; x++)
             {
-                var nextCell = GetCellAndSetAsPathPart(path[x] - body.Transform.origin);
+                var nextCell = GetCellAndSetAsPathPart(path.Path[x] - body.Transform.origin);
 
                 if (nextCell == null)
                     continue;

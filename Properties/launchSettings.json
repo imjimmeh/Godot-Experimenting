@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "FaffLatest": {
+      "commandName": "Project",
+      "commandLineArgs": "-e --path C:\\Users\\jimme\\OneDrive\\Documents\\Godot\\FaffLatest",
+      "workingDirectory": "$(ProjectDir)"
+    }
+  }
+}

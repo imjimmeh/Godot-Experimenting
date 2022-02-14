@@ -43,12 +43,12 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.04, 0 )
 shape = SubResource( 5 )
 
 [node name="PlayerSpawnableArea" parent="." instance=ExtResource( 3 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 0.5, -19 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0.5, -20 )
 visible = true
 mesh = SubResource( 7 )
 
 [node name="EnemySpawnableArea" parent="." instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 17.5, 0.5, 17.5 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0.5, 20 )
 mesh = SubResource( 8 )
 
 [node name="Objects" type="Node" parent="."]

@@ -50,7 +50,7 @@ namespace FaffLatest.scripts.map
 
             float halfX, halfZ, negativeHalfX, negativeHalfZ;
             GetBoundsOfMesh(size, out halfX, out halfZ, out negativeHalfX, out negativeHalfZ);
-
+            
             for (var x = negativeHalfX; x <= halfX; x++)
             {
                 for (var z = negativeHalfZ; z <= halfZ; z++)

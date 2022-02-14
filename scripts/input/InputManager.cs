@@ -143,11 +143,11 @@ namespace FaffLatest.scripts.input
 
             var convertedPath = aStarNavigator.GetMovementPath(body.Transform.origin, position, gameStateManager.SelectedCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn); // navigation.GetMovementPathNodes(body.Transform, position);
 
-            if (convertedPath == null)
+            if (convertedPath == null && convertedPath.IsSuccess && convertedPath.Path?.Length > 0)
                 return;
 
 			gameStateManager.SetCharacterActive(gameStateManager.SelectedCharacter, true);
-			EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.SelectedCharacter, convertedPath);
+			EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.SelectedCharacter, convertedPath.Path);
 			gameStateManager.ClearCurrentlySelectedCharacter();
 		}
 

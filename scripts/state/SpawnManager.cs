@@ -4,6 +4,7 @@ using FaffLatest.scripts.constants;
 using FaffLatest.scripts.effects;
 using FaffLatest.scripts.map;
 using FaffLatest.scripts.movement;
+using FaffLatest.scripts.shared;
 using FaffLatest.scripts.ui;
 using FaffLatest.scripts.weapons;
 using Godot;
@@ -68,6 +69,7 @@ namespace FaffLatest.scripts.state
 				var areaToSpawnFrom = charactersToCreate[x].IsPlayerCharacter ? spawnArea.PlayerSpawnableAreas : spawnArea.EnemySpawnableAreas;
 				var spawnPosition = GetSpawnPosition(areaToSpawnFrom, random);
 
+				spawnPosition = spawnPosition.WithValues(y: 0.5f);
 				var character = SpawnCharacter(charactersToCreate[x], spawnPosition);
 
 				if(character.Stats.IsPlayerCharacter)

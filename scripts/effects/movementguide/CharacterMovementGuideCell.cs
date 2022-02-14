@@ -76,7 +76,7 @@ namespace FaffLatest.scripts.effects.movementguide
 
 		private void ConnectSignals()
 		{
-			Connect(SignalNames.MovementGuide.CLICKED_ON, GetNode("../"), SignalNames.MovementGuide.CLICKED_ON_METHOD);
+			Connect(SignalNames.MovementGuide.CLICKED_ON, GetParent(), SignalNames.MovementGuide.CLICKED_ON_METHOD);
 		}
 
 		public void SetVisiblity(bool visible)
@@ -101,11 +101,16 @@ namespace FaffLatest.scripts.effects.movementguide
 				return;
 			}
 
-			var start = parent.Transform.origin;
+			var start = parent.GlobalTransform.origin;
 			
             var path = AStar.GetMovementPath(start, GlobalTransform.origin, movementDistanceLeft);
-            isVisible = path != null && path.Length <= movementDistanceLeft;
+            isVisible = path != null && path.IsSuccess && 
+			path.Path != null && path.Path.Length <= movementDistanceLeft && path.Path.Length > 0;
 
+			if(!isVisible)
+			{
+				var test = 5;
+			}
 			SetVisiblity(isVisible);
         }
 

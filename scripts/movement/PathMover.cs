@@ -26,8 +26,8 @@ namespace FaffLatest.scripts.movement
 		{
 			base._Ready();
 
-			character = GetNode("../../");
-			KinematicBody = GetNode<Spatial>("../");
+			character = GetParent().GetParent();
+			KinematicBody = GetParent<Spatial>();
 		}
 
 		public override void _PhysicsProcess(float delta)

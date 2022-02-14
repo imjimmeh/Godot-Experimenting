@@ -46,10 +46,9 @@ public class MovingKinematicBody : KinematicBody
 
         if (Parent == null)
         {
-            Parent = GetNode<Node>("../");
+            Parent = GetParent();
         }
 
-        Transform = new Transform(Transform.basis, Transform.origin.Round());
         pathMover = GetNode<PathMover>("PathMover");
         CharacterMesh = GetNode<ColouredBox>("CSGBox");
 
@@ -61,6 +60,7 @@ public class MovingKinematicBody : KinematicBody
     {
         if (inputEvent is InputEventMouseButton mouseButtonEvent)
         {
+            GD.Print("Clicked");
             EmitSignal(Characters.CLICKED_ON, Parent, mouseButtonEvent);
         }
     }

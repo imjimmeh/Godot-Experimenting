@@ -3,7 +3,7 @@ using Godot;
 
 namespace FaffLatest.scripts.characters
 {
-	public class Character : Spatial
+	public class Character : Node
 	{
 		[Signal]
 		public delegate void _Character_Disposing(Node character);

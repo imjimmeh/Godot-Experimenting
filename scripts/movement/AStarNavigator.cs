@@ -1,5 +1,6 @@
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
+using FaffLatest.scripts.shared;
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -110,7 +111,7 @@ namespace FaffLatest.scripts.movement
             Width = width;
         }
 
-        public Vector3[] GetMovementPath(Vector3 start, Vector3 end, Character character) => GetMovementPath(start, end, character.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
+        public Vector3[] GetMovementPath(Vector3 start, Vector3 end, Character character) => GetMovementPath(start, end, character.ProperBody.MovementStats.AmountLeftToMoveThisTurn).Path;
 
         public bool TryGetNearestEmptyPointToLocation(Vector3 target, Vector3 origin, out Vector3 point, int tryCount = 0)
         {
@@ -211,21 +212,62 @@ namespace FaffLatest.scripts.movement
             return disabled;
         }
 
-        public Vector3[] GetMovementPath(Vector3 start, Vector3 end, int movementDistance)
+        public GetMovementPathResult GetMovementPath(Vector3 start, Vector3 end, int movementDistance)
         {
             try
             {
+                start = start.Ceil();
+                end = end.Ceil();
+                end = end.CopyYValue(start);
+
                 var (startPoint, endPoint) = GetStartAndEndPoints(start, end);
 
                 var s = astar.GetPointPosition(startPoint.Id);
                 var e = astar.GetPointPosition(endPoint.Id);
 
+                if(endPoint.OccupyingNode != null)
+                {
+                    return new GetMovementPathResult(
+                        isSuccess: false,
+                        path: null,
+                        startOrigin: start,
+                        endOrigin: end,
+                        startPoint: startPoint,
+                        endPoint: endPoint,
+                        foundStartPoint: s,
+                        foundEndPoint: e
+                    );
+                }
+                
                 var path = astar.GetPointPath(startPoint.Id, endPoint.Id);
 
-                if (path == null)
-                    return null;
+                if (path == null || path.Length < 2)
+                {
+                      return new GetMovementPathResult(
+                        isSuccess: false,
+                        path: null,
+                        startOrigin: start,
+                        endOrigin: end,
+                        startPoint: startPoint,
+                        endPoint: endPoint,
+                        foundStartPoint: s,
+                        foundEndPoint: e
+                    );
+                }
+                var trimmedPath = TrimAndClampPath(path, start, movementDistance);
+                
+                var success = trimmedPath != null && trimmedPath.Length > 0;
 
-                return TrimAndClampPath(path, start, movementDistance);
+                  return new GetMovementPathResult(
+                        isSuccess: success,
+                        path: trimmedPath,
+                        startOrigin: start,
+                        endOrigin: end,
+                        startPoint: startPoint,
+                        endPoint: endPoint,
+                        foundStartPoint: s,
+                        foundEndPoint: e
+                    );
             }
             catch (Exception ex)
             {
@@ -264,7 +306,7 @@ namespace FaffLatest.scripts.movement
 
         public void _On_Character_Created(Character character)
         {
-            var point = astar.GetClosestPoint(character.ProperBody.Transform.origin);
+            var point = astar.GetClosestPoint(character.ProperBody.GlobalTransform.origin);
             astar.SetPointDisabled(point);
             CreatePointInfos(character, character.ProperBody);
         }
@@ -279,7 +321,7 @@ namespace FaffLatest.scripts.movement
 
         private void CreatePointInfos(Character character, MovingKinematicBody body)
         {
-            var pointInfo = GetPointInfoForVector3(body.Transform.origin);
+            var pointInfo = GetPointInfoForVector3(body.GlobalTransform.origin);
             pointInfo.SetOccupier(character);
             characterLocations.Add(character, pointInfo);
         }
