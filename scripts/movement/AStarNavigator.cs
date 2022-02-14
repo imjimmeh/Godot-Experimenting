@@ -129,11 +129,9 @@ namespace FaffLatest.scripts.movement
                 if (path == null)
                 {
                     GD.Print($"Could not find path for {start} to {end}");
-
                     return null;
                 }
 
-                GD.Print($"found path {string.Join(",", path)}");
                 return TrimAndClampPath(path, start, movementDistance);
             }
             catch (Exception ex)
@@ -167,11 +165,8 @@ namespace FaffLatest.scripts.movement
 
             var newArray = new Vector3[maxX];
 
-            for(var x = 0; x <= maxX; x++)
+            for(var x = 1; x <= maxX; x++)
             {
-                if (x == 0)
-                    continue;
-
                 newArray[x - 1] = points[x];
             }
 

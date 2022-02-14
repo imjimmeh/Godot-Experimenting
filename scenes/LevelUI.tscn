@@ -1,10 +1,13 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://scenes/ui/SelectedCharacter.tscn" type="PackedScene" id=1]
 [ext_resource path="res://scenes/ui/MiniCharacterDisplay.tscn" type="PackedScene" id=2]
 [ext_resource path="res://scripts/ui/UIElementContainer.cs" type="Script" id=3]
 [ext_resource path="res://scripts/ui/inlevel/CharacterSelector.cs" type="Script" id=4]
 [ext_resource path="res://scripts/ui/inlevel/FinishTurn.cs" type="Script" id=5]
+[ext_resource path="res://scenes/ui/ingame/CharacterDamageText.tscn" type="PackedScene" id=6]
+[ext_resource path="res://resources/fonts/TitilliumWeb-s32.tres" type="DynamicFont" id=7]
+[ext_resource path="res://scenes/ui/ingame/LabelWithTimeToLive.tscn" type="PackedScene" id=8]
 
 [node name="UI" type="Control"]
 margin_right = 40.0
@@ -13,6 +16,10 @@ script = ExtResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+CharacterDamageTextScene = ExtResource( 6 )
+CharacterDamageTextFont = ExtResource( 7 )
+LabelWithTimeToLiveScene = ExtResource( 8 )
+LabelWithTimeToLiveFont = ExtResource( 7 )
 
 [node name="SelectedCharacter" parent="." instance=ExtResource( 1 )]
 

@@ -75,6 +75,7 @@ namespace FaffLatest.scripts.movement
         public void ResetMovement()
         {
             AmountMovedThisTurn = 0;
+            GD.Print($"Amount moved this turn now {AmountMovedThisTurn}");
         }
 
         public void IncrementMovement()

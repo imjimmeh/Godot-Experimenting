@@ -52,7 +52,6 @@ namespace FaffLatest.scripts.ui
 
 		private void _On_Character_SelectionCleared()
 		{
-			GD.Print("Unselected");
 			selectedCharacter = null;
 
 			healthbar.CharacterSelectionCleared();

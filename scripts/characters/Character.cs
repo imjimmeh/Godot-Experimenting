@@ -78,6 +78,12 @@ namespace FaffLatest.scripts.characters
 			Body.GetNode<ColouredBox>("CSGBox").SetColour(Stats);
 		}
 
+		public void ResetTurnStats()
+		{
+			ProperBody.MovementStats.ResetMovement();
+			IsActive = false;
+		}
+
 		private void InitialiseDispose()
 		{
 			EmitSignal("_Character_Disposing", this);

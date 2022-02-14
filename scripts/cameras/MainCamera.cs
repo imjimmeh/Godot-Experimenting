@@ -1,3 +1,4 @@
+using FaffLatest.scripts.constants;
 using Godot;
 using System;
 
@@ -17,6 +18,9 @@ namespace FaffLatest.scripts.cameras
 		public override void _Ready()
 		{
 			NegativeSpeed = Speed;
+
+			GetNode(NodeReferences.Systems.INPUT_MANAGER).Connect("_Camera_MoveToPosition", this, "_On_Camera_MoveToPosition");
+			base._Ready();
 		}
 
 		public override void _PhysicsProcess(float delta)
@@ -69,20 +73,14 @@ namespace FaffLatest.scripts.cameras
 			Transform = Transform.InterpolateWith(targetTransform, 1.0f);
 		}
 
-		private void _On_Character_FaceIconClicked(Node character)
+		private void _On_Camera_MoveToPosition(Vector3 position)
         {
-			if(character is Spatial spatial)
-            {
-				var body = spatial.GetNode<Spatial>("KinematicBody");
-				GD.Print($"Received camera move signal");
-                MoveToSpatialPostion(body);
+			MoveToSpatialPostion(position);
+		}
 
-            }
-        }
-
-        private void MoveToSpatialPostion(Spatial spatial)
+        private void MoveToSpatialPostion(Vector3 position)
         {
-            Vector3 target = new Vector3(spatial.GlobalTransform.origin.x, GlobalTransform.origin.y, spatial.GlobalTransform.origin.z);
+            Vector3 target = new Vector3(position.x, GlobalTransform.origin.y, position.z);
 
 			//GD.Print($"Moving to {target}");
             GlobalTransform = new Transform(GlobalTransform.basis, target);

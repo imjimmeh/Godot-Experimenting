@@ -26,15 +26,11 @@ namespace FaffLatest.scripts.ui
 
 		private void _On_Turn_Change(string whoseTurn)
 		{
-			var newLabel = new LabelWithTimeToLive
-			{
-				Text = $"{whoseTurn} Turn"
-			};
-
 			var viewportSize = GetViewport().GetVisibleRect().Size;
 
-			newLabel.RectPosition = new Vector2(viewportSize.x * 0.5f, viewportSize.y * 0.5f);
-			ElementContainer.AddChild(newLabel);
+			var position = new Vector2(viewportSize.x * 0.5f, viewportSize.y * 0.5f);
+
+			elementContainer.SpawnBigTemporaryText(position, $"{whoseTurn}" + "\n" + "Turn");
 		}
 	}
 

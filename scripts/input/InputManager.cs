@@ -17,6 +17,9 @@ namespace FaffLatest.scripts.input
 		[Signal]
 		public delegate void _Character_MoveTo(Character character, Vector3[] target);
 
+		[Signal]
+		public delegate void _Camera_MoveToPosition(Vector3 position);
+
 		public override void _Ready()
 		{
 			base._Ready();
@@ -39,7 +42,27 @@ namespace FaffLatest.scripts.input
 			}
 		}
 
-		private void _On_Character_Mouse_Pressed(Character character, InputEventMouseButton mouseButtonEvent)
+		private void _On_Character_PortraitClicked(Character character)
+        {
+            ProcessCharacterClick(character);
+        }
+
+        private void ProcessCharacterClick(Character character)
+        {
+            if (!gameStateManager.IsPlayerTurn || gameStateManager.CharacterIsActive)
+                return;
+
+            if (gameStateManager.HaveACharacterSelected && character == gameStateManager.SelectedCharacter)
+            {
+                EmitSignal("_Camera_MoveToPosition", gameStateManager.SelectedCharacter.ProperBody.GlobalTransform.origin);
+            }
+            else
+            {
+                gameStateManager.SetCurrentlySelectedCharacter(character);
+            }
+        }
+
+        private void _On_Character_Mouse_Pressed(Character character, InputEventMouseButton mouseButtonEvent)
         {
 
         }

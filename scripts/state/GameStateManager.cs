@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using FaffLatest.scripts.ai;
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
@@ -35,6 +36,8 @@ namespace FaffLatest.scripts.state
 
 		public bool SelectedCharacterCanMove => HaveACharacterSelected && !SelectedCharacter.ProperBody.MovementStats.CanMove;
 
+		public bool IsPlayerTurn => CurrentTurn == Faction.PLAYER;
+
 		public override void _Ready()
 		{
 			base._Ready();
@@ -56,7 +59,6 @@ namespace FaffLatest.scripts.state
 		{
 			ClearCurrentlySelectedCharacter();
 
-			GD.Print($"Selected");
 			selectedCharacter = character;
 			EmitSignal(SignalNames.Characters.SELECTED, character);
 		}
@@ -69,31 +71,53 @@ namespace FaffLatest.scripts.state
 
 		public void PlayerEndTurn()
         {
-			SetCurrentTurn(Faction.ENEMY);
+            SetTurn(Faction.ENEMY);
         }
 
-		public void SetCurrentTurn(Faction turn)
+        private void ResetCurrentFactionTurnStats(Godot.Collections.Array characters = null)
+        {
+            if (characters == null)
+            {
+                characters = GetCurrentFactionCharacters();
+            }
+
+            for (var x = 0; x < characters.Count; x++)
+            {
+                var asCharacter = characters[x] as Character;
+
+                Task.Run(() => asCharacter.ResetTurnStats());
+            }
+        }
+
+
+		private Godot.Collections.Array GetCurrentFactionCharacters()
+        {
+            var groupNameForCurrentCharacters = CurrentTurn == Faction.PLAYER ? GroupNames.PLAYER_CHARACTERS : GroupNames.AI_CHARACTERS;
+			var characters = GetTree().GetNodesInGroup(groupNameForCurrentCharacters);
+
+            return characters;
+        }
+
+        public void SetTurn(Faction turn)
 		{
 			if (currentTurn == turn)
 				return;
 
-			GD.Print($"Setting signal");
-			currentTurn = turn;
+			ResetCurrentFactionTurnStats();
 			ClearCurrentlySelectedCharacter();
+
+			currentTurn = turn;
 
 			EmitSignal("_Turn_Changed", currentTurn.ToString());
 		}
 
-		private void _On_Character_FinishedMoving(Node character, Vector3 newPosition)
-		{
-			if (character is Character c)
-			{
-				SetCharacterActive(false);
-				CheckTurnIsFinished(c);
-			}
-		}
+		private void _On_Character_FinishedMoving(Character character, Vector3 newPosition)
+        {
+            SetCharacterActive(false);
+			CheckTurnFinishedAndProcess();
+        }
 
-		public void SetCharacterActive(bool isActive = true)
+        public void SetCharacterActive(bool isActive = true)
 		{
 			SetCharacterActive(SelectedCharacter, isActive);
 		}
@@ -106,44 +130,48 @@ namespace FaffLatest.scripts.state
 			character.IsActive = isActive;
 		}
 
-		private void CheckTurnIsFinished(Character c)
+		public void CheckTurnFinishedAndProcess()
         {
-            //GD.Print($"Character {c.Stats.CharacterName} has finished a movement");
+			var characters = GetCurrentFactionCharacters();
 
-            var characterParentNode = c.Stats.IsPlayerCharacter ? GroupNames.PLAYER_CHARACTERS : GroupNames.AI_CHARACTERS;
-            var charactersInGroup = GetTree().GetNodesInGroup(characterParentNode);
-
-            for (var x = 0; x < charactersInGroup.Count; x++)
+			if (!HasTurnFinished(characters))
             {
-                var asCharacter = charactersInGroup[x] as Character;
+				return;
+            }
 
-                if (asCharacter.Stats.IsPlayerCharacter != c.Stats.IsPlayerCharacter)
-                    continue;
+			var nextTurn = GetNextTurn(CurrentTurn);
+			SetTurn(nextTurn);
+		}
+
+		private bool HasTurnFinished(Godot.Collections.Array characters = null)
+        {
+			if(characters == null)
+				characters = GetCurrentFactionCharacters();
+
+            for (var x = 0; x < characters.Count; x++)
+            {
+                var asCharacter = characters[x] as Character;
 
                 if (asCharacter.ProperBody.MovementStats.CanMove)
                 {
-                    return;
+					return false;
                 }
             }
 
-            GD.Print($"next turn");
-            var nextTurn = c.Stats.IsPlayerCharacter ? Faction.ENEMY : Faction.PLAYER;
-
-            SetCurrentTurn(nextTurn);
-            ResetTurnStats(c, charactersInGroup);
+			return true;
         }
 
-        private static void ResetTurnStats(Character c, Godot.Collections.Array charactersInGroup)
+		private static Faction GetNextTurn(Faction currentTurn)
         {
-            for (var x = 0; x < charactersInGroup.Count; x++)
+            switch (currentTurn)
             {
-                var asCharacter = charactersInGroup[x] as Character;
+				case Faction.PLAYER:
+					return Faction.ENEMY;
+				case Faction.ENEMY:
+					return Faction.PLAYER;
+			}
 
-                if (asCharacter.Stats.IsPlayerCharacter != c.Stats.IsPlayerCharacter)
-                    continue;
-
-                asCharacter.ProperBody.MovementStats.ResetMovement();
-            }
+			return Faction.PLAYER;
         }
     }
 }

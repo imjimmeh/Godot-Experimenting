@@ -1,5 +1,6 @@
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
+using FaffLatest.scripts.movement;
 using Godot;
 using System;
 
@@ -7,7 +8,22 @@ namespace FaffLatest.scripts.ui
 { 
 	public class UIElementContainer : Node
 	{
-		private Camera camera;
+		[Export]
+		public PackedScene CharacterDamageTextScene { get; private set; }
+
+		[Export]
+		public DynamicFont CharacterDamageTextFont { get; private set; }
+
+		[Export]
+		public PackedScene LabelWithTimeToLiveScene { get; private set; }
+
+		[Export]
+		public DynamicFont LabelWithTimeToLiveFont { get; private set; }
+
+        private const int BIG_FONT_SIZE = 32;
+        private const int DAMAGE_FONT_SIZE = 20;
+
+        private Camera camera;
 
 		public CharacterSelector CharacterSelector { get; private set; }
 
@@ -18,50 +34,83 @@ namespace FaffLatest.scripts.ui
 		public Control EffectLabelsParent { get; private set; }
 
 		public override void _Ready()
-        {
-            GetUIChildrenNodes();
+		{
+			GetUIChildrenNodes();
 			ConnectSignals();
 
-            var viewportSize = GetViewport().GetVisibleRect().Size;
-            SelectedCharacter.RectPosition = new Vector2(viewportSize.x - 200, viewportSize.y - 200);
+			var viewportSize = GetViewport().GetVisibleRect().Size;
+			SelectedCharacter.RectPosition = new Vector2(viewportSize.x - 200, viewportSize.y - 200);
 
+			CharacterDamageTextFont.Size = DAMAGE_FONT_SIZE;
+			CharacterDamageTextFont.OutlineSize = 1;
+			CharacterDamageTextFont.OutlineColor = new Color(0, 0, 0, 1);
+			CharacterDamageTextFont.UseFilter = true;
 
-            base._Ready();
-        }
+			LabelWithTimeToLiveFont.Size = BIG_FONT_SIZE;
+			LabelWithTimeToLiveFont.OutlineSize = 3;
+			LabelWithTimeToLiveFont.OutlineColor = new Color(0, 0, 0, 1);
+			LabelWithTimeToLiveFont.UseFilter = true;
 
-        private void GetUIChildrenNodes()
-        {
+			base._Ready();
+		}
+
+		private void GetUIChildrenNodes()
+		{
 			GD.Print("Getting children nodes");
-            CharacterSelector = GetNode<CharacterSelector>("CharacterSelector");
-            SelectedCharacter = GetNode<SelectedCharacter>("SelectedCharacter");
-            EffectLabelsParent = GetNode<Control>("EffectLabels");
-        }
+			CharacterSelector = GetNode<CharacterSelector>("CharacterSelector");
+			SelectedCharacter = GetNode<SelectedCharacter>("SelectedCharacter");
+			EffectLabelsParent = GetNode<Control>("EffectLabels");
+		}
 
 		private void ConnectSignals()
-        {
+		{
 			SelectedCharacter.ConnectSignals(GetNode(NodeReferences.Systems.GAMESTATE_MANAGER));
 		}
 
 		private void _On_Character_ReceivedDamage(Node character, int damage, Node origin, bool killingBlow)
 		{
+			if (killingBlow)
+				return;
+
 			var asChar = character as Character;
 
 			if(camera == null)
 				camera = GetNode<Camera>(NodeReferences.BaseLevel.Cameras.MAIN_CAMERA);
 
-			SpawnExpiringLabel(camera.UnprojectPosition(asChar.ProperBody.GlobalTransform.origin), damage.ToString(), 5, true);
+			SpawnDamageLabel(asChar.ProperBody, damage.ToString());
 		}
 
-		private LabelWithTimeToLive SpawnExpiringLabel(Vector2 pos, string text, float timeToLive, bool addChild = true)
+		public Control SpawnDamageLabel(Spatial worldObject, string text)
 		{
-			var label = new LabelWithTimeToLive(timeToLive);
+			var parent = CharacterDamageTextScene.Instance<WorldCenteredControl>();
+			parent.Initialise(worldObject, camera);
+
+			EffectLabelsParent.AddChild(parent);
+
+			var label = parent.GetNode<Label>("Label");
+			label.AddFontOverride("font", CharacterDamageTextFont);
 			label.Text = text;
-			label.RectPosition = pos;
-			
-			if(addChild)
-				EffectLabelsParent.AddChild(label);
+			label.AddColorOverride("font_color", Colors.Red);
 
 			return label;
 		}
+
+		public Control SpawnBigTemporaryText(Vector2 position, string text)
+		{
+			var label = LabelWithTimeToLiveScene.Instance<Label>();
+
+			var blankNode = new Node();
+
+			AddChild(blankNode);
+			blankNode.AddChild(label);
+
+			label.AddFontOverride("font", LabelWithTimeToLiveFont);
+			label.Text = text;
+			label.AddColorOverride("font_color", Colors.Red);
+			label.RectPosition = new Vector2(position.x - ((6 * BIG_FONT_SIZE) / 2), position.y);
+
+			return label;
+		}
+
 	}
 }

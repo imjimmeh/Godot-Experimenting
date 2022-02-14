@@ -12,7 +12,7 @@ namespace FaffLatest.scripts.ui
 	public class MiniCharacterDisplay : Control
 	{
 		[Signal]
-		public delegate void _FaceIcon_Clicked(Node character);
+		public delegate void _Portrait_Clicked(Node character);
 
 		[Export]
 		public DynamicFont FontToUse { get; set; }
@@ -24,7 +24,7 @@ namespace FaffLatest.scripts.ui
 		public float MaxWidthOfIcon { get; set; } = 32;
 
 
-		private TextureRect characterFaceIcon;
+		private TextureRect characterPortrait;
 		private Label characterName;
 		private Character character;
 
@@ -50,7 +50,8 @@ namespace FaffLatest.scripts.ui
 
 			characterName.AddFontOverride("font", FontToUse);
 
-			Connect("_FaceIcon_Clicked", GetNode(NodeReferences.BaseLevel.Cameras.MAIN_CAMERA), "_On_Character_FaceIconClicked");
+			
+			Connect("_Portrait_Clicked", GetNode(NodeReferences.Systems.INPUT_MANAGER), "_On_Character_PortraitClicked");
 		}
 
 		private void InitialiseFont()
@@ -63,7 +64,7 @@ namespace FaffLatest.scripts.ui
 
 		private void GetChildrenNodes()
 		{
-			characterFaceIcon = GetNode<TextureRect>("Icon");
+			characterPortrait = GetNode<TextureRect>("Icon");
 			characterName = GetNode<Label>("CharacterName");
 		}
 
@@ -96,7 +97,7 @@ namespace FaffLatest.scripts.ui
 
 		private void SetValues()
 		{
-			characterFaceIcon.Texture = character.Stats.FaceIcon;
+			characterPortrait.Texture = character.Stats.FaceIcon;
 
 			if (TextureIsTooLarge())
 			{
@@ -106,15 +107,15 @@ namespace FaffLatest.scripts.ui
 			characterName.Text = character.Stats.CharacterName;
 		}
 
-		private bool TextureNotInitialisedButCharacterIs => characterFaceIcon.Texture == null && character != null && character?.Stats != null && character.Stats.FaceIcon != null;
+		private bool TextureNotInitialisedButCharacterIs => characterPortrait.Texture == null && character != null && character?.Stats != null && character.Stats.FaceIcon != null;
 
 		private void ResizeTexture()
 		{
-			var div = MaxWidthOfIcon / characterFaceIcon.Texture.GetWidth();
+			var div = MaxWidthOfIcon / characterPortrait.Texture.GetWidth();
 			RectScale = new Vector2(div, div);
 		}
 
-		private bool TextureIsTooLarge() => characterFaceIcon.Texture.GetWidth() > MaxWidthOfIcon;
+		private bool TextureIsTooLarge() => characterPortrait.Texture.GetWidth() > MaxWidthOfIcon;
 
 		public override void _Notification(int what)
 		{
@@ -144,9 +145,9 @@ namespace FaffLatest.scripts.ui
 			base._Input(inputEvent);
 			if(mouseIsOver && inputEvent is InputEventMouseButton mouseButton)
 			{
-				if(mouseButton.ButtonIndex == 1)
+				if(mouseButton.ButtonIndex == 1 && !mouseButton.Pressed)
 				{
-					EmitSignal("_FaceIcon_Clicked", character);
+					EmitSignal("_Portrait_Clicked", character);
 				}
 			}
 		}

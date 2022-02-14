@@ -8,7 +8,7 @@ using Godot.Collections;
 
 namespace FaffLatest.scripts.effects.movementguide
 {
-    public class CharacterMovementGuide : Spatial, ICharacterMovementGuide
+    public class CharacterMovementGuide : Spatial
     {
         private CharacterMovementGuideCell[] currentPath;
 
@@ -17,7 +17,6 @@ namespace FaffLatest.scripts.effects.movementguide
 
 
         private Dictionary<Vector2, CharacterMovementGuideCell> existingMovementGuide;
-        private int movementGuideCount = 0;
 
         private Character parent;
         private KinematicBody body;
@@ -70,13 +69,12 @@ namespace FaffLatest.scripts.effects.movementguide
 
         private void _On_Character_Selected(Character character)
         {
-            GD.Print("Char selected>");
             if (character != parent)
             {
                 Hide();
                 return;
             }
-
+            GD.Print("Selected");
 
             if (body == null)
                 GetBody();
@@ -250,7 +248,6 @@ namespace FaffLatest.scripts.effects.movementguide
         public void AddCellToArray(CharacterMovementGuideCell cell, float a, float b)
         {
             existingMovementGuide[new Vector2(a, b)] = cell;
-            movementGuideCount++;
         }
 
         private void _On_Character_SelectionCleared()
