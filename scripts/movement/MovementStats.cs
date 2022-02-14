@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FaffLatest.scripts.shared;
 using Godot;
+using static FaffLatest.scripts.constants.SignalNames;
 
 namespace FaffLatest.scripts.movement
 {

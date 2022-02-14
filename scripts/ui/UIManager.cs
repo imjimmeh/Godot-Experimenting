@@ -24,7 +24,7 @@ namespace FaffLatest.scripts.ui
 		}
 
 
-		private void _On_Turn_Change(string whoseTurn)
+		private void _On_Turn_Changed(string whoseTurn)
 		{
 			var viewportSize = GetViewport().GetVisibleRect().Size;
 

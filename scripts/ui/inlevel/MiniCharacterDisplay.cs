@@ -55,7 +55,7 @@ namespace FaffLatest.scripts.ui
 			
 			Connect("_Portrait_Clicked", GetNode(NodeReferences.Systems.INPUT_MANAGER), "_On_Character_PortraitClicked");
 
-			GetNode(NodeReferences.Systems.GAMESTATE_MANAGER).Connect("_Turn_Changed", this,"_On_Turn_Changed");
+			GetNode(NodeReferences.Systems.GAMESTATE_MANAGER).Connect(SignalNames.State.TURN_CHANGE, this, SignalNames.State.TURN_CHANGE_METHOD);
 		}
 
 		private void InitialiseFont()
@@ -164,11 +164,14 @@ namespace FaffLatest.scripts.ui
 
 			if(character is Character asChar)
             {
-				if(!asChar.ProperBody.MovementStats.CanMove)
+				GD.Print($"Received finished moving signal - {character} - {asChar.ProperBody.MovementStats.CanMove} - {asChar.ProperBody.MovementStats} - {asChar.ProperBody.MovementStats.AmountLeftToMoveThisTurn}");
+
+				if (!asChar.ProperBody.MovementStats.CanMove)
                 {
 					movementIcon.Hide();
 
 				}
+				
             }
         }
 

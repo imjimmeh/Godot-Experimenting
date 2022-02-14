@@ -188,8 +188,8 @@ public class MovingKinematicBody : KinematicBody
 
     private void MovementFinished()
     {
-        ResetVariables();
         EmitSignal(Characters.MOVEMENT_FINISHED, Parent, Transform.origin);
+        ResetVariables();
     }
 
     private void SnapToCurrentDestination()

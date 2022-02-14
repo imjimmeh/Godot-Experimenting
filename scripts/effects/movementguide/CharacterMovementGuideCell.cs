@@ -44,6 +44,7 @@ namespace FaffLatest.scripts.effects.movementguide
 
 		private void _On_Mouse_Entered()
 		{
+			GD.Print("Enter");
 			MouseIsOver = true;
 			EmitSignal(SignalNames.MovementGuide.CELL_MOUSE_ENTERED, this);
 
@@ -84,9 +85,22 @@ namespace FaffLatest.scripts.effects.movementguide
 			}
 		}
 
-		private void CalculateVisiblity(float movementDistanceLeft)
+		private void CalculateVisiblity(int movementDistanceLeft)
 		{
-			bool shouldHide = IsOutsideWorldBounds() || PositionIsOccupied() || IsOutsideMovementDistance(movementDistanceLeft);
+			bool shouldHide = true;
+
+			if (IsOutsideWorldBounds())
+			{
+
+			}
+			else
+			{
+				var start = GetParent().GetParent<Spatial>().Transform.origin;
+				var path = AStar.GetMovementPath(start, GlobalTransform.origin, movementDistanceLeft);
+				//bool shouldHide = IsOutsideWorldBounds() || PositionIsOccupied() || IsOutsideMovementDistance(movementDistanceLeft);
+				shouldHide = path == null || path.Length > movementDistanceLeft;
+				var pathString = path != null ? string.Join(",", path) : "";
+			}
 			SetVisiblity(!shouldHide);
 		}
 

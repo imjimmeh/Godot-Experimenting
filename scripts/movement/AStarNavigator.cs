@@ -110,7 +110,9 @@ namespace FaffLatest.scripts.movement
 			Width = width;
         }
 
-		public Vector3[] GetMovementPath(Vector3 start, Vector3 end, int movementDistance)
+        public Vector3[] GetMovementPath(Vector3 start, Vector3 end, Character character) => GetMovementPath(start, end, character.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
+
+        public Vector3[] GetMovementPath(Vector3 start, Vector3 end, int movementDistance)
 		{
 			try
             {
@@ -119,13 +121,7 @@ namespace FaffLatest.scripts.movement
                 var s = astar.GetPointPosition(startPoint.Id);
                 var e = astar.GetPointPosition(endPoint.Id);
 
-                if (endPoint.OccupyingNode != null)
-                {
-                    return null;
-                }
-
                 var path = astar.GetPointPath(startPoint.Id, endPoint.Id);
-
                 if (path == null)
                 {
                     GD.Print($"Could not find path for {start} to {end}");
@@ -146,11 +142,11 @@ namespace FaffLatest.scripts.movement
         {
             if(points == null || points.Length == 0)
             {
-                throw new Exception("No path given");
+                return null;
             }
             else if(points.Length == 1)
             {
-                throw new Exception("Only one point on path given");
+                return points;
             }
             else if(start.z != points[0].z || start.z != points[0].z)
             {

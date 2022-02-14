@@ -80,7 +80,7 @@ namespace FaffLatest.scripts.constants
 		public class State
         {
 			public const string TURN_CHANGE = "_Turn_Changed";
-			public const string TURN_CHANGE_METHOD = "_On_Turn_Change";
+			public const string TURN_CHANGE_METHOD = SharedParts.ON + TURN_CHANGE;
 
 		}
         public class World

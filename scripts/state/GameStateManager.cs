@@ -77,13 +77,8 @@ namespace FaffLatest.scripts.state
             SetTurn(Faction.ENEMY);
         }
 
-        private void ResetCurrentFactionTurnStats(Godot.Collections.Array characters = null)
+        private void ResetTurnStats(Godot.Collections.Array characters)
         {
-            if (characters == null)
-            {
-                characters = GetCurrentFactionCharacters();
-            }
-
             for (var x = 0; x < characters.Count; x++)
             {
                 var asCharacter = characters[x] as Character;
@@ -93,25 +88,30 @@ namespace FaffLatest.scripts.state
         }
 
 
-		private Godot.Collections.Array GetCurrentFactionCharacters()
-        {
-            var groupNameForCurrentCharacters = CurrentTurn == Faction.PLAYER ? GroupNames.PLAYER_CHARACTERS : GroupNames.AI_CHARACTERS;
+		private Godot.Collections.Array GetCurrentFactionCharacters() => GetFactionCharacters(CurrentTurn);
+
+		private Godot.Collections.Array GetFactionCharacters(Faction faction)
+		{
+			var groupNameForCurrentCharacters = faction == Faction.PLAYER ? GroupNames.PLAYER_CHARACTERS : GroupNames.AI_CHARACTERS;
 			var characters = GetTree().GetNodesInGroup(groupNameForCurrentCharacters);
 
-            return characters;
-        }
+			return characters;
+		}
 
-        public void SetTurn(Faction turn)
+
+		public void SetTurn(Faction nextTurn)
 		{
-			if (currentTurn == turn)
+			if (currentTurn == nextTurn)
 				return;
 
-			ResetCurrentFactionTurnStats();
+			var nextFactionCharacters = GetFactionCharacters(nextTurn);
+			ResetTurnStats(nextFactionCharacters);
+
 			ClearCurrentlySelectedCharacter();
 
-			currentTurn = turn;
+			currentTurn = nextTurn;
 
-			EmitSignal("_Turn_Changed", currentTurn.ToString());
+			EmitSignal(SignalNames.State.TURN_CHANGE, currentTurn.ToString());
 		}
 
 		private void _On_Character_FinishedMoving(Character character, Vector3 newPosition)
@@ -165,9 +165,9 @@ namespace FaffLatest.scripts.state
 			return true;
         }
 
-		private static Faction GetNextTurn(Faction currentTurn)
+		private static Faction GetNextTurn(Faction faction)
         {
-            switch (currentTurn)
+            switch (faction)
             {
 				case Faction.PLAYER:
 					return Faction.ENEMY;

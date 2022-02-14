@@ -35,7 +35,7 @@ namespace FaffLatest.scripts.ai
 			currentArrayPos = 0;
 		}
 
-		private void _On_Turn_Change(string turn)
+		private void _On_Turn_Changed(string turn)
 		{
 			var ourTurn = turn.Equals("ENEMY");
 
@@ -90,17 +90,24 @@ namespace FaffLatest.scripts.ai
 
 		private void MoveCharacter()
 		{
-			var body = currentlyActioningCharacter.Body as MovingKinematicBody;
-			var (_, targetPosition) = GetNearestPCToCharacter(body.Transform.origin);
+			var (_, targetPosition) = GetNearestPCToCharacter(currentlyActioningCharacter.ProperBody.Transform.origin);
 
-			var path = aStarNavigator.GetMovementPath(body.Transform.origin, targetPosition, currentlyActioningCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
+			var path = aStarNavigator.GetMovementPath(
+				start: currentlyActioningCharacter.ProperBody.Transform.origin, 
+				end:targetPosition, 
+				character: currentlyActioningCharacter);
 
 			if(path == null)
 			{
-				throw new Exception($"Could not move {body} to {targetPosition}");
+				while (currentlyActioningCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn > 0)
+                {
+					currentlyActioningCharacter.ProperBody.MovementStats.IncrementMovement();
+					GetNextCharacter();
+					return;
+				}
 			}
 
-			body.GetNode<PathMover>("PathMover").MoveWithPath(path);
+			currentlyActioningCharacter.ProperBody.GetNode<PathMover>("PathMover").MoveWithPath(path);
 			currentlyActioningCharacter.IsActive = true;
 		}
 
