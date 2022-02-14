@@ -10,9 +10,12 @@ namespace FaffLatest.scripts.state
 {
 	public class GameStateManager : Node
 	{
+		private Character activeCharacter;
+
 		private Character selectedCharacter;
 		private Faction currentTurn;
 
+		public Character ActiveCharacter => activeCharacter;
 		public Character SelectedCharacter => selectedCharacter;
 		public Faction CurrentTurn => currentTurn;
 
@@ -28,7 +31,7 @@ namespace FaffLatest.scripts.state
 		public AStarNavigator AStarNavigator { get; private set; }
 		public SpawnManager SpawnManager { get; private set; }
 
-		public bool CharacterIsActive => HaveACharacterSelected && SelectedCharacter.IsActive;
+		public bool CharacterIsActive => ActiveCharacter != null && ActiveCharacter.IsActive;
 
 		public bool HaveACharacterSelected => SelectedCharacter != null;
 
@@ -119,9 +122,16 @@ namespace FaffLatest.scripts.state
 
 		public void SetCharacterActive(Character character, bool isActive = true)
 		{
+			if (activeCharacter != null)
+			{
+				activeCharacter = null;
+			}
+
 			if(character == null)
+            {
 				return;
-				
+            }
+
 			character.IsActive = isActive;
 		}
 

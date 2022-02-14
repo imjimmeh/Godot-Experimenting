@@ -28,17 +28,25 @@ namespace FaffLatest.scripts.characters
 
 		public bool IsDisposing = false;
 
+		private bool IsHighlighted = false;
+
 		public override void _Ready()
 		{
 			base._Ready();
 
-			Body = GetNode("KinematicBody");
-			ProperBody = Body as MovingKinematicBody;
+			GetChildNodeFields();
 
 			AddToGroup(GroupNames.CHARACTER);
 			ConnectSignals();
+			ProperBody.CharacterMesh.SetColour(Stats);
 
 			EmitSignal(SignalNames.Characters.READY, this);
+		}
+
+		private void GetChildNodeFields()
+		{
+			Body = GetNode("KinematicBody");
+			ProperBody = Body as MovingKinematicBody;
 		}
 
 		public override void _Process(float delta)
@@ -74,7 +82,7 @@ namespace FaffLatest.scripts.characters
 		{
 			Connect(SignalNames.Characters.READY, Body.GetNode("CharacterMovementGuide"), SignalNames.Characters.READY_METHOD);
 			ProperBody.GetNode("PathMover").Connect(SignalNames.Characters.REACHED_PATH_PART, ProperBody.MovementStats, SignalNames.Characters.REACHED_PATH_PART_METHOD);
-			Body.GetNode<ColouredBox>("CSGBox").SetColour(Stats);
+			ProperBody.CharacterMesh.SetParent(this);
 		}
 
 		public void ResetTurnStats()

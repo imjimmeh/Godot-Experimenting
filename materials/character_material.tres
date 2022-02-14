@@ -1,0 +1,46 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type spatial;
+uniform vec3 colour = vec3(1.0);
+uniform float alpha = 1.0;
+
+uniform vec3 inAttackRangeColour = vec3(1.0, 0.0, 0.0);
+uniform vec3 highlightedColour = vec3(0.0, 0.0, 1.0);
+uniform vec3 selectedColour = vec3(1.0, 1.0, 0.0);
+
+uniform bool inAttackRange = false;
+uniform bool isHighlighted = false;
+uniform bool isSelected = false;
+
+vec3 GetColour()
+{
+	if(isSelected)
+		return selectedColour;
+		
+	if(isHighlighted)
+		return highlightedColour;
+		
+	if(inAttackRange)
+		return inAttackRangeColour;
+	
+	return colour;
+}
+
+
+void fragment(){
+	ALBEDO = GetColour();
+	ALPHA = alpha;
+}"
+
+[resource]
+resource_local_to_scene = true
+shader = SubResource( 1 )
+shader_param/colour = Vector3( 1, 1, 1 )
+shader_param/alpha = 1.0
+shader_param/inAttackRangeColour = Vector3( 1, 0, 0 )
+shader_param/highlightedColour = Vector3( 0, 0, 1 )
+shader_param/selectedColour = Vector3( 1, 1, 0 )
+shader_param/inAttackRange = false
+shader_param/isHighlighted = false
+shader_param/isSelected = false

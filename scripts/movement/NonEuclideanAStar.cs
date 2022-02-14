@@ -16,7 +16,18 @@ namespace FaffLatest.scripts.movement
 
         public override float _EstimateCost(int fromId, int toId)
         {
-            return 1;
+            var from = GetPointPosition(fromId);
+            var to = GetPointPosition(toId);
+
+            int cost = 0;
+
+            if (from.x != to.x)
+                cost++;
+
+            if (from.z != to.z)
+                cost++;
+
+            return cost;
         }
     }
 }

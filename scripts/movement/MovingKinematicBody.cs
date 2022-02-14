@@ -18,14 +18,20 @@ public class MovingKinematicBody : KinematicBody
     [Signal]
     public delegate void _Character_TurnFinished(Node character);
 
+    [Signal]
+    public delegate void _Character_Highlight_Change(bool isHighlighted);
+
     [Export]
     public MovementStats MovementStats { get; private set; }
 
 
-    private bool haveRotated = false;
+    public ColouredBox CharacterMesh { get; private set; }
+
     private PathMover pathMover;
 
     public Node Parent;
+
+    private bool haveRotated = false;
 
     public Vector3 CurrentMovementDestination { get; private set; }
     public Vector3 CurrentMovementVector { get; private set; }
@@ -45,13 +51,16 @@ public class MovingKinematicBody : KinematicBody
 
         Transform = new Transform(Transform.basis, Transform.origin.Round());
         pathMover = GetNode<PathMover>("PathMover");
+        CharacterMesh = GetNode<ColouredBox>("CSGBox");
+
+        Connect("mouse_entered", CharacterMesh, "_On_Character_MouseEntered");
+        Connect("mouse_exited", CharacterMesh, "_On_Character_MouseExited");
     }
 
     public override void _InputEvent(Godot.Object camera, InputEvent inputEvent, Vector3 position, Vector3 normal, int shapeIdx)
     {
         if (inputEvent is InputEventMouseButton mouseButtonEvent)
         {
-            //GD.Print("Character clicked on - emitting signal");
             EmitSignal(Characters.CLICKED_ON, Parent, mouseButtonEvent);
         }
     }
@@ -140,7 +149,7 @@ public class MovingKinematicBody : KinematicBody
             pathMover.ClearPath();
             return;
         }
-        
+
         this.InterpolateAndMove(delta, CurrentMovementDestination);
 
         bool atSamePoint = ReachedCurrentDestination();

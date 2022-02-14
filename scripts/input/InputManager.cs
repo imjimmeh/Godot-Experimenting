@@ -149,8 +149,9 @@ namespace FaffLatest.scripts.input
                 return;
             }
 
-			EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.SelectedCharacter, convertedPath);
 			gameStateManager.SetCharacterActive(gameStateManager.SelectedCharacter);
+			EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.SelectedCharacter, convertedPath);
+			gameStateManager.ClearCurrentlySelectedCharacter();
 		}
 
 		private Vector3 GetTargetPositionClampedByMovementDistance(Vector3 position, KinematicBody body)
