@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
@@ -11,6 +12,7 @@ namespace FaffLatest.scripts.effects.movementguide
 {
     public class CharacterMovementGuide : Spatial
     {
+        private const string CALCULATE_VISIBLITY = "CalculateVisiblity";
         private CharacterMovementGuideCell[] currentPath;
 
         [Signal]
@@ -19,7 +21,7 @@ namespace FaffLatest.scripts.effects.movementguide
         [Signal]
         public delegate void _Character_MoveGuide_CalculateCellVisiblity(int amountLeftToMoveThisTurn);
 
-        private Dictionary<Vector2, CharacterMovementGuideCell> existingMovementGuide;
+        private Godot.Collections.Dictionary<Vector2, CharacterMovementGuideCell> existingMovementGuide;
 
         private Character parent;
         private KinematicBody body;
@@ -88,9 +90,12 @@ namespace FaffLatest.scripts.effects.movementguide
 
 
             RotationDegrees = body.RotationDegrees * -1;
+            CallDeferred("ShowCells");
+        }
 
+        private void ShowCells()
+        {
             EmitSignal("_Character_MoveGuide_CalculateCellVisiblity", parent.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
-            GD.Print("Show");
             Show();
         }
 
@@ -99,44 +104,35 @@ namespace FaffLatest.scripts.effects.movementguide
             Hide();
         }
 
-        public void CreateMeshes()
+        public async void CreateMeshes()
         {
-            var pos = Vector3.Zero;
+            var max = parent.ProperBody.MovementStats.MaxMovementDistancePerTurn;
+            var min = max * -1;
 
-            (var x, var z) = (pos.x, pos.z);
-
-            (var maxX, var maxZ) = GetMaxPossibleValues(parent, x, z);
-
-            (var minX, var minZ) = GetMinimumPossibleValues(parent, x, z);
-
-            existingMovementGuide = new Dictionary<Vector2, CharacterMovementGuideCell>();
-
-            for (var a = minX; a <= maxX; a += AStar.GridSize)
+            existingMovementGuide = new Godot.Collections.Dictionary<Vector2, CharacterMovementGuideCell>();
+            
+            for (var x = min; x <= max; x += AStar.GridSize)
             {
-                for (var b = minZ; b <= maxZ; b += AStar.GridSize)
+                for (var y = min; y <= max; y += AStar.GridSize)
                 {
-                    ProcessCoordinates(pos, a, b);
+                    ProcessCoordinates(x, y);
                 }
             }
         }
 
-        private void ProcessCoordinates(Vector3 pos, float a, float b)
+        private Task<CharacterMovementGuideCell> ProcessCoordinates(float x, float y)
         {
-            var currentVector = pos.WithValues(x: a, z: b);
+            var currentVector = new Vector3(x: x, y: 0, z: y);
 
-            bool withinMovementDistance = parent.ProperBody.MovementStats.IsCellWithinMovementDistance(pos, currentVector);
+            bool withinMovementDistance = parent.ProperBody.MovementStats.IsCellWithinMovementDistance(Vector3.Zero, currentVector);
 
             if (!withinMovementDistance)
-            {
-                return;
-            }
+                return null;
 
-            BuildMesh(a, b, currentVector);
-
-            return;
+            return BuildMesh(x, y, currentVector);
         }
 
-        private void BuildMesh(float a, float b, Vector3 currentVector)
+        private async Task<CharacterMovementGuideCell> BuildMesh(float a, float b, Vector3 currentVector)
         {
             var mesh = this.CreateMeshInstanceForPosition(currentVector);
 
@@ -145,29 +141,34 @@ namespace FaffLatest.scripts.effects.movementguide
 
             mesh.SetParentCharacterTransform(parent.ProperBody);
 
-            Connect(SignalNames.MovementGuide.CELL_CALCULATE_VISIBLITY, mesh, "CalculateVisiblity");
+            Connect(SignalNames.MovementGuide.CELL_CALCULATE_VISIBLITY, mesh, CALCULATE_VISIBLITY);
             
-            AddChild(mesh);
+            this.CallDeferred("AddMeshChild", mesh);
+
+            return mesh;
         }
 
+        private void AddMeshChild(Node mesh) => AddChild(mesh);
 
-        private void _On_Cell_Mouse_Entered(CharacterMovementGuideCell node)
+
+        private async void _On_Cell_Mouse_Entered(CharacterMovementGuideCell node)
         {
-            ClearExistingPath();
-            var path = AStar.GetMovementPath(body.Transform.origin, node.GlobalTransform.origin, parent.ProperBody.MovementStats.MaxMovementDistancePerTurn);
-            if (path == null || path.Path == null ||  path.Path.Length == 0 || !path.IsSuccess)
+            var clearPathTask = ClearExistingPath();
+
+            var result = await AStar.TryGetMovementPathAsync(body.Transform.origin, node.GlobalTransform.origin, parent.ProperBody.MovementStats.MaxMovementDistancePerTurn);
+
+            if (result == null || !result.IsSuccess || result.Path.Length > parent.ProperBody.MovementStats.AmountLeftToMoveThisTurn)
                 return;
 
-            currentPath = new CharacterMovementGuideCell[path.Path.Length];
+            currentPath = new CharacterMovementGuideCell[result.Path.Length];
+
             int pathCount = 0;
 
-            for (var x = 0; x < path.Path.Length; x++)
+            await clearPathTask;
+            
+            for (var x = 0; x < result.Path.Length; x++)
             {
-                var nextCell = GetCellAndSetAsPathPart(path.Path[x] - body.Transform.origin);
-
-                if (nextCell == null)
-                    continue;
-
+                var nextCell = GetCellAndSetAsPathPart(result.Path[x] - body.GlobalTransform.origin);
                 currentPath[x] = nextCell;
                 pathCount++;
             }
@@ -184,8 +185,7 @@ namespace FaffLatest.scripts.effects.movementguide
                 return null;
             }
 
-            newPathCell.SetPartOfPath(true);
-
+            newPathCell.CallDeferred("SetPartOfPath",true);
             return newPathCell;
         }
 
@@ -202,7 +202,7 @@ namespace FaffLatest.scripts.effects.movementguide
             return null;
         }
 
-        private void ClearExistingPath()
+        private async Task ClearExistingPath()
         {
             if (currentPath != null)
             {
@@ -231,19 +231,6 @@ namespace FaffLatest.scripts.effects.movementguide
                 EmitSignal(SignalNames.Characters.MOVE_ORDER, worldPos);
                 Hide();
             }
-        }
-
-
-        private static (float x, float z) GetMinimumPossibleValues(Character character, float x, float z)
-        {
-            (var minX, var minZ) = (x - character.ProperBody.MovementStats.MaxMovementDistancePerTurn, z - character.ProperBody.MovementStats.MaxMovementDistancePerTurn);
-            return (minX, minZ);
-        }
-
-        private static (float x, float z) GetMaxPossibleValues(Character character, float x, float z)
-        {
-            (var maxX, var maxZ) = (x + character.ProperBody.MovementStats.MaxMovementDistancePerTurn, z + character.ProperBody.MovementStats.MaxMovementDistancePerTurn);
-            return (maxX, maxZ);
         }
 
         public void AddCellToArray(CharacterMovementGuideCell cell, float a, float b)

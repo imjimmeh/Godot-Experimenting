@@ -127,7 +127,7 @@ namespace FaffLatest.scripts.input
 			}
 		}
 
-		private void IssueMoveOrder(Vector3 position)
+		private async void IssueMoveOrder(Vector3 position)
 		{
 			var body = gameStateManager.SelectedCharacter.GetNode<KinematicBody>("KinematicBody");
             position = position.Round();
@@ -141,13 +141,13 @@ namespace FaffLatest.scripts.input
 
             position = GetTargetPositionClampedByMovementDistance(position, body);
 
-            var convertedPath = aStarNavigator.GetMovementPath(body.Transform.origin, position, gameStateManager.SelectedCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn); // navigation.GetMovementPathNodes(body.Transform, position);
+            var result = await aStarNavigator.TryGetMovementPathAsync(body.Transform.origin, position, gameStateManager.SelectedCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn); // navigation.GetMovementPathNodes(body.Transform, position);
 
-            if (convertedPath == null && convertedPath.IsSuccess && convertedPath.Path?.Length > 0)
+            if (result == null && result.IsSuccess && result.Path?.Length > 0)
                 return;
 
 			gameStateManager.SetCharacterActive(gameStateManager.SelectedCharacter, true);
-			EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.SelectedCharacter, convertedPath.Path);
+			EmitSignal(SignalNames.Characters.MOVE_TO, gameStateManager.SelectedCharacter, result.Path);
 			gameStateManager.ClearCurrentlySelectedCharacter();
 		}
 

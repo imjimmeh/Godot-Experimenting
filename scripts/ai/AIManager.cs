@@ -94,7 +94,7 @@ namespace FaffLatest.scripts.ai
 			currentlyActioningCharacter = null;
 		}
 
-		private void MoveCharacter()
+		private async void MoveCharacter()
 		{
 			var (_, targetPosition) = GetNearestPCToCharacter(currentlyActioningCharacter.ProperBody.Transform.origin);
 
@@ -116,18 +116,18 @@ namespace FaffLatest.scripts.ai
 				return;
             }
 
-            var path = aStarNavigator.GetMovementPath(
+            var result = await aStarNavigator.TryGetMovementPathAsync(
 				start: currentlyActioningCharacter.ProperBody.Transform.origin, 
 				end:foundPoint, 
 				character: currentlyActioningCharacter);
 
-			if(path == null)
+			if(result == null || !result.IsSuccess || result.Path.Length < currentlyActioningCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn)
             {
                 CantMoveCharacterFurther();
                 return;
             }
 
-			currentlyActioningCharacter.ProperBody.GetNode<PathMover>("PathMover").MoveWithPath(path);
+			currentlyActioningCharacter.ProperBody.GetNode<PathMover>("PathMover").MoveWithPath(result.Path);
 			currentlyActioningCharacter.IsActive = true;
 		}
 

@@ -91,7 +91,7 @@ namespace FaffLatest.scripts.effects.movementguide
 			}
 		}
 
-		private void CalculateVisiblity(int movementDistanceLeft)
+		private async void CalculateVisiblity(int movementDistanceLeft)
 		{
 			bool isVisible = false;
 
@@ -103,9 +103,11 @@ namespace FaffLatest.scripts.effects.movementguide
 
 			var start = parent.GlobalTransform.origin;
 			
-            var path = AStar.GetMovementPath(start, GlobalTransform.origin, movementDistanceLeft);
-            isVisible = path != null && path.IsSuccess && 
-			path.Path != null && path.Path.Length <= movementDistanceLeft && path.Path.Length > 0;
+            var result = await AStar.TryGetMovementPathAsync(start, GlobalTransform.origin, movementDistanceLeft);
+
+            isVisible = result != null && result.IsSuccess && 
+			result.Path != null && result.Path.Length <= movementDistanceLeft && result.Path.Length > 0;
+
 			SetVisiblity(isVisible);
         }
 
