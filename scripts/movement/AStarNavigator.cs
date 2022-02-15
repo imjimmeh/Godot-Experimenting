@@ -212,36 +212,29 @@ namespace FaffLatest.scripts.movement
             return disabled;
         }
 
-        public Task<GetMovementPathResult> TryGetMovementPathAsync(Vector3 start, Vector3 end, int movementDistance)
+        public async Task<GetMovementPathResult> TryGetMovementPathAsync(Vector3 start, Vector3 end, int movementDistance)
         {
             try
             {
-                start = start.Ceil();
-                end = end.Ceil();
-                end = end.CopyYValue(start);
-
                 var (startPoint, endPoint) = GetStartAndEndPoints(start, end);
-
-                var s = astar.GetPointPosition(startPoint.Id);
-                var e = astar.GetPointPosition(endPoint.Id);
 
                 if(endPoint.OccupyingNode != null)
                 {
-                    return Task.FromResult(new GetMovementPathResult(false));
+                    return new GetMovementPathResult(false);
                 }
                 
                 var path = astar.GetPointPath(startPoint.Id, endPoint.Id);
 
                 if (path == null || path.Length < 2)
                 {
-                    return Task.FromResult(new GetMovementPathResult(false));
+                    return new GetMovementPathResult(false);
                 }
 
                 var trimmedPath = TrimAndClampPath(path, start, movementDistance);
                 
                 var success = trimmedPath != null && trimmedPath.Length > 0;
 
-                return Task.FromResult(new GetMovementPathResult(trimmedPath, success));
+                return new GetMovementPathResult(trimmedPath, success);
             }
             catch (Exception ex)
             {
@@ -272,10 +265,19 @@ namespace FaffLatest.scripts.movement
 
         private (PointInfo start, PointInfo end) GetStartAndEndPoints(Vector3 start, Vector3 end)
         {
+            CleanStartAndEnd(ref start, ref end);
+
             (var startX, var startY) = ((int)start.x, (int)start.z);
             (var endX, var endY) = ((int)end.x, (int)end.z);
 
             return (start: Points[startX, startY], end: Points[endX, endY]);
+        }
+
+        private static void CleanStartAndEnd(ref Vector3 start, ref Vector3 end)
+        {
+            start = start.Ceil();
+            end = end.Ceil();
+            end = end.CopyYValue(start);
         }
 
         public void _On_Character_Created(Character character)

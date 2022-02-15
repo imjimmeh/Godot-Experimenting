@@ -78,40 +78,40 @@ namespace FaffLatest.scripts.effects.movementguide
 		{
 			Connect(SignalNames.MovementGuide.CLICKED_ON, GetParent(), SignalNames.MovementGuide.CLICKED_ON_METHOD);
 		}
-
-		public void SetVisiblity(bool visible)
-		{
-			if (!visible)
-			{
-				Hide();
-			}
-			else
-			{
-				Show();
-			}
-		}
-
+		
 		private async void CalculateVisiblity(int movementDistanceLeft)
-		{
-			bool isVisible = false;
+        {
+            bool isVisible = false;
 
-			if (IsOutsideWorldBounds())
-			{
-				SetVisiblity(isVisible);
-				return;
-			}
+            if (IsOutsideWorldBounds())
+            {
+                SetVisiblity(isVisible);
+                return;
+            }
 
-			var start = parent.GlobalTransform.origin;
-			
+            var start = parent.GlobalTransform.origin;
+
             var result = await AStar.TryGetMovementPathAsync(start, GlobalTransform.origin, movementDistanceLeft);
 
-            isVisible = result != null && result.IsSuccess && 
-			result.Path != null && result.Path.Length <= movementDistanceLeft && result.Path.Length > 0;
+            isVisible = result != null && result.IsSuccess &&
+            result.Path != null && result.Path.Length <= movementDistanceLeft && result.Path.Length > 0;
 
-			SetVisiblity(isVisible);
+            SetVisiblity(isVisible);
         }
 
-		private bool IsOutsideWorldBounds()
+        private void SetVisiblity(bool isVisible)
+        {
+            if (isVisible)
+            {
+                CallDeferred("show");
+            }
+            else
+            {
+                CallDeferred("hide");
+            }
+        }
+
+        private bool IsOutsideWorldBounds()
 			=> GlobalTransform.origin.x < 1 || GlobalTransform.origin.x >= AStar.Width || GlobalTransform.origin.z < 1 || GlobalTransform.origin.z >= AStar.Length;
 	}
 }

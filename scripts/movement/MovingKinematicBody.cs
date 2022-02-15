@@ -1,6 +1,7 @@
 using FaffLatest.scripts.constants;
 using FaffLatest.scripts.effects.movementguide;
 using FaffLatest.scripts.movement;
+using FaffLatest.scripts.shared;
 using Godot;
 using System;
 using static FaffLatest.scripts.constants.SignalNames;
@@ -60,7 +61,6 @@ public class MovingKinematicBody : KinematicBody
     {
         if (inputEvent is InputEventMouseButton mouseButtonEvent)
         {
-            GD.Print("Clicked");
             EmitSignal(Characters.CLICKED_ON, Parent, mouseButtonEvent);
         }
     }
@@ -194,7 +194,9 @@ public class MovingKinematicBody : KinematicBody
 
     private void SnapToCurrentDestination()
     {
-        Transform = new Transform(Transform.basis, CurrentMovementDestination);
+        var newPosition = Transform.origin.Round().CopyYValue(Transform.origin);
+
+        Transform = new Transform(Transform.basis, newPosition);
     }
 
     private void ResetVariables()

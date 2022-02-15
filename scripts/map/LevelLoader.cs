@@ -29,7 +29,7 @@ namespace FaffLatest.scripts.map
 
 			if(currentLevelIsDisposing)
 			{
-				DisposeLevel();
+				CallDeferred("DisposeLevel");
 			}
 		}
 
@@ -58,8 +58,8 @@ namespace FaffLatest.scripts.map
 			//currentScene.Dispose();
 
 			var baseLevel = BaseLevel.Instance() as BaseLevel;
-			root.AddChild(baseLevel);
-			baseLevel.LoadMap(loadingMap);
+			root.CallDeferred("add_child", baseLevel);
+			baseLevel.CallDeferred("LoadMap", loadingMap);
 
 			ClearVariables();
 		}

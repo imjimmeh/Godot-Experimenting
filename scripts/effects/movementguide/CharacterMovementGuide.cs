@@ -70,7 +70,7 @@ namespace FaffLatest.scripts.effects.movementguide
         private void _On_Character_Ready(Node character)
         {
             Initialise();
-            CreateMeshes();
+            CallDeferred("CreateMeshes");
         }
 
         private void _On_Character_Selected(Character character)
@@ -80,7 +80,6 @@ namespace FaffLatest.scripts.effects.movementguide
                 Hide();
                 return;
             }
-            GD.Print("MoveGuide");
 
             if (body == null)
                 GetBody();
@@ -96,12 +95,12 @@ namespace FaffLatest.scripts.effects.movementguide
         private void ShowCells()
         {
             EmitSignal("_Character_MoveGuide_CalculateCellVisiblity", parent.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
-            Show();
+            CallDeferred("show");
         }
 
         private void _On_Character_SelectonCleared()
         {
-            Hide();
+            CallDeferred("hide");
         }
 
         public async void CreateMeshes()
@@ -120,19 +119,19 @@ namespace FaffLatest.scripts.effects.movementguide
             }
         }
 
-        private Task<CharacterMovementGuideCell> ProcessCoordinates(float x, float y)
+        private async void ProcessCoordinates(float x, float y)
         {
             var currentVector = new Vector3(x: x, y: 0, z: y);
 
             bool withinMovementDistance = parent.ProperBody.MovementStats.IsCellWithinMovementDistance(Vector3.Zero, currentVector);
 
             if (!withinMovementDistance)
-                return null;
+                return;
 
-            return BuildMesh(x, y, currentVector);
+            BuildMesh(x, y, currentVector);
         }
 
-        private async Task<CharacterMovementGuideCell> BuildMesh(float a, float b, Vector3 currentVector)
+        private async void BuildMesh(float a, float b, Vector3 currentVector)
         {
             var mesh = this.CreateMeshInstanceForPosition(currentVector);
 
@@ -144,8 +143,6 @@ namespace FaffLatest.scripts.effects.movementguide
             Connect(SignalNames.MovementGuide.CELL_CALCULATE_VISIBLITY, mesh, CALCULATE_VISIBLITY);
             
             this.CallDeferred("AddMeshChild", mesh);
-
-            return mesh;
         }
 
         private void AddMeshChild(Node mesh) => AddChild(mesh);
