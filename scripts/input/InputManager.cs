@@ -2,6 +2,7 @@ using FaffLatest.scripts.characters;
 using FaffLatest.scripts.combat;
 using FaffLatest.scripts.constants;
 using FaffLatest.scripts.movement;
+using FaffLatest.scripts.shared;
 using FaffLatest.scripts.state;
 using FaffLatest.scripts.world;
 using Godot;
@@ -127,21 +128,16 @@ namespace FaffLatest.scripts.input
 			}
 		}
 
-		private async void IssueMoveOrder(Vector3 position)
-		{
-			var body = gameStateManager.SelectedCharacter.GetNode<KinematicBody>("KinematicBody");
+		private void IssueMoveOrder(Vector3 position)
+		{		
             position = position.Round();
+            position = position.CopyYValue(gameStateManager.SelectedCharacter.ProperBody.Transform.origin);
+            position = GetTargetPositionClampedByMovementDistance(position, gameStateManager.SelectedCharacter.ProperBody);
 
-            (var x, var y, var z) = (position.x, body.Transform.origin.y, position.z);
-
-            x = Mathf.Clamp(x, 1, 50);
-            z = Mathf.Clamp(z, 1, 50);
-
-            position = new Vector3(x, y, z);
-
-            position = GetTargetPositionClampedByMovementDistance(position, body);
-
-            var result = await aStarNavigator.TryGetMovementPathAsync(body.Transform.origin, position, gameStateManager.SelectedCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn); // navigation.GetMovementPathNodes(body.Transform, position);
+            var result = aStarNavigator.TryGetMovementPath(
+				start: gameStateManager.SelectedCharacter.ProperBody.Transform.origin, 
+				end: position, 
+				character: gameStateManager.SelectedCharacter); 
 
             if (result == null && result.IsSuccess && result.Path?.Length > 0)
                 return;

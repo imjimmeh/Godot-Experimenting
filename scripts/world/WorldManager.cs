@@ -12,6 +12,9 @@ namespace FaffLatest.scripts.world
 	{
 		private AStarNavigator astar;
 		private SpawnManager spawnManager;
+		private Thread thread = new Thread();
+
+
 		public SpawnManager SpawnManager { get => GetSpawnManager(); private set => spawnManager = value; }
 
 		[Export]
@@ -20,6 +23,12 @@ namespace FaffLatest.scripts.world
 		public CharacterRandomiser CharacterRandomiser { get; private set; }
 
 
+		[Signal]
+		public delegate void _Characters_Loaded();
+
+		[Signal]
+		public delegate void _World_Loaded();
+		
 		public override void _Ready()
 		{
 			base._Ready();
@@ -37,32 +46,41 @@ namespace FaffLatest.scripts.world
 		}
 
 		public async void InitialiseMap(MapInfo map)
-		{
-			MeshInstance level = GetLevelInstance(map);
+        {
+            MeshInstance level = GetLevelInstance(map);
 
-			InitialiseAStar(level);
+            InitialiseAStar(level);
 
-			await ToSignal(level, "ready");
+            await ToSignal(level, "ready");
 
-			if(map.Characters == null || map.Characters.Length == 0)
-				InitialiseNewCharacters();
-			else
-			{
-				GetSpawnLocationsAndSpawnCharacters(map.Characters);
-			}
+			thread.Start(this, nameof(LoadCharacters), map);
+			await ToSignal(this, nameof(_Characters_Loaded));
 
-			var worldObjects = GetTree().GetNodesInGroup("worldObjects");
+            LoadWorldObjectsIntoAStar();
+			EmitSignal(nameof(_World_Loaded));
+        }
 
-			foreach(var worldObject in worldObjects)
+        private void LoadWorldObjectsIntoAStar()
+        {
+            var worldObjects = GetTree().GetNodesInGroup("worldObjects");
+
+            foreach (WorldObject worldObject in worldObjects)
             {
-				if(worldObject is WorldObject wo)
-                {
-					wo.RegisterWithAStar(astar);
-                }
+				worldObject.CallDeferred(nameof(WorldObject.RegisterWithAStar), astar);
             }
-		}
+        }
 
-		private void InitialiseNewCharacters()
+        private void LoadCharacters(MapInfo map)
+        {
+            var shouldCreateRandomCharacters = map.Characters == null || map.Characters.Length == 0;
+
+            if (shouldCreateRandomCharacters)
+                InitialiseNewCharacters();
+            else
+                GetSpawnLocationsAndSpawnCharacters(map.Characters);
+        }
+
+        private void InitialiseNewCharacters()
 		{
 			var chars = new CharacterStats[9];
 
@@ -76,9 +94,17 @@ namespace FaffLatest.scripts.world
 			GetSpawnLocationsAndSpawnCharacters(chars);
 		}
 
+		public void GetSpawnLocationsAndSpawnCharacters(CharacterStats[] characters)
+		{
+			var spawnLocations = this.GetSpawnArea();
+			SpawnManager.SpawnCharacters(characters, spawnLocations);
+			EmitSignal(nameof(_Characters_Loaded));
+		}
+
+		
 		private void InitialiseAStar(MeshInstance level)
 		{
-			astar = GetNode<AStarNavigator>(AStarNavigator.GLOBAL_SCENE_PATH);
+			astar = AStarNavigator.Instance;
 
 			var plane = level.Mesh as PlaneMesh;
 			var size = plane.Size;
@@ -92,12 +118,6 @@ namespace FaffLatest.scripts.world
 			CallDeferred("add_child",levelInstance);
 
 			return levelInstance as MeshInstance;
-		}
-
-		public void GetSpawnLocationsAndSpawnCharacters(CharacterStats[] characters)
-		{
-			var spawnLocations = this.GetSpawnArea();
-			SpawnManager.SpawnCharacters(characters, spawnLocations);
 		}
 	}
 }

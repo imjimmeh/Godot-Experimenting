@@ -100,29 +100,26 @@ namespace FaffLatest.scripts.state
             var character = CharacterBase.Instance<Character>();
             character.Stats = stats;
 
-            var body = SetPosition(spawnPosition, character);
             var root = stats.IsPlayerCharacter ? playerCharactersRoot : aiCharactersRoot;
             var groupName = stats.IsPlayerCharacter ? GroupNames.PLAYER_CHARACTERS : GroupNames.AI_CHARACTERS;
 
             root.CallDeferred("add_child", character);
             character.CallDeferred("add_to_group", groupName);
 
-            AddCharacterSignals(body, character);
 
             await ToSignal(character, "ready");
-            astarNavigator._On_Character_Created(character);
 
+			var body = character.ProperBody;
+			SetPosition(spawnPosition, body);
+            AddCharacterSignals(body, character);
+            astarNavigator._On_Character_Created(character);
+			
             return character;
         }
 
-        private static KinematicBody SetPosition(Vector3 spawnPosition, Character character)
-        {
-            var newCharacterKinematicBody = character.GetNode<KinematicBody>("KinematicBody");
-            newCharacterKinematicBody.Transform = new Transform(newCharacterKinematicBody.Transform.basis, spawnPosition);
-
-            return newCharacterKinematicBody;
-        }
-
+        private static void SetPosition(Vector3 spawnPosition, Spatial character)
+			=> character.Transform = new Transform(character.Transform.basis, spawnPosition);
+		
         private void AddCharacterSignals(Node newCharacterKinematicBody, Character character)
 		{
 			var pathMover = newCharacterKinematicBody.GetNode("PathMover");

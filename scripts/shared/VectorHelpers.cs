@@ -51,14 +51,4 @@ namespace FaffLatest.scripts.shared
                 z ?? vector.z);
 
     }
-
-    public class CharacterMovementGuideCellComparer : IEqualityComparer<CharacterMovementGuideCell>
-    {
-        public bool Equals(CharacterMovementGuideCell x, CharacterMovementGuideCell y)
-        { return x.GlobalTransform.origin == y.GlobalTransform.origin;}
-
-        public int GetHashCode(CharacterMovementGuideCell obj)
-        { return obj.GlobalTransform.origin.GetHashCode() ^ obj.Transform.origin.GetHashCode();
-    }
-    }
 }

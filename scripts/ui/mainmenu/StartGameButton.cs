@@ -23,7 +23,7 @@ namespace FaffLatest.scripts.ui.mainmenu
         public override void _Pressed()
         {
             base._Pressed();
-            levelLoader.CallDeferred("LoadLevel", FirstLevel);
+            levelLoader.CallDeferred(nameof(LevelLoader.StartLevelLoading), FirstLevel);
         }
     }
 }

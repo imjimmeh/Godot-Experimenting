@@ -12,7 +12,7 @@ namespace FaffLatest.scripts.movement
 {
     public class AStarNavigator : Node
     {
-        public const string GLOBAL_SCENE_PATH = NodeReferences.Systems.ASTAR;
+        public static AStarNavigator Instance;
 
         private readonly NonEuclideanAStar astar = new NonEuclideanAStar();
         private Dictionary<Character, PointInfo> characterLocations;
@@ -31,10 +31,6 @@ namespace FaffLatest.scripts.movement
 
         public Dictionary<Character, PointInfo> CharacterLocations => characterLocations;
 
-        private Godot.Mutex mutex;
-        
-        private Godot.Thread thread;
-
         public AStarNavigator()
         {
         }
@@ -42,8 +38,7 @@ namespace FaffLatest.scripts.movement
         public override void _Ready()
         {
             base._Ready();
-
-            mutex = new Mutex();
+            Instance = this;
         }
 
         public void CreatePointsForMap(int length, int width, Vector2[] initiallyOccupiedPoints)
@@ -118,7 +113,7 @@ namespace FaffLatest.scripts.movement
             Width = width;
         }
 
-        public Task<GetMovementPathResult> TryGetMovementPathAsync(Vector3 start, Vector3 end, Character character) => TryGetMovementPathAsync(start, end, character.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
+        public GetMovementPathResult TryGetMovementPath(Vector3 start, Vector3 end, Character character) => TryGetMovementPath(start, end, character.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
 
         public bool TryGetNearestEmptyPointToLocation(Vector3 target, Vector3 origin, out Vector3 point, int tryCount = 0)
         {
@@ -214,7 +209,7 @@ namespace FaffLatest.scripts.movement
             return disabled;
         }
 
-        public async Task<GetMovementPathResult> TryGetMovementPathAsync(Vector3 start, Vector3 end, int movementDistance)
+        public GetMovementPathResult TryGetMovementPath(Vector3 start, Vector3 end, int movementDistance)
         {
             try
             {
@@ -227,7 +222,6 @@ namespace FaffLatest.scripts.movement
             }
             catch (Exception ex)
             {
-                mutex.Unlock();
                 GD.Print($"Error getting path from {start} to {end}- {ex.Message}");
                 return new GetMovementPathResult(false);
             }
@@ -235,9 +229,7 @@ namespace FaffLatest.scripts.movement
 
         private GetMovementPathResult GetAndCleanPath(Vector3 start, int movementDistance, PointInfo startPoint, PointInfo endPoint)
         {       
-            mutex.Lock();
             var path = astar.GetPointPath(startPoint.Id, endPoint.Id);
-            mutex.Unlock();
 
             if (path == null || path.Length < 2)
                 return new GetMovementPathResult(false);

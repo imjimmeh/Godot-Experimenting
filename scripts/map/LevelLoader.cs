@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.state;
 using Godot;
@@ -9,14 +10,15 @@ namespace FaffLatest.scripts.map
 	public class LevelLoader : Godot.Node
 	{
 		[Export]
-		public PackedScene BaseLevel { get; set; }
+		public PackedScene BaseLevelScene { get; set; }
 
 		private bool currentLevelIsDisposing = false;
+		private bool startedLevelLoad = false;
 
 		private Node currentScene { get; set; }
 		private Node root { get; set; }
-		private MapInfo loadingMap { get; set; 
-		}
+		private MapInfo loadingMap { get; set; }
+		
 		public override void _Ready()
 		{
 			base._Ready();
@@ -27,9 +29,10 @@ namespace FaffLatest.scripts.map
 		{
 			base._Process(delta);
 
-			if(currentLevelIsDisposing)
+			if(currentLevelIsDisposing && !startedLevelLoad)
 			{
-				CallDeferred("DisposeLevel");
+				startedLevelLoad = true;
+				LoadLevel();
 			}
 		}
 
@@ -39,35 +42,50 @@ namespace FaffLatest.scripts.map
 		}
 
 
-		public void LoadLevel(MapInfo map)
+		public void StartLevelLoading(MapInfo map)
 		{
-			ClearLevel();
+			InitialiseCurrentSceneDisposal();
 			loadingMap = map;
 		}
 
-		private void ClearLevel()
+		private void InitialiseCurrentSceneDisposal()
 		{
 			currentScene = root.GetChild(1);
-			currentScene.QueueFree();
 			currentLevelIsDisposing = true;
 		}
 
-		private void DisposeLevel()
-		{
-			//root.RemoveChild(currentScene);
-			//currentScene.Dispose();
+		private async void LoadLevel()
+        {
+            BaseLevel baseLevel = GetBaseLevelInstance();
+            LoadMapIntoBaseLevel(baseLevel);
+            ClearVariables();
 
-			var baseLevel = BaseLevel.Instance() as BaseLevel;
-			root.CallDeferred("add_child", baseLevel);
-			baseLevel.CallDeferred("LoadMap", loadingMap);
+            await DisposeOriginalSceneOnLevelLoad(baseLevel);
+        }
 
-			ClearVariables();
-		}
+        private async Task DisposeOriginalSceneOnLevelLoad(BaseLevel baseLevel)
+        {
+            await ToSignal(baseLevel, nameof(BaseLevel._Level_Loaded));
+            currentScene.CallDeferred("queue_free");
+        }
 
-		private void ClearVariables()
+        private void LoadMapIntoBaseLevel(BaseLevel baseLevel)
+        {
+            baseLevel.CallDeferred(nameof(BaseLevel.LoadLevel), loadingMap);
+        }
+
+        private BaseLevel GetBaseLevelInstance()
+        {
+            var baseLevel = BaseLevelScene.Instance() as BaseLevel;
+            root.CallDeferred("add_child", baseLevel);
+            return baseLevel;
+        }
+
+        private void ClearVariables()
 		{
 			currentLevelIsDisposing = false;
 			loadingMap = null;
+			
 		}
 	}
 }

@@ -13,16 +13,25 @@ public class BaseLevel : Spatial
 	[Export]
 	public Texture FaceSprites { get; set; }
 
+	[Signal]
+	public delegate void _Level_Loaded();
+
 	public override void _Ready()
 	{
 		base._Ready();
 	}
 
-	public void LoadMap(MapInfo map)
-	{
-		var worldManager = GetNode(NodeReferences.BaseLevel.WORLD_MANAGER);
+	public async void LoadLevel(MapInfo map)
+    {
+        var worldManager = GetNode(NodeReferences.BaseLevel.WORLD_MANAGER);
+        worldManager.CallDeferred("InitialiseMap", map);
+        await ToSignal(worldManager, nameof(WorldManager._World_Loaded));
 
-		worldManager.CallDeferred("InitialiseMap", map);
+        _On_Level_Loaded();
+    }
 
-	}
+    private void _On_Level_Loaded()
+    {
+        EmitSignal(nameof(_Level_Loaded));
+    }
 }

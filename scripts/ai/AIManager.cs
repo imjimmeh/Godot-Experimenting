@@ -93,7 +93,7 @@ namespace FaffLatest.scripts.ai
             currentlyActioningCharacter = null;
         }
 
-        private async void MoveCharacter()
+        private void MoveCharacter()
         {
             var (_, targetPosition) = GetNearestPCToCharacter(currentlyActioningCharacter.ProperBody.Transform.origin);
 
@@ -115,7 +115,7 @@ namespace FaffLatest.scripts.ai
                 return;
             }
 
-            var result = await aStarNavigator.TryGetMovementPathAsync(
+            var result = aStarNavigator.TryGetMovementPath(
                 start: currentlyActioningCharacter.ProperBody.Transform.origin,
                 end: foundPoint,
                 character: currentlyActioningCharacter);

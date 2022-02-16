@@ -87,7 +87,7 @@ namespace FaffLatest.scripts.effects.movementguide
 			Connect(SignalNames.MovementGuide.CLICKED_ON, GetParent(), SignalNames.MovementGuide.CLICKED_ON_METHOD);
 		}
 
-		private void CalculateVisiblity(int movementDistanceLeft)
+		public void CalculateVisiblity(int movementDistanceLeft)
         {
             if (IsOutsideWorldBounds() || OutsideMovementDistance(movementDistanceLeft))
             {
@@ -95,15 +95,15 @@ namespace FaffLatest.scripts.effects.movementguide
                 return;
             }
 
-           CallDeferred("GetPathAndSetVisiblity", movementDistanceLeft);
+           GetPathAndSetVisiblity(movementDistanceLeft);
         }
 
         private bool OutsideMovementDistance(int movementDistanceLeft)
 		 => parent.GlobalTransform.origin.DistanceToIgnoringHeight(GlobalTransform.origin) > movementDistanceLeft;
 
-        private async void GetPathAndSetVisiblity(int movementDistanceLeft)
+        private void GetPathAndSetVisiblity(int movementDistanceLeft)
 		{
-            var result = await AStar.TryGetMovementPathAsync(parent.GlobalTransform.origin, GlobalTransform.origin, movementDistanceLeft);
+            var result = AStar.TryGetMovementPath(parent.GlobalTransform.origin, GlobalTransform.origin, movementDistanceLeft);
 
             var isVisible = result != null && result.IsSuccess &&
             result.Path != null &&  result.Path.Length > 0;
@@ -115,11 +115,11 @@ namespace FaffLatest.scripts.effects.movementguide
         {
 			if(isVisible)
 			{
-				CallDeferred("show");
+				Show();
 			}
 			else
 			{
-				CallDeferred("hide");
+				Hide();
 			}
         }
 

@@ -31,6 +31,9 @@ namespace FaffLatest.scripts.effects.movementguide
         public PackedScene MovementGuideCellScene { get; private set; }
         public AStarNavigator AStar { get; private set; }
 
+        private Thread thread = new Thread();
+        private Mutex mutex = new Mutex();
+
         public override void _Ready()
         {
             base._Ready();
@@ -38,13 +41,12 @@ namespace FaffLatest.scripts.effects.movementguide
 
         public void Initialise()
         {
-            AStar = GetNode<AStarNavigator>(AStarNavigator.GLOBAL_SCENE_PATH);
+            AStar = AStarNavigator.Instance;
 
             GetCharacterNode();
             GetBody();
 
             ConnectSignals();
-
             Show();
             CallDeferred("hide");
         }
@@ -91,16 +93,26 @@ namespace FaffLatest.scripts.effects.movementguide
                 throw new Exception("Player body is null?");
 
             RotationDegrees = body.RotationDegrees * -1;
-            CallDeferred("ShowCells");
+
+            if(thread.IsActive())
+                thread.WaitToFinish();
+
+            thread.Start(this, "ShowCells");
         }
 
         private void ShowCells()
         {
-            EmitSignal("_Character_MoveGuide_CalculateCellVisiblity", parent.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
-            CallDeferred("show");
+            var amountLeftToMoveThisTurn = parent.ProperBody.MovementStats.AmountLeftToMoveThisTurn;
+            
+            foreach(var pathPart in existingMovementGuide)
+            {
+                pathPart.Value.CalculateVisiblity(amountLeftToMoveThisTurn);
+            }
+
+            Show();
         }
 
-        public async void CreateMeshes()
+        public void CreateMeshes()
         {
             var max = parent.ProperBody.MovementStats.MaxMovementDistancePerTurn;
             var min = max * -1;
@@ -142,9 +154,12 @@ namespace FaffLatest.scripts.effects.movementguide
             CallDeferred("add_child", mesh);
         }
 
-        private async void _On_Cell_Mouse_Entered(CharacterMovementGuideCell node)
+        private void _On_Cell_Mouse_Entered(CharacterMovementGuideCell node)
         {
-            var result = await AStar.TryGetMovementPathAsync(body.Transform.origin, node.GlobalTransform.origin, parent.ProperBody.MovementStats.MaxMovementDistancePerTurn);
+            var result = AStar.TryGetMovementPath(
+                start: body.Transform.origin,
+                end: node.GlobalTransform.origin,
+                character: parent);
             
             if (!result.IsSuccess)
             {
@@ -153,7 +168,6 @@ namespace FaffLatest.scripts.effects.movementguide
             }
 
             var newPath = new HashSet<CharacterMovementGuideCell>(result.Path.Length);
-
 
             for (var x = 0; x < result.Path.Length; x++)
             {
@@ -166,7 +180,6 @@ namespace FaffLatest.scripts.effects.movementguide
             }
 
             ClearExistingPath();
-
             currentPath = newPath;
         }
 
