@@ -89,25 +89,17 @@ namespace FaffLatest.scripts.effects.movementguide
 
 		public void CalculateVisiblity(int movementDistanceLeft)
         {
-            if (IsOutsideWorldBounds() || OutsideMovementDistance(movementDistanceLeft))
-            {
-                SetVisiblity(false);
-                return;
-            }
-
-           GetPathAndSetVisiblity(movementDistanceLeft);
+			GetPathAndSetVisiblity(movementDistanceLeft);
         }
-
-        private bool OutsideMovementDistance(int movementDistanceLeft)
-		 => parent.GlobalTransform.origin.DistanceToIgnoringHeight(GlobalTransform.origin) > movementDistanceLeft;
-
-        private void GetPathAndSetVisiblity(int movementDistanceLeft)
+		
+        private bool GetPathAndSetVisiblity(int movementDistanceLeft)
 		{
             var result = AStar.TryGetMovementPath(parent.GlobalTransform.origin, GlobalTransform.origin, movementDistanceLeft);
 
             var isVisible = result != null && result.CanFindPath && !result.NotEnoughMovementDistanceToFullyReach;
 
             SetVisiblity(isVisible);
+			return isVisible;
 		}
 
         private void SetVisiblity(bool isVisible)

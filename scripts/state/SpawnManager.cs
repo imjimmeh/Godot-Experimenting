@@ -17,7 +17,7 @@ namespace FaffLatest.scripts.state
 	public class SpawnManager : Node
 	{
 		[Signal]
-		public delegate void _Characters_Spawned(Node spawnManager);
+		public delegate void _Characters_Spawned();
 
 		[Export]
 		public Weapon ZombieWeapon { get; private set; }
@@ -35,16 +35,11 @@ namespace FaffLatest.scripts.state
 		private Node gameStateManager;
 		private Node playerCharactersRoot;
 		private UIElementContainer ui;
-
-		private Character[] characters;
-		public Character[] Characters { get => characters; set => characters = value; }
-
 		private RandomNumberGenerator random;
 
 		public override void _Ready()
 		{
 			FindNeededNodes();
-			Preload();
 
 			random = new RandomNumberGenerator();
 			random.Randomize();
@@ -55,47 +50,32 @@ namespace FaffLatest.scripts.state
 
 		public async Task SpawnCharacters(CharacterStats[] charactersToCreate, SpawnableAreas spawnArea)
 		{
-			var playerCharacters = new Character[charactersToCreate.Length];
-			var aiChars = new Character[charactersToCreate.Length];
-
-			int pc = 0;
-			int nonPc = 0;
-
-
 			for (var x = 0; x < charactersToCreate.Length; x++)
 			{
 				if (charactersToCreate[x] == null)
 					break;
 
-				var areaToSpawnFrom = charactersToCreate[x].IsPlayerCharacter ? spawnArea.PlayerSpawnableAreas : spawnArea.EnemySpawnableAreas;
-				var spawnPosition = GetSpawnPosition(areaToSpawnFrom, random);
+				var spawnPosition = spawnArea.GetSpawnPosition(charactersToCreate[x]);
 
-				spawnPosition = spawnPosition.WithValues(y: 0.5f);
 				var character = await SpawnCharacter(charactersToCreate[x], spawnPosition);
 
-				if(character.Stats.IsPlayerCharacter)
-				{
-					playerCharacters[pc] = character;
-					pc++;
-				}
-				else
-				{
+				if(!character.Stats.IsPlayerCharacter)
 					character.Stats.EquippedWeapon = ZombieWeapon;
-					aiChars[nonPc] = character;
-					nonPc++;
-				}
 			}
 
-			Array.Resize(ref playerCharacters, pc);
-			Array.Resize(ref aiChars, nonPc);
-
-			this.characters = playerCharacters;
-			GD.Print($"Setting AI Chars");
-			GetNode<AIManager>("../AIManager").SetCharacters(aiChars);
-			EmitSignal(SignalNames.Loading.CHARACTERS_SPAWNED, this);
+			EmitSignal(SignalNames.Loading.CHARACTERS_SPAWNED);
 		}
 
 		public async Task<Character> SpawnCharacter(CharacterStats stats, Vector3 spawnPosition)
+        {
+            Character character = InitialiseCharacterFromStats(stats);
+
+            await On_SpawnedCharacter_Ready(spawnPosition, character);
+
+            return character;
+        }
+
+        private Character InitialiseCharacterFromStats(CharacterStats stats)
         {
             var character = CharacterBase.Instance<Character>();
             character.Stats = stats;
@@ -105,16 +85,19 @@ namespace FaffLatest.scripts.state
 
             root.CallDeferred("add_child", character);
             character.CallDeferred("add_to_group", groupName);
+            return character;
+        }
 
-
+        private async Task On_SpawnedCharacter_Ready(Vector3 spawnPosition, Character character)
+        {
             await ToSignal(character, "ready");
 
-			var body = character.ProperBody;
-			SetPosition(spawnPosition, body);
+            var body = character.ProperBody;
+            SetPosition(spawnPosition, body);
             AddCharacterSignals(body, character);
             astarNavigator._On_Character_Created(character);
-			
-            return character;
+
+            CharacterManager.Instance.AddCharacter(character);
         }
 
         private static void SetPosition(Vector3 spawnPosition, Spatial character)
@@ -144,32 +127,12 @@ namespace FaffLatest.scripts.state
 		private void FindNeededNodes()
 		{
 			aiCharactersRoot = GetNode(NodeReferences.BaseLevel.AI_ROOT);
-			astarNavigator = GetNode<AStarNavigator>(NodeReferences.Systems.ASTAR);
+			astarNavigator = AStarNavigator.Instance;
 			characterMovementPathManager = GetNode<CharacterMovementPathManager>(NodeReferences.BaseLevel.Effects.MOVEMENT_PATH);
 			gameStateManager = GetNode(NodeReferences.Systems.GAMESTATE_MANAGER);
 			inputManager = GetNode(NodeReferences.Systems.INPUT_MANAGER);
 			playerCharactersRoot = GetNode(NodeReferences.BaseLevel.PLAYER_ROOT);
 			ui = GetNode<UIElementContainer>(NodeReferences.BaseLevel.UI);
 		}
-
-		private void Preload()
-		{
-		}
-
-		private static Vector3 GetSpawnPosition(List<Vector3> positions, RandomNumberGenerator random)
-		{
-			var posToGet = random.RandiRange(0, positions.Count - 1);
-
-			var position = positions[posToGet];
-
-			if(position != null)
-			{
-				positions.Remove(position);
-
-				return position;
-			}
-
-			return GetSpawnPosition(positions, random);
-		}
-	}
+    }
 }

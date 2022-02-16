@@ -1,4 +1,5 @@
 using FaffLatest.scripts.characters;
+using FaffLatest.scripts.shared;
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -121,6 +122,9 @@ namespace FaffLatest.scripts.movement
         {
             try
             {
+                if (OutsideWorldBounds(start, end) || OutsideMovementDistance(start, end, movementDistance))
+                    return new GetMovementPathResult(false);;
+
                 var (startPoint, endPoint) = this.GetStartAndEndPoints(start, end);
 
                 if (endPoint.OccupyingNode != null)
@@ -134,6 +138,20 @@ namespace FaffLatest.scripts.movement
                 return new GetMovementPathResult(false);
             }
         }
+
+        private bool OutsideWorldBounds(Vector3 start, Vector3 end)
+            => AnyValueLessThanZero(start)
+            || AnyValueLessThanZero(end) 
+            || AnyValueGreaterThanOrEqualToValue(start, Width)
+            || AnyValueGreaterThanOrEqualToValue(end, Length);
+
+        private bool AnyValueLessThanZero(Vector3 vector)
+            => vector.x < 0 || vector.z < 0;
+
+        private bool AnyValueGreaterThanOrEqualToValue(Vector3 vector, float v)
+            => vector.x >= v || vector.z >= v;
+        private bool OutsideMovementDistance(Vector3 start, Vector3 end, int movementDistanceLeft)
+		    => start.DistanceToIgnoringHeight(end) > movementDistanceLeft;
 
 
         public void _On_Character_Created(Character character)

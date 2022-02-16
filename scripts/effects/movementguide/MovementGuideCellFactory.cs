@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FaffLatest.scripts.constants;
-using FaffLatest.scripts.movement;
+﻿using FaffLatest.scripts.constants;
 using Godot;
 
 namespace FaffLatest.scripts.effects.movementguide
@@ -12,7 +6,6 @@ namespace FaffLatest.scripts.effects.movementguide
     public static class MovementGuideCellFactory
     {
         public static Quat DefaultRotation = new Quat(0, 100, 0, 0);
-
 
 		public static CharacterMovementGuideCell CreateMeshInstanceForPosition(this CharacterMovementGuide guide, Vector3 position)
 		{

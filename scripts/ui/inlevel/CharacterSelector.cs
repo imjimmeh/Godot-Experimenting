@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
 using FaffLatest.scripts.state;
@@ -23,38 +25,34 @@ namespace FaffLatest.scripts.ui
 			base._Ready();
 			GetNode(NodeReferences.Systems.SPAWN_MANAGER)
 				.Connect(SignalNames.Loading.CHARACTERS_SPAWNED, this, SignalNames.Loading.CHARACTERS_SPAWNED_METHOD);
-
 		}
 
-		public void AddCharacters(Character[] characters)
+		public void AddCharacters(IEnumerable<Character> characters)
 		{
-			if (characters == null || characters.Length == 0)
+			if (characters == null)
 				return;
 
+			int characterCount = characters.Count();
+			characterDisplays = new MiniCharacterDisplay[characterCount];
 
-			characterDisplays = new MiniCharacterDisplay[characters.Length];
-
-			var drawn = 0;
+			var index = 0;
 
 			int spriteSize = 32;
-			for (int i = 0; i < characters.Length; i++)
+
+			foreach(var character in characters)
 			{
-				var display = CreateDisplay(characters[i], spriteSize, i);
-
-				characterDisplays[i] = display;
-
-				AddChild(display);
-				drawn++;
+				var display = CreateDisplay(character, spriteSize, index);
+				characterDisplays[characterCount] = display;
+				CallDeferred("add_child",display);
+				index++;
 			}
 		}
 
-		private void _On_Characters_Spawned(Node spawnManager)
+		private void _On_Characters_Spawned()
 		{
-			if(spawnManager is SpawnManager sm)
-			{
-				AddCharacters(sm.Characters);
-			}
+			AddCharacters(CharacterManager.Instance.PlayerCharacters);
 		}
+		
 
 		private MiniCharacterDisplay CreateDisplay(Character character, int spriteSize, int currentIndex)
 		{

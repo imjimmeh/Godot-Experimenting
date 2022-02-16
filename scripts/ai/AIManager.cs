@@ -10,10 +10,11 @@ namespace FaffLatest.scripts.ai
 {
     public class AIManager : Node
     {
+        private HashSet<Character> aiCharacters => CharacterManager.Instance.AiCharacters;
+
         [Signal]
         public delegate void _Change_Turn(Faction faction);
 
-        private HashSet<Character> aiCharacters;
         private bool isOurTurn;
 
         private Character currentlyActioningCharacter;
@@ -22,13 +23,6 @@ namespace FaffLatest.scripts.ai
         private bool haveMoreCharacters => aiCharacters != null && aiCharacters.Count > currentArrayPos;
 
         private AStarNavigator aStarNavigator;
-
-        public void SetCharacters(Character[] characters)
-        {
-            aiCharacters = characters.ToHashSet();
-
-            ConnectCharacterSignals();
-        }
 
         public void SetAITurn(bool isTurn)
         {
