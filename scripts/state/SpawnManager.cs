@@ -90,9 +90,6 @@ namespace FaffLatest.scripts.state
 			Array.Resize(ref aiChars, nonPc);
 
 			this.characters = playerCharacters;
-
-			var nodes = playerCharacters as Node[];
-
 			GD.Print($"Setting AI Chars");
 			GetNode<AIManager>("../AIManager").SetCharacters(aiChars);
 			EmitSignal(SignalNames.Loading.CHARACTERS_SPAWNED, this);

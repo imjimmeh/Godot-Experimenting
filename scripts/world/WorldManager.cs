@@ -36,11 +36,13 @@ namespace FaffLatest.scripts.world
 			return spawnManager;
 		}
 
-		public void InitialiseMap(MapInfo map)
+		public async void InitialiseMap(MapInfo map)
 		{
 			MeshInstance level = GetLevelInstance(map);
 
 			InitialiseAStar(level);
+
+			await ToSignal(level, "ready");
 
 			if(map.Characters == null || map.Characters.Length == 0)
 				InitialiseNewCharacters();
@@ -69,7 +71,6 @@ namespace FaffLatest.scripts.world
 				var newCharacter = CharacterRandomiser.GenerateRandomCharacter();
 				chars[x] = newCharacter;
 				chars[x].IsPlayerCharacter = x <= 5;
-				
 			}
 
 			GetSpawnLocationsAndSpawnCharacters(chars);
@@ -88,12 +89,12 @@ namespace FaffLatest.scripts.world
 		private MeshInstance GetLevelInstance(MapInfo map)
 		{
 			var levelInstance = map.Level.Instance();
-			AddChild(levelInstance);
+			CallDeferred("add_child",levelInstance);
 
 			return levelInstance as MeshInstance;
 		}
 
-		private void GetSpawnLocationsAndSpawnCharacters(CharacterStats[] characters)
+		public void GetSpawnLocationsAndSpawnCharacters(CharacterStats[] characters)
 		{
 			var spawnLocations = this.GetSpawnArea();
 			SpawnManager.SpawnCharacters(characters, spawnLocations);

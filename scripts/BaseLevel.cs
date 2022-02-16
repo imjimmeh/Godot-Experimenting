@@ -20,9 +20,9 @@ public class BaseLevel : Spatial
 
 	public void LoadMap(MapInfo map)
 	{
-		var worldManager = GetNode<WorldManager>(NodeReferences.BaseLevel.WORLD_MANAGER);
+		var worldManager = GetNode(NodeReferences.BaseLevel.WORLD_MANAGER);
 
-		worldManager.InitialiseMap(map);
+		worldManager.CallDeferred("InitialiseMap", map);
 
 	}
 }
