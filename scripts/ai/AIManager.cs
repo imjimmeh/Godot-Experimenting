@@ -102,12 +102,14 @@ namespace FaffLatest.scripts.ai
 
             if (distance < 1.00001f)
             {
-                GD.Print($"Next to player - clearing");
                 ClearCharacterForTurn();
                 return;
             }
 
-            var foundEmptyPosition = aStarNavigator.TryGetNearestEmptyPointToLocationWithLoop(targetPosition, currentlyActioningCharacter.ProperBody.Transform.origin, out Vector3 foundPoint, 5);
+            var foundEmptyPosition = aStarNavigator.TryGetNearestEmptyPointToLocation(
+                target: targetPosition, 
+                origin: currentlyActioningCharacter.ProperBody.Transform.origin, 
+                out Vector3 foundPoint);
 
             if (!foundEmptyPosition)
             {
@@ -120,7 +122,7 @@ namespace FaffLatest.scripts.ai
                 end: foundPoint,
                 character: currentlyActioningCharacter);
 
-            if (result == null || !result.IsSuccess)
+            if (result == null || !result.CanFindPath)
             {
                 CantMoveCharacterFurther();
                 return;

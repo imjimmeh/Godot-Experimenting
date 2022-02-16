@@ -139,7 +139,7 @@ namespace FaffLatest.scripts.input
 				end: position, 
 				character: gameStateManager.SelectedCharacter); 
 
-            if (result == null && result.IsSuccess && result.Path?.Length > 0)
+            if (result == null && result.CanFindPath && result.Path?.Length > 0)
                 return;
 
 			gameStateManager.SetCharacterActive(gameStateManager.SelectedCharacter, true);

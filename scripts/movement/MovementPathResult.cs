@@ -3,29 +3,33 @@ using Godot;
 namespace FaffLatest.scripts.movement{
     public class GetMovementPathResult{
         public readonly Vector3[] Path;
-        public bool IsSuccess;
+        public readonly bool CanFindPath;
+        public readonly bool NotEnoughMovementDistanceToFullyReach;
 
         public GetMovementPathResult()
         {
         }
 
-        public GetMovementPathResult(Vector3[] path, bool isSuccess)
+        public GetMovementPathResult(Vector3[] path, bool canFindPath, bool notEnoughMovementDistanceToFullyReach)
         {
             Path = path;
-            IsSuccess = isSuccess;
+            CanFindPath = canFindPath;
+            NotEnoughMovementDistanceToFullyReach = notEnoughMovementDistanceToFullyReach;
         }
 
-         public GetMovementPathResult(Vector3[] path)
+         public GetMovementPathResult(Vector3[] path, bool notEnoughMovementDistanceToFullyReach)
         {
             Path = path;
-            IsSuccess = true;
+            CanFindPath = true;
+            NotEnoughMovementDistanceToFullyReach = notEnoughMovementDistanceToFullyReach;
         }
 
         
          public GetMovementPathResult(bool isSuccess)
         {
             Path = null;
-            IsSuccess = isSuccess;
+            CanFindPath = isSuccess;
+            NotEnoughMovementDistanceToFullyReach = false;
         }
     }
 }

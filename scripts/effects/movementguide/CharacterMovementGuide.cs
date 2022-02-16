@@ -161,7 +161,7 @@ namespace FaffLatest.scripts.effects.movementguide
                 end: node.GlobalTransform.origin,
                 character: parent);
             
-            if (!result.IsSuccess)
+            if (!result.CanFindPath)
             {
                 ClearExistingPath();
                 return;
@@ -185,7 +185,7 @@ namespace FaffLatest.scripts.effects.movementguide
 
         private bool IsValidPath(GetMovementPathResult result)
         {
-            return result == null || !result.IsSuccess || result.Path == null || result.Path.Length > parent.ProperBody.MovementStats.AmountLeftToMoveThisTurn
+            return result == null || !result.CanFindPath || result.Path == null || result.Path.Length > parent.ProperBody.MovementStats.AmountLeftToMoveThisTurn
             || result.Path.Length == 0;
         }
 

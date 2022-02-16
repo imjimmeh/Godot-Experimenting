@@ -105,9 +105,8 @@ namespace FaffLatest.scripts.effects.movementguide
 		{
             var result = AStar.TryGetMovementPath(parent.GlobalTransform.origin, GlobalTransform.origin, movementDistanceLeft);
 
-            var isVisible = result != null && result.IsSuccess &&
-            result.Path != null &&  result.Path.Length > 0;
-			
+            var isVisible = result != null && result.CanFindPath && !result.NotEnoughMovementDistanceToFullyReach;
+
             SetVisiblity(isVisible);
 		}
 
