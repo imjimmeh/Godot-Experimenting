@@ -54,9 +54,11 @@ namespace FaffLatest.scripts.world
             await ToSignal(level, "ready");
 
 			thread.Start(this, nameof(LoadCharacters), map);
-			await ToSignal(this, nameof(_Characters_Loaded));
 
             LoadWorldObjectsIntoAStar();
+
+			await ToSignal(this, nameof(_Characters_Loaded));
+
 			EmitSignal(nameof(_World_Loaded));
         }
 
@@ -94,10 +96,10 @@ namespace FaffLatest.scripts.world
 			GetSpawnLocationsAndSpawnCharacters(chars);
 		}
 
-		public void GetSpawnLocationsAndSpawnCharacters(CharacterStats[] characters)
+		public async void GetSpawnLocationsAndSpawnCharacters(CharacterStats[] characters)
 		{
 			var spawnLocations = this.GetSpawnArea();
-			SpawnManager.SpawnCharacters(characters, spawnLocations);
+			await SpawnManager.SpawnCharacters(characters, spawnLocations);
 			EmitSignal(nameof(_Characters_Loaded));
 		}
 

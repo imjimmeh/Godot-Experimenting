@@ -26,7 +26,6 @@ public class BaseLevel : Spatial
         var worldManager = GetNode(NodeReferences.BaseLevel.WORLD_MANAGER);
         worldManager.CallDeferred("InitialiseMap", map);
         await ToSignal(worldManager, nameof(WorldManager._World_Loaded));
-
         _On_Level_Loaded();
     }
 

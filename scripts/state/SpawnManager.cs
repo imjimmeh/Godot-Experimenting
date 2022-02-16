@@ -53,7 +53,7 @@ namespace FaffLatest.scripts.state
 			base._Ready();
 		}
 
-		public async void SpawnCharacters(CharacterStats[] charactersToCreate, SpawnableAreas spawnArea)
+		public async Task SpawnCharacters(CharacterStats[] charactersToCreate, SpawnableAreas spawnArea)
 		{
 			var playerCharacters = new Character[charactersToCreate.Length];
 			var aiChars = new Character[charactersToCreate.Length];
