@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
@@ -13,7 +14,7 @@ namespace FaffLatest.scripts.effects.movementguide
     public class CharacterMovementGuide : Spatial
     {
         private const string CALCULATE_VISIBLITY = "CalculateVisiblity";
-        private CharacterMovementGuideCell[] currentPath;
+        private HashSet<CharacterMovementGuideCell> currentPath;
 
         [Signal]
         public delegate void _Character_MoveOrder(Vector3 position);
@@ -30,9 +31,12 @@ namespace FaffLatest.scripts.effects.movementguide
         public PackedScene MovementGuideCellScene { get; private set; }
         public AStarNavigator AStar { get; private set; }
 
+        private Mutex mutex;
+
         public override void _Ready()
         {
             base._Ready();
+            mutex = new Mutex();
         }
 
         public void Initialise()
@@ -44,6 +48,7 @@ namespace FaffLatest.scripts.effects.movementguide
 
             ConnectSignals();
 
+            Show();
             Hide();
         }
 
@@ -71,6 +76,7 @@ namespace FaffLatest.scripts.effects.movementguide
         {
             Initialise();
             CallDeferred("CreateMeshes");
+            currentPath = new HashSet<CharacterMovementGuideCell>();
         }
 
         private void _On_Character_Selected(Character character)
@@ -95,12 +101,7 @@ namespace FaffLatest.scripts.effects.movementguide
         private void ShowCells()
         {
             EmitSignal("_Character_MoveGuide_CalculateCellVisiblity", parent.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
-            CallDeferred("show");
-        }
-
-        private void _On_Character_SelectonCleared()
-        {
-            CallDeferred("hide");
+            Show();
         }
 
         public async void CreateMeshes()
@@ -139,51 +140,44 @@ namespace FaffLatest.scripts.effects.movementguide
                 .AddCellToArray(mesh, a, b);
 
             mesh.SetParentCharacterTransform(parent.ProperBody);
-
+            mesh.Show();
             Connect(SignalNames.MovementGuide.CELL_CALCULATE_VISIBLITY, mesh, CALCULATE_VISIBLITY);
             
-            this.CallDeferred("AddMeshChild", mesh);
+            CallDeferred("add_child", mesh);
         }
-
-        private void AddMeshChild(Node mesh) => AddChild(mesh);
-
 
         private async void _On_Cell_Mouse_Entered(CharacterMovementGuideCell node)
         {
-            var clearPathTask = ClearExistingPath();
-
+           // mutex.Lock();
             var result = await AStar.TryGetMovementPathAsync(body.Transform.origin, node.GlobalTransform.origin, parent.ProperBody.MovementStats.MaxMovementDistancePerTurn);
-
-            if (result == null || !result.IsSuccess || result.Path.Length > parent.ProperBody.MovementStats.AmountLeftToMoveThisTurn)
-                return;
-
-            currentPath = new CharacterMovementGuideCell[result.Path.Length];
-
-            int pathCount = 0;
-
-            await clearPathTask;
             
+            if (!result.IsSuccess)
+            {
+                ClearExistingPath();
+                return;
+            }
+            var newPath = new HashSet<CharacterMovementGuideCell>(result.Path.Length);
+
+
             for (var x = 0; x < result.Path.Length; x++)
             {
-                var nextCell = GetCellAndSetAsPathPart(result.Path[x] - body.GlobalTransform.origin);
-                currentPath[x] = nextCell;
-                pathCount++;
+                var matchingCell = GetCellFromLocalTransform(result.Path[x] - body.GlobalTransform.origin);
+                newPath.Add(matchingCell);
+                matchingCell.SetPartOfPath(true);
+
+                if(currentPath.Contains(matchingCell))
+                    currentPath.Remove(matchingCell);
             }
 
-            System.Array.Resize(ref currentPath, pathCount);
+            ClearExistingPath();
+
+            currentPath = newPath;
         }
 
-        private CharacterMovementGuideCell GetCellAndSetAsPathPart(Vector3 targetVector)
+        private bool IsValidPath(GetMovementPathResult result)
         {
-            var newPathCell = GetCellFromLocalTransform(targetVector);
-
-            if (newPathCell == null)
-            {
-                return null;
-            }
-
-            newPathCell.CallDeferred("SetPartOfPath",true);
-            return newPathCell;
+            return result == null || !result.IsSuccess || result.Path == null || result.Path.Length > parent.ProperBody.MovementStats.AmountLeftToMoveThisTurn
+            || result.Path.Length == 0;
         }
 
         private CharacterMovementGuideCell GetCellFromLocalTransform(Vector3 targetVector)
@@ -199,19 +193,17 @@ namespace FaffLatest.scripts.effects.movementguide
             return null;
         }
 
-        private async Task ClearExistingPath()
+        private void ClearExistingPath()
         {
             if (currentPath != null)
             {
-                //GD.Print($"Clearing path");
-                for (var x = 0; x < currentPath.Length; x++)
+                foreach(var path in currentPath)
                 {
-                    if (currentPath[x] == null)
-                        continue;
-
-                    currentPath[x].SetPartOfPath(false);
+                    path.SetPartOfPath(false);
                 }
             }
+
+            currentPath.Clear();
         }
 
         private void _On_Cell_Mouse_Exited(Node node)

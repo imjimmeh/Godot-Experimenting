@@ -31,12 +31,19 @@ namespace FaffLatest.scripts.movement
 
         public Dictionary<Character, PointInfo> CharacterLocations => characterLocations;
 
+        private Godot.Mutex mutex;
+        
+        private Godot.Thread thread;
+
         public AStarNavigator()
         {
         }
 
         public override void _Ready()
         {
+            base._Ready();
+
+            mutex = new Mutex();
         }
 
         public void CreatePointsForMap(int length, int width, Vector2[] initiallyOccupiedPoints)
@@ -115,8 +122,13 @@ namespace FaffLatest.scripts.movement
 
         public bool TryGetNearestEmptyPointToLocation(Vector3 target, Vector3 origin, out Vector3 point, int tryCount = 0)
         {
-            if (!IsPointDisabled(target, out point))
+            point = Vector3.Zero;
+
+            if (!IsPointDisabled(target))
+            {
+                point = target;
                 return true;
+            }
 
             var end = tryCount + 1;
             var start = end * -1;
@@ -128,7 +140,7 @@ namespace FaffLatest.scripts.movement
             {
                 for (int y = start; y <= end; y += end)
                 {
-                    foundPoint = IsLocationValidAndFree(target, ref point, tryCount, ref closestDistance, x, y);
+                    foundPoint = IsLocationValidAndFree(target, tryCount, ref closestDistance, x, y, out point);
 
                     if (closestDistance <= 1.001f)
                         break;
@@ -138,13 +150,12 @@ namespace FaffLatest.scripts.movement
             return foundPoint;
         }
 
-        private bool IsLocationValidAndFree(Vector3 target, ref Vector3 point, int tryCount, ref float closestDistance, int x, int y)
+        private bool IsLocationValidAndFree(Vector3 target, int tryCount, ref float closestDistance, int x, int y, out Vector3 newPoint)
         {
-            bool foundPoint = IsValidPositionAndIsFree(tryCount, x, y, target, this, out Vector3 newPoint);
+            bool foundPoint = IsValidPositionAndIsFree(tryCount, x, y, target, this, out newPoint);
 
-            if (IsPointCloserToTargetThanCurrent(target, newPoint, point, closestDistance, out float newDistance))
+            if (IsPointCloserToTargetThanCurrent(target, newPoint, closestDistance, out float newDistance))
             {
-                point = newPoint;
                 closestDistance = newDistance;
             }
 
@@ -154,19 +165,18 @@ namespace FaffLatest.scripts.movement
         public bool TryGetNearestEmptyPointToLocationWithLoop(Vector3 target, Vector3 origin, out Vector3 point, int maxTryCount)
         {
             int tryCount = -1;
-            Vector3 foundPoint = Vector3.Zero;
+            point = Vector3.Zero;
             bool success;
 
             while(true)
             {
                 tryCount++;
-                success = TryGetNearestEmptyPointToLocation(target, origin, out foundPoint, tryCount);
+                success = TryGetNearestEmptyPointToLocation(target, origin, out point, tryCount);
 
                 if (success || tryCount == maxTryCount)
                     break;
             }
 
-            point = foundPoint;
             return success;
         }
 
@@ -182,33 +192,25 @@ namespace FaffLatest.scripts.movement
             if (newPoint.x < 0 || newPoint.y < 0)
                 return false;
 
-            var pointDisabled = astar.IsPointDisabled(newPoint, out _);
+            var pointDisabled = astar.IsPointDisabled(newPoint);
 
-            if (pointDisabled)
-                return false;
-
-            return true;
+            return pointDisabled;
         }
 
-        private static bool IsPointCloserToTargetThanCurrent(Vector3 target, Vector3 newPoint, Vector3 current, float currentClosestDistance, out float distance)
+        private static bool IsPointCloserToTargetThanCurrent(Vector3 target, Vector3 newPoint, float currentClosestDistance, out float distance)
         {
             var vectorDistance = (target - newPoint).Abs();
             distance = vectorDistance.x + vectorDistance.z;
 
-            if (distance < currentClosestDistance)
-            {
-                return true;
-            }
-
-            return false;
+            return distance < currentClosestDistance;
         }
 
-        private bool IsPointDisabled(Vector3 target, out Vector3 matchingPoint)
+        private bool IsPointDisabled(Vector3 target)
         {
             var pointInfo = GetPointInfoForVector3(target);
             var point = astar.GetPointPosition(pointInfo.Id);
-            matchingPoint = point;
             var disabled = astar.IsPointDisabled(pointInfo.Id);
+
             return disabled;
         }
 
@@ -218,29 +220,33 @@ namespace FaffLatest.scripts.movement
             {
                 var (startPoint, endPoint) = GetStartAndEndPoints(start, end);
 
-                if(endPoint.OccupyingNode != null)
-                {
+                if (endPoint.OccupyingNode != null)
                     return new GetMovementPathResult(false);
-                }
-                
-                var path = astar.GetPointPath(startPoint.Id, endPoint.Id);
 
-                if (path == null || path.Length < 2)
-                {
-                    return new GetMovementPathResult(false);
-                }
-
-                var trimmedPath = TrimAndClampPath(path, start, movementDistance);
-                
-                var success = trimmedPath != null && trimmedPath.Length > 0;
-
-                return new GetMovementPathResult(trimmedPath, success);
+                return GetAndCleanPath(start, movementDistance, startPoint, endPoint);
             }
             catch (Exception ex)
             {
+                mutex.Unlock();
                 GD.Print($"Error getting path from {start} to {end}- {ex.Message}");
-                return null;
+                return new GetMovementPathResult(false);
             }
+        }
+
+        private GetMovementPathResult GetAndCleanPath(Vector3 start, int movementDistance, PointInfo startPoint, PointInfo endPoint)
+        {
+            mutex.Lock();
+            var path = astar.GetPointPath(startPoint.Id, endPoint.Id);
+            mutex.Unlock();
+
+            if (path == null || path.Length < 2)
+                return new GetMovementPathResult(false);
+
+            var trimmedPath = TrimAndClampPath(path, start, movementDistance);
+
+            var success = trimmedPath != null && trimmedPath.Length > 0;
+
+            return new GetMovementPathResult(trimmedPath, success);
         }
 
         private Vector3[] TrimAndClampPath(Vector3[] points, Vector3 start, int maxLength)
@@ -253,7 +259,7 @@ namespace FaffLatest.scripts.movement
             var pointsCount = points.Count() - 1;
 
             var pathLongerThanAllowed = pointsCount > maxLength;
-            var maxX = pathLongerThanAllowed ? maxLength + 1 : pointsCount;
+            var maxX = pathLongerThanAllowed ? maxLength : pointsCount;
 
             var newArray = new Vector3[maxX];
 

@@ -215,9 +215,7 @@ public class MovingKinematicBody : KinematicBody
         CurrentMovementDestination = target;
         HaveDestination = true;
 
-        var newTargetMovementVector = (target - Transform.origin).Normalized();
-
-        CurrentMovementVector = newTargetMovementVector;
+        CurrentMovementVector = Transform.origin.MovementVectorTo(target);
         haveRotated = HaveRotated();
     }
 

@@ -1,6 +1,7 @@
 using FaffLatest.scripts.constants;
 using FaffLatest.scripts.input;
 using FaffLatest.scripts.movement;
+using FaffLatest.scripts.shared;
 using Godot;
 
 namespace FaffLatest.scripts.effects.movementguide
@@ -27,16 +28,24 @@ namespace FaffLatest.scripts.effects.movementguide
 		public AStarNavigator AStar;
 
 		private Spatial parent;
-
+		
 		public override void _Ready()
 		{
 			base._Ready();
+
+
 			ConnectSignals();
 
 			material = Mesh.SurfaceGetMaterial(0) as ShaderMaterial;
+			Hide();
 		}
 
-		public void SetParentCharacterTransform(Spatial parent)
+        public override void _Process(float delta)
+		{
+			base._Process(delta);
+        }
+
+        public void SetParentCharacterTransform(Spatial parent)
         {
 			this.parent = parent;
         }
@@ -69,7 +78,6 @@ namespace FaffLatest.scripts.effects.movementguide
 		{
 			if (inputEvent is InputEventMouseButton mouseButtonEvent)
 			{
-				//GD.Print("World clicked on - emitting signal");
 				EmitSignal(SignalNames.MovementGuide.CLICKED_ON, this, mouseButtonEvent);
 			}
 		}
@@ -78,37 +86,42 @@ namespace FaffLatest.scripts.effects.movementguide
 		{
 			Connect(SignalNames.MovementGuide.CLICKED_ON, GetParent(), SignalNames.MovementGuide.CLICKED_ON_METHOD);
 		}
-		
+
 		private async void CalculateVisiblity(int movementDistanceLeft)
         {
-            bool isVisible = false;
-
-            if (IsOutsideWorldBounds())
+            if (IsOutsideWorldBounds() || OutsideMovementDistance(movementDistanceLeft))
             {
-                SetVisiblity(isVisible);
+                SetVisiblity(false);
                 return;
             }
 
-            var start = parent.GlobalTransform.origin;
 
-            var result = await AStar.TryGetMovementPathAsync(start, GlobalTransform.origin, movementDistanceLeft);
-
-            isVisible = result != null && result.IsSuccess &&
-            result.Path != null && result.Path.Length <= movementDistanceLeft && result.Path.Length > 0;
-
-            SetVisiblity(isVisible);
+           CallDeferred("GetPathAndSetVisiblity", movementDistanceLeft);
         }
+
+        private bool OutsideMovementDistance(int movementDistanceLeft)
+		 => parent.GlobalTransform.origin.DistanceToIgnoringHeight(GlobalTransform.origin) > movementDistanceLeft;
+
+        private async void GetPathAndSetVisiblity(int movementDistanceLeft)
+		{
+            var result = await AStar.TryGetMovementPathAsync(parent.GlobalTransform.origin, GlobalTransform.origin, movementDistanceLeft);
+
+            var isVisible = result != null && result.IsSuccess &&
+            result.Path != null &&  result.Path.Length > 0;
+			
+            SetVisiblity(isVisible);
+		}
 
         private void SetVisiblity(bool isVisible)
         {
-            if (isVisible)
-            {
-                CallDeferred("show");
-            }
-            else
-            {
-                CallDeferred("hide");
-            }
+			if(isVisible)
+			{
+				Show();
+			}
+			else
+			{
+				Hide();
+			}
         }
 
         private bool IsOutsideWorldBounds()
