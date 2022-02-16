@@ -234,7 +234,7 @@ namespace FaffLatest.scripts.movement
         }
 
         private GetMovementPathResult GetAndCleanPath(Vector3 start, int movementDistance, PointInfo startPoint, PointInfo endPoint)
-        {
+        {       
             mutex.Lock();
             var path = astar.GetPointPath(startPoint.Id, endPoint.Id);
             mutex.Unlock();
@@ -257,7 +257,6 @@ namespace FaffLatest.scripts.movement
                 return points;
 
             var pointsCount = points.Count() - 1;
-
             var pathLongerThanAllowed = pointsCount > maxLength;
             var maxX = pathLongerThanAllowed ? maxLength : pointsCount;
 
@@ -292,7 +291,6 @@ namespace FaffLatest.scripts.movement
             astar.SetPointDisabled(point);
             CreatePointInfos(character, character.ProperBody);
         }
-
 
         public void MarkNodeAsOccupied(Vector3 position)
         {

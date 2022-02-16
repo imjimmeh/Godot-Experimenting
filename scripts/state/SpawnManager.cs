@@ -10,6 +10,7 @@ using FaffLatest.scripts.weapons;
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FaffLatest.scripts.state
 {
@@ -52,7 +53,7 @@ namespace FaffLatest.scripts.state
 			base._Ready();
 		}
 
-		public void SpawnCharacters(CharacterStats[] charactersToCreate, SpawnableAreas spawnArea)
+		public async void SpawnCharacters(CharacterStats[] charactersToCreate, SpawnableAreas spawnArea)
 		{
 			var playerCharacters = new Character[charactersToCreate.Length];
 			var aiChars = new Character[charactersToCreate.Length];
@@ -70,7 +71,7 @@ namespace FaffLatest.scripts.state
 				var spawnPosition = GetSpawnPosition(areaToSpawnFrom, random);
 
 				spawnPosition = spawnPosition.WithValues(y: 0.5f);
-				var character = SpawnCharacter(charactersToCreate[x], spawnPosition);
+				var character = await SpawnCharacter(charactersToCreate[x], spawnPosition);
 
 				if(character.Stats.IsPlayerCharacter)
 				{
@@ -97,34 +98,35 @@ namespace FaffLatest.scripts.state
 			EmitSignal(SignalNames.Loading.CHARACTERS_SPAWNED, this);
 		}
 
-		public Character SpawnCharacter(CharacterStats stats, Vector3 spawnPosition)
-		{
-			var newCharacter = CharacterBase.Instance<Character>();
+		public async Task<Character> SpawnCharacter(CharacterStats stats, Vector3 spawnPosition)
+        {
+            var character = CharacterBase.Instance<Character>();
+            character.Stats = stats;
 
-			newCharacter.Stats = stats;
-			var newCharacterKinematicBody = newCharacter.GetNode<KinematicBody>("KinematicBody");
-			newCharacterKinematicBody.Transform = new Transform(newCharacterKinematicBody.Transform.basis, spawnPosition);
+            var body = SetPosition(spawnPosition, character);
+            var root = stats.IsPlayerCharacter ? playerCharactersRoot : aiCharactersRoot;
+            var groupName = stats.IsPlayerCharacter ? GroupNames.PLAYER_CHARACTERS : GroupNames.AI_CHARACTERS;
 
-			if (stats.IsPlayerCharacter)
-			{
-				playerCharactersRoot.AddChild(newCharacter);
-				newCharacter.AddToGroup(GroupNames.PLAYER_CHARACTERS);
-			}
-			else
-			{ 
-			aiCharactersRoot.AddChild(newCharacter);
-				newCharacter.AddToGroup(GroupNames.AI_CHARACTERS);
+            root.CallDeferred("add_child", character);
+            character.CallDeferred("add_to_group", groupName);
 
-			}
+            AddCharacterSignals(body, character);
 
-			AddCharacterSignals(newCharacterKinematicBody, newCharacter);
+            await ToSignal(character, "ready");
+            astarNavigator._On_Character_Created(character);
 
-			astarNavigator._On_Character_Created(newCharacter);
+            return character;
+        }
 
-			return newCharacter;
-		}
+        private static KinematicBody SetPosition(Vector3 spawnPosition, Character character)
+        {
+            var newCharacterKinematicBody = character.GetNode<KinematicBody>("KinematicBody");
+            newCharacterKinematicBody.Transform = new Transform(newCharacterKinematicBody.Transform.basis, spawnPosition);
 
-		private void AddCharacterSignals(Node newCharacterKinematicBody, Character character)
+            return newCharacterKinematicBody;
+        }
+
+        private void AddCharacterSignals(Node newCharacterKinematicBody, Character character)
 		{
 			var pathMover = newCharacterKinematicBody.GetNode("PathMover");
 

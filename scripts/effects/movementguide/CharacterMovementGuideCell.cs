@@ -37,7 +37,7 @@ namespace FaffLatest.scripts.effects.movementguide
 			ConnectSignals();
 
 			material = Mesh.SurfaceGetMaterial(0) as ShaderMaterial;
-			Hide();
+			CallDeferred("hide");
 		}
 
         public override void _Process(float delta)
@@ -87,14 +87,13 @@ namespace FaffLatest.scripts.effects.movementguide
 			Connect(SignalNames.MovementGuide.CLICKED_ON, GetParent(), SignalNames.MovementGuide.CLICKED_ON_METHOD);
 		}
 
-		private async void CalculateVisiblity(int movementDistanceLeft)
+		private void CalculateVisiblity(int movementDistanceLeft)
         {
             if (IsOutsideWorldBounds() || OutsideMovementDistance(movementDistanceLeft))
             {
                 SetVisiblity(false);
                 return;
             }
-
 
            CallDeferred("GetPathAndSetVisiblity", movementDistanceLeft);
         }
@@ -116,11 +115,11 @@ namespace FaffLatest.scripts.effects.movementguide
         {
 			if(isVisible)
 			{
-				Show();
+				CallDeferred("show");
 			}
 			else
 			{
-				Hide();
+				CallDeferred("hide");
 			}
         }
 

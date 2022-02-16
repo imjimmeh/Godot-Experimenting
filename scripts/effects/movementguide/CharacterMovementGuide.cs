@@ -31,12 +31,9 @@ namespace FaffLatest.scripts.effects.movementguide
         public PackedScene MovementGuideCellScene { get; private set; }
         public AStarNavigator AStar { get; private set; }
 
-        private Mutex mutex;
-
         public override void _Ready()
         {
             base._Ready();
-            mutex = new Mutex();
         }
 
         public void Initialise()
@@ -49,7 +46,7 @@ namespace FaffLatest.scripts.effects.movementguide
             ConnectSignals();
 
             Show();
-            Hide();
+            CallDeferred("hide");
         }
 
         private void GetCharacterNode()
@@ -83,7 +80,7 @@ namespace FaffLatest.scripts.effects.movementguide
         {
             if (character != parent)
             {
-                Hide();
+                CallDeferred("hide");
                 return;
             }
 
@@ -93,7 +90,6 @@ namespace FaffLatest.scripts.effects.movementguide
             if (body == null)
                 throw new Exception("Player body is null?");
 
-
             RotationDegrees = body.RotationDegrees * -1;
             CallDeferred("ShowCells");
         }
@@ -101,7 +97,7 @@ namespace FaffLatest.scripts.effects.movementguide
         private void ShowCells()
         {
             EmitSignal("_Character_MoveGuide_CalculateCellVisiblity", parent.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
-            Show();
+            CallDeferred("show");
         }
 
         public async void CreateMeshes()
@@ -110,7 +106,7 @@ namespace FaffLatest.scripts.effects.movementguide
             var min = max * -1;
 
             existingMovementGuide = new Godot.Collections.Dictionary<Vector2, CharacterMovementGuideCell>();
-            
+
             for (var x = min; x <= max; x += AStar.GridSize)
             {
                 for (var y = min; y <= max; y += AStar.GridSize)
@@ -120,7 +116,7 @@ namespace FaffLatest.scripts.effects.movementguide
             }
         }
 
-        private async void ProcessCoordinates(float x, float y)
+        private void ProcessCoordinates(float x, float y)
         {
             var currentVector = new Vector3(x: x, y: 0, z: y);
 
@@ -132,7 +128,7 @@ namespace FaffLatest.scripts.effects.movementguide
             BuildMesh(x, y, currentVector);
         }
 
-        private async void BuildMesh(float a, float b, Vector3 currentVector)
+        private void BuildMesh(float a, float b, Vector3 currentVector)
         {
             var mesh = this.CreateMeshInstanceForPosition(currentVector);
 
@@ -140,7 +136,7 @@ namespace FaffLatest.scripts.effects.movementguide
                 .AddCellToArray(mesh, a, b);
 
             mesh.SetParentCharacterTransform(parent.ProperBody);
-            mesh.Show();
+            mesh.CallDeferred("show");
             Connect(SignalNames.MovementGuide.CELL_CALCULATE_VISIBLITY, mesh, CALCULATE_VISIBLITY);
             
             CallDeferred("add_child", mesh);
@@ -148,7 +144,6 @@ namespace FaffLatest.scripts.effects.movementguide
 
         private async void _On_Cell_Mouse_Entered(CharacterMovementGuideCell node)
         {
-           // mutex.Lock();
             var result = await AStar.TryGetMovementPathAsync(body.Transform.origin, node.GlobalTransform.origin, parent.ProperBody.MovementStats.MaxMovementDistancePerTurn);
             
             if (!result.IsSuccess)
@@ -156,6 +151,7 @@ namespace FaffLatest.scripts.effects.movementguide
                 ClearExistingPath();
                 return;
             }
+
             var newPath = new HashSet<CharacterMovementGuideCell>(result.Path.Length);
 
 
@@ -218,7 +214,7 @@ namespace FaffLatest.scripts.effects.movementguide
                 var cell = node as CharacterMovementGuideCell;
                 var worldPos = cell.GlobalTransform.origin;
                 EmitSignal(SignalNames.Characters.MOVE_ORDER, worldPos);
-                Hide();
+                CallDeferred("hide");
             }
         }
 
@@ -229,7 +225,7 @@ namespace FaffLatest.scripts.effects.movementguide
 
         private void _On_Character_SelectionCleared()
         {
-            Hide();
+            CallDeferred("hide");
         }
     }
 }

@@ -49,6 +49,5 @@ namespace FaffLatest.scripts.movement
 
 			return withinDistance;
 		}
-
 	}
 }

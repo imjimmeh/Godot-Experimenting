@@ -42,8 +42,8 @@ namespace FaffLatest.scripts.map
 
         private static IEnumerable<Vector3> GetSpawnPositionsForMesh(MeshInstance mesh, PlaneMesh plane)
         {
-            mesh.Hide();
-            mesh.QueueFree();
+            mesh.CallDeferred("hide");
+            mesh.CallDeferred("queue_free");
 
             var size = plane.Size;
             var position = mesh.GlobalTransform.origin;

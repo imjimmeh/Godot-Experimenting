@@ -94,10 +94,8 @@ namespace FaffLatest.scripts.characters
 		private void InitialiseDispose()
 		{
 			EmitSignal("_Character_Disposing", this);
-			GD.Print($"No health - disposing");
-
 			IsDisposing = true;
-			QueueFree();
+			CallDeferred("queue_free");
 		}
 
 		private bool IsAlive() => Stats.CurrentHealth > 0;

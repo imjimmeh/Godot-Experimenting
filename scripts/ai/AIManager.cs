@@ -66,7 +66,11 @@ namespace FaffLatest.scripts.ai
 
         private void MoveCharacterIfPossible()
         {
+            if(currentlyActioningCharacter == null)
+                return;
+
             bool inactiveCurrentCharacterWithMovementLeft = !currentlyActioningCharacter.IsActive && currentlyActioningCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn > 0;
+
             if (inactiveCurrentCharacterWithMovementLeft)
             {
                 MoveCharacter();
@@ -75,13 +79,11 @@ namespace FaffLatest.scripts.ai
             {
                 CantMoveCharacterFurther();
             }
-            else
+            else if (!currentlyActioningCharacter.ProperBody.HaveDestination)
             {
-                if (!currentlyActioningCharacter.ProperBody.HaveDestination)
-                {
-                    CantMoveCharacterFurther();
-                }
+                CantMoveCharacterFurther();
             }
+
         }
 
 
@@ -131,7 +133,6 @@ namespace FaffLatest.scripts.ai
         private void CantMoveCharacterFurther()
         {
             ClearCharacterForTurn();
-
             GetNextCharacter();
         }
 

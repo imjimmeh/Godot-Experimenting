@@ -49,7 +49,8 @@ namespace FaffLatest.scripts.ui
 			portrait.Texture = character.Stats.FaceIcon;
 			name.Text = character.Stats.CharacterName;
 			movementText.Text = $"{character.ProperBody.MovementStats.AmountLeftToMoveThisTurn}/{character.ProperBody.MovementStats.MaxMovementDistancePerTurn}";
-			Show();
+			
+			CallDeferred("show");
 		}
 
 		private void _On_Character_SelectionCleared()
@@ -58,7 +59,7 @@ namespace FaffLatest.scripts.ui
 
 			healthbar.CharacterSelectionCleared();
 
-			Hide();
+			CallDeferred("hide");
 		}
 
 		private void _On_Character_ReceivedDamage(Character character, int damage, Node origin, bool killingBlow)

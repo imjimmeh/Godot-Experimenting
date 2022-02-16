@@ -143,7 +143,7 @@ namespace FaffLatest.scripts.ui
 			{
 				if (!asChar.ProperBody.MovementStats.CanMove)
 				{
-					movementIcon.Hide();
+					movementIcon.CallDeferred("hide");
 				}
 			}
 		}
@@ -152,21 +152,21 @@ namespace FaffLatest.scripts.ui
 		{
 			if(character.ProperBody.MovementStats.CanMove)
 			{
-				movementIcon.Show();
+				movementIcon.CallDeferred("show");
 			}
 		}
 
 		private void _MouseEntered()
 		{
 			mouseIsOver = true;
-			characterName.Show();
+			characterName.CallDeferred("show");
 			GD.Print("Mouse is over");
 		}
 
 		private void _MouseExited()
 		{
 			mouseIsOver = false;
-			characterName.Hide();
+			characterName.CallDeferred("hide");
 			GD.Print("Mouse left");
 		}
 	}
