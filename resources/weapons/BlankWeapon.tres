@@ -8,5 +8,5 @@ script = ExtResource( 1 )
 Name = ""
 MinDamage = 0
 MaxDamage = 0
-AmmoPerClip = 0
+AttacksPerTurn = 0
 Range = 0

@@ -19,6 +19,16 @@ namespace FaffLatest.scripts.weapons
             Range = range;
         }
 
+        public Weapon(Weapon weapon)
+        {
+            Name = weapon.Name;
+            MinDamage = weapon.MinDamage;
+            MaxDamage = weapon.MaxDamage;
+            AttacksPerTurn = weapon.AttacksPerTurn;
+            AttacksLeftThisTurn = weapon.AttacksPerTurn;
+            Range = weapon.Range;
+        }
+
         [Export]
         public string Name { get; private set; }
 
@@ -38,33 +48,33 @@ namespace FaffLatest.scripts.weapons
 
         public bool CanAttack => HaveAttacksLeft;
         public bool HaveAttacksLeft => AttacksLeftThisTurn > 0;
-        public bool IsMelee => Range == 1;
         public bool UsesAmmo => AttacksPerTurn > 0;
 
-        public bool TryAttack(out int damage)
+        public AttackResult TryAttack(out int damage)
         {
             damage = 0;
-             if (!CanAttack)
-                return false;
+
+            if (!HaveAttacksLeft || !CanAttack)
+                return AttackResult.OutOfAttacksForTurn;
 
             damage = GetAttackDamage();
 
-            if(!IsMelee)
-                DecreaseAmmo();
-                
-            return true;
+            DecreaseAttacksLeft();
+
+            return AttackResult.Success;
         }
+
+        public bool WithinAttackRange(float enemyDistance) => Range + 0.5 >= enemyDistance;
 
         public int GetAttackDamage() => RandomHelper.RNG.RandiRange(MinDamage, MaxDamage);
 
-        public void ResetTurnStats()
-        {
-            AttacksLeftThisTurn = AttacksPerTurn;
-        }
+        public void ResetTurnStats() => AttacksLeftThisTurn = AttacksPerTurn;
 
-        private void DecreaseAmmo() => AttacksLeftThisTurn--;
+        private void DecreaseAttacksLeft() => AttacksLeftThisTurn--;
 
-        private void SetAmmo(int ammo) => AttacksLeftThisTurn = ammo;
-        
+        private void SetAttacksPerLeft(int attacksLeft) => AttacksLeftThisTurn = attacksLeft;
+
+        public void EndTurn() => SetAttacksPerLeft(0);
+
     }
 }

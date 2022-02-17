@@ -58,7 +58,7 @@ namespace FaffLatest.scripts.movement
 
         public bool CanMove => AmountMovedThisTurn < MaxMovementDistancePerTurn;
 
-        public bool HasMovedThisTurn => AmountLeftToMoveThisTurn != MaxMovementDistancePerTurn;
+        public bool HasMovedThisTurn => AmountMovedThisTurn > 0;
         
         public void SetCurrentRotationSpeed(float newRotationSpeed)
             => CurrentRotationSpeed = Mathf.Clamp(newRotationSpeed, 0.0f, MaxRotationSpeed);
@@ -74,10 +74,9 @@ namespace FaffLatest.scripts.movement
         public void StopRotating() => CurrentRotationSpeed = 0.0f;
         public void StopMoving() => Velocity = Vector3.Zero;
 
-
         public void SetCantMoveAnymoreThisTurn()
         {
-            AmountMovedThisTurn = 0;
+            AmountMovedThisTurn = MaxMovementDistancePerTurn;
         }
 
         public void IncreaseAmountMovedThisTurn()
@@ -88,6 +87,11 @@ namespace FaffLatest.scripts.movement
         private void _On_Character_ReachedPathPart(Node character, Vector3 part)
         {
             IncreaseAmountMovedThisTurn();
+        }
+
+        public void ResetMovementForTurn()
+        {
+            AmountMovedThisTurn = 0;
         }
     }
 }

@@ -15,7 +15,7 @@ namespace FaffLatest.scripts.movement
 
             newPoint = new Vector3(target.x + x, target.y, target.z + y).Ceil();
 
-            if (newPoint.x < 0 || newPoint.y < 0)
+            if (newPoint.x < 0 || newPoint.z < 0 || newPoint.x > 50 || newPoint.z > 50)
                 return false;
 
             var pointDisabled = AStarNavigator.Instance.IsPointDisabled(newPoint);
@@ -83,6 +83,14 @@ namespace FaffLatest.scripts.movement
             return foundPoint;
         }
 
+
+        public static void MarkNodeAsOccupied(this AStar astar, Vector3 position)
+        {
+            var point = astar.GetClosestPoint(position);
+
+            astar.SetPointDisabled(point);
+        }
+
         public static bool TryGetNearestEmptyPointToLocationWithLoop(this AStarNavigator astar, Vector3 target, Vector3 origin, int maxTryCount, out Vector3 point)
         {
             int tryCount = -1;
@@ -144,12 +152,23 @@ namespace FaffLatest.scripts.movement
             return (start: astar.Points[startX, startY], end: astar.Points[endX, endY]);
         }
 
-
         private static void CleanStartAndEnd(ref Vector3 start, ref Vector3 end)
         {
-            start = start.Ceil();
-            end = end.Ceil();
+            start = start.Round();
+            end = end.Round();
             end = end.CopyYValue(start);
+        }
+
+        public static void SetPointOccupiedByCharacter(this AStarNavigator astar, Character character, PointInfo point) 
+            => astar.SetPointEnabledStatus(point, character, true);
+
+        public static void SetPointFree(this AStarNavigator astar, PointInfo point)
+         => astar.SetPointEnabledStatus(point, null, false);
+
+        public static void SetPointEnabledStatus(this AStarNavigator astar, PointInfo point, Node occupant, bool disabled)
+        {
+            astar.AStar.SetPointDisabled(point.Id, disabled);
+            point.SetOccupier(occupant);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FaffLatest.scripts.characters;
 using FaffLatest.scripts.effects.movementguide;
 using Godot;
 
@@ -55,6 +56,5 @@ namespace FaffLatest.scripts.shared
                 x ?? vector.x,
                 y ?? vector.y,
                 z ?? vector.z);
-
     }
 }

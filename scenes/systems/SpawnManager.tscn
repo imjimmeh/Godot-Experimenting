@@ -10,5 +10,5 @@
 process_priority = 50
 script = ExtResource( 4 )
 ZombieWeapon = ExtResource( 1 )
-PossibleInitialWeapons = [ ExtResource( 2 ), ExtResource( 3 ), ExtResource( 1 ) ]
+PossibleInitialWeapons = [ ExtResource( 2 ), ExtResource( 3 ) ]
 CharacterBase = ExtResource( 5 )

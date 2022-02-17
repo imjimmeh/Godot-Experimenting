@@ -1,4 +1,5 @@
 using FaffLatest.scripts.constants;
+using FaffLatest.scripts.weapons;
 using Godot;
 
 namespace FaffLatest.scripts.characters
@@ -66,14 +67,15 @@ namespace FaffLatest.scripts.characters
 
 		public void _On_Character_ReceiveDamage(int damage, Node origin)
 		{
+			GD.Print($"{Stats.CharacterName} received {damage} - initial health now at {Stats.CurrentHealth}");
 			Stats.AddHealth(-damage);
 
-			var characterStillAlive = IsAlive();
+			GD.Print($"{Stats.CurrentHealth} is new health");
+			EmitSignal(SignalNames.Characters.RECEIVED_DAMAGE, this, damage, origin, !IsAlive);
 
-			EmitSignal(SignalNames.Characters.RECEIVED_DAMAGE, this, damage, origin, !characterStillAlive);
-
-			if (!characterStillAlive)
+			if (!IsAlive)
 			{
+				GD.Print($"Dead - dyin");
 				InitialiseDispose();
 			}
 		}
@@ -85,9 +87,26 @@ namespace FaffLatest.scripts.characters
 			ProperBody.CharacterMesh.SetParent(this);
 		}
 
+		public AttackResult TryAttackTarget(Character target)
+		{
+			var distanceToTarget = this.DistanceToIgnoringHeight(target);
+            
+            if(!Stats.EquippedWeapon.WithinAttackRange(distanceToTarget))
+				return AttackResult.OutOfRange;
+
+			var attackResult = Stats.EquippedWeapon.TryAttack(out int damage);
+
+			if(attackResult != AttackResult.Success)
+				return attackResult;
+
+			target._On_Character_ReceiveDamage(damage, this);
+			
+			return AttackResult.Success;
+		}
+
 		public void ResetTurnStats()
 		{
-			ProperBody.MovementStats.SetCantMoveAnymoreThisTurn();
+			ProperBody.MovementStats.ResetMovementForTurn();
 			Stats.EquippedWeapon.ResetTurnStats();
 			IsActive = false;
 		}
@@ -99,6 +118,6 @@ namespace FaffLatest.scripts.characters
 			CallDeferred("queue_free");
 		}
 
-		private bool IsAlive() => Stats.CurrentHealth > 0;
+		private bool IsAlive => Stats.CurrentHealth > 0;
 	}
 }

@@ -77,12 +77,30 @@ namespace FaffLatest.scripts.input
 			}
 			else if(mouseButtonEvent.IsAttackCommand(gameStateManager, character))
 			{
-				var canAttack = gameStateManager
+				var attackResult = gameStateManager
 					.SelectedCharacter
-					.TryIssueAttackCommand(character);
+					.TryAttackTarget(character);
 
-					if(!canAttack)
-						GD.Print("Cant attack - no ammo left?");
+				switch(attackResult)
+				{
+					case weapons.AttackResult.OutOfRange:
+					{
+						GD.Print($"Out of range");
+						break;
+					}
+
+					case weapons.AttackResult.OutOfAttacksForTurn:
+					{
+						GD.Print($"Out of attacks");
+						break;
+					}
+
+					case weapons.AttackResult.Success:
+					{
+						GD.Print("Success");
+						break;
+					}
+				}
 			}
 		}
 

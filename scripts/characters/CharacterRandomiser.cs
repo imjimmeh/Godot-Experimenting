@@ -25,7 +25,8 @@ using System;
                 faceIcon: stats.GetRandomFaceIcon(),
                 weapon: stats.GetRandomWeapon());
 
-            GD.Print($"Generated character {newCharacter}");
+            newCharacter.EquippedWeapon.ResetTurnStats();
+
             return newCharacter;
         }
 
@@ -39,6 +40,11 @@ using System;
 
         public static AtlasTexture GetRandomFaceIcon(this CharacterGeneratorStats stats) => stats.PossibleFaceIcons.GetRandomFromArray();
 
-        public static Weapon GetRandomWeapon(this CharacterGeneratorStats stats) => stats.PossibleStartWeapons.GetRandomFromArray();
+        public static Weapon GetRandomWeapon(this CharacterGeneratorStats stats) 
+        {
+            var weapon = stats.PossibleStartWeapons.GetRandomFromArray();
+
+            return new Weapon(weapon);
+        }
     }
 }

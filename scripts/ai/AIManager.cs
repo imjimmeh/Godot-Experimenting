@@ -123,6 +123,8 @@ namespace FaffLatest.scripts.ai
         {
             currentlyActioningCharacter = null;
             characterController = null;
+
+            character.ResetTurnStats();
         }
 
         private void _On_Character_Disposing(Character character)

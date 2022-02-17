@@ -1,0 +1,8 @@
+-Attack effects (blood etc)
+-Healthbars on units
+	-Max these an option in main menu
+-Attack radius visiblity
+-Movement range display (i.e. how much this iwll cost)
+-Hide UI until level loaded
+_minicharacter display weapon icon needs to go once used
+-update character display

@@ -26,7 +26,7 @@ namespace FaffLatest.scripts.world
 		{
 			foreach(var cell in GetOccupiedCells())
 			{
-				astar.MarkNodeAsOccupied(cell);
+				astar.AStar.MarkNodeAsOccupied(cell);
 			}
 		}
 
