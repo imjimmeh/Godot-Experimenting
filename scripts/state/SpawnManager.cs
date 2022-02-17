@@ -90,7 +90,6 @@ namespace FaffLatest.scripts.state
         {
             var character = CharacterBase.Instance<Character>();
             character.Stats = stats;
-
             var root = stats.IsPlayerCharacter ? playerCharactersRoot : aiCharactersRoot;
             var groupName = stats.IsPlayerCharacter ? GroupNames.PLAYER_CHARACTERS : GroupNames.AI_CHARACTERS;
 
@@ -104,6 +103,7 @@ namespace FaffLatest.scripts.state
             await ToSignal(character, "ready");
 
             var body = character.ProperBody;
+			GD.Print($"Setting character to position {spawnPosition}");
             SetPosition(spawnPosition, body);
             AddCharacterSignals(body, character);
             astarNavigator._On_Character_Created(character);
