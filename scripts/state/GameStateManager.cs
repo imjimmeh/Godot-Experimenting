@@ -100,7 +100,6 @@ namespace FaffLatest.scripts.state
 			return characters;
 		}
 
-
 		public void SetTurn(Faction nextTurn)
 		{
 			if (currentTurn == nextTurn)
@@ -131,6 +130,11 @@ namespace FaffLatest.scripts.state
 				return;
 
 			character.IsActive = isActive;
+		}
+
+		public void _On_Faction_Killed(Faction faction)
+		{
+			GD.Print($"Faction won");
 		}
 
 		public void CheckTurnFinishedAndProcess()

@@ -104,7 +104,7 @@ namespace FaffLatest.scripts.effects.movementguide
         private void _On_Cell_Mouse_Entered(CharacterMovementGuideCell node)
         {
             var result = AStar.TryGetMovementPath(
-                start: body.Transform.origin,
+                start: body.GlobalTransform.origin,
                 end: node.GlobalTransform.origin,
                 character: parent);
             

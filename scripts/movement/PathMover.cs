@@ -39,7 +39,7 @@ namespace FaffLatest.scripts.movement
 
 			if (notFirstPart)
 			{
-				EmitSignal(Characters.REACHED_PATH_PART, this, KinematicBody.Transform.origin.Round());
+				EmitSignal(Characters.REACHED_PATH_PART, this, KinematicBody.GlobalTransform.origin.Round());
 			}
 
 			CurrentPathIndex++;
@@ -53,7 +53,7 @@ namespace FaffLatest.scripts.movement
 			}
 			else
 			{
-				nextPath = CurrentTarget.CopyYValue(KinematicBody.Transform.origin);
+				nextPath = CurrentTarget.CopyYValue(KinematicBody.GlobalTransform.origin);
 			}
 
 			return !pathFinished;

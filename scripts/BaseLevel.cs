@@ -32,5 +32,7 @@ public class BaseLevel : Spatial
     private void _On_Level_Loaded()
     {
         EmitSignal(nameof(_Level_Loaded));
+        CharacterManager.Instance.Connect(nameof(CharacterManager._Faction_Killed), GameStateManager.Instance, $"_On{nameof(CharacterManager._Faction_Killed)}");
+        GetNode(NodeReferences.Systems.UI_MANAGER).CallDeferred("ShowUi");
     }
 }

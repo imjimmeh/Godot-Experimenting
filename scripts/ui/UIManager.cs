@@ -32,6 +32,11 @@ namespace FaffLatest.scripts.ui
 
 			elementContainer.SpawnBigTemporaryText(position, $"{whoseTurn}" + "\n" + "Turn");
 		}
+
+		public void ShowUi()
+		{
+			elementContainer.Show();
+		}
 	}
 
 }

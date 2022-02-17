@@ -20,7 +20,7 @@ namespace FaffLatest.scripts.movement
 
             var pointDisabled = AStarNavigator.Instance.IsPointDisabled(newPoint);
 
-            return pointDisabled;
+            return !pointDisabled;
         }
 
         public static bool IsPointCloserToTargetThanCurrent(Vector3 target, Vector3 newPoint, float currentClosestDistance, out float distance)

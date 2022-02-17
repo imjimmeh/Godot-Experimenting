@@ -12,9 +12,9 @@ namespace FaffLatest.scripts.movement
 	{
 		public static MovingKinematicBody InterpolateAndMove(this MovingKinematicBody body, float delta, Vector3 target)
         {
-			target = target.CopyYValue(body.Transform.origin);
+			target = target.CopyYValue(body.GlobalTransform.origin);
 
-			body.MovementStats.CalculateAndSetNewVelocity(body.Transform.origin, target, delta);
+			body.MovementStats.CalculateAndSetNewVelocity(body.GlobalTransform.origin, target, delta);
             CalculateAndSetTransform(body);
 
 			return body;
@@ -27,7 +27,7 @@ namespace FaffLatest.scripts.movement
         }
 
         private static Vector3 GetTargetPosition(MovingKinematicBody body)
-			=> body.MovementStats.Velocity + body.Transform.origin;
+			=> body.MovementStats.Velocity + body.GlobalTransform.origin;
 
 		public static MovementStats CalculateAndSetNewVelocity(this MovementStats stats, Vector3 currentPosition, Vector3 target, float delta)
 		{

@@ -10,6 +10,7 @@
 [ext_resource path="res://resources/fonts/TitilliumWeb-s32.tres" type="DynamicFont" id=8]
 
 [node name="UI" type="Control"]
+visible = false
 margin_right = 40.0
 margin_bottom = 40.0
 script = ExtResource( 1 )
@@ -48,3 +49,13 @@ __meta__ = {
 [node name="EffectLabels" type="Control" parent="."]
 margin_right = 40.0
 margin_bottom = 14.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
+margin_right = 200.0
+margin_bottom = 70.0
+__meta__ = {
+"_edit_use_anchors_": false
+}

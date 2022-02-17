@@ -9,23 +9,21 @@ namespace FaffLatest.scripts.ui
 {
 	public class WorldCenteredControl : Control
 	{
-		private Spatial worldObject;
+		private Vector3? worldPositionToCenterOn;
 		private Camera camera;
 
 		private bool isDisposing = false;
-		public void Initialise(Spatial objectToCenterOn, Camera camera)
+		public void Initialise(Vector3 worldPositionToCenterOn, Camera camera)
 		{
-			worldObject = objectToCenterOn;
+			this.worldPositionToCenterOn = worldPositionToCenterOn;
 			this.camera = camera;
-
-			objectToCenterOn.GetParent().Connect("_Character_Disposing", this, "_On_WorldObject_Disposing");
 		}
 
 		public override void _PhysicsProcess(float delta)
 		{
 			base._PhysicsProcess(delta);
 
-			if (isDisposing)
+			if (isDisposing || worldPositionToCenterOn == null)
 				return;
 
 			var newPosition = GetUnprojectedPosition();
@@ -34,14 +32,14 @@ namespace FaffLatest.scripts.ui
 			RectPosition = newPosition;
 		}
 
-		private Vector2 GetUnprojectedPosition() => camera.UnprojectPosition(worldObject.GlobalTransform.origin);
+		private Vector2 GetUnprojectedPosition() => camera.UnprojectPosition(worldPositionToCenterOn.Value);
 
 		private void DisposeThis()
 		{
-			worldObject = null;
+			worldPositionToCenterOn = null;
 			camera = null;
 			isDisposing = true;
-			QueueFree();
+			CallDeferred("queue_free");
 		}
 
         private void _On_WorldObject_Disposing(Spatial worldObject)

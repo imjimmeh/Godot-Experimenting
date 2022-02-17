@@ -40,7 +40,7 @@ namespace FaffLatest.scripts.ai
                                                                                                           Character checking,
                                                                                                         float closestDistance)
         {
-            var vector = (checking.ProperBody.Transform.origin - us.ProperBody.GlobalTransform.origin);
+            var vector = (checking.ProperBody.GlobalTransform.origin - us.ProperBody.GlobalTransform.origin);
             var distance = vector.Length();
 
             if (distance > closestDistance)
@@ -53,7 +53,7 @@ namespace FaffLatest.scripts.ai
         {
             var direction = vector.Normalized().Round();
 
-            return character.ProperBody.Transform.origin - direction;;
+            return character.ProperBody.GlobalTransform.origin - direction;;
         }
     }
 }

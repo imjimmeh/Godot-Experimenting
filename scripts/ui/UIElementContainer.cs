@@ -3,10 +3,11 @@ using FaffLatest.scripts.constants;
 using FaffLatest.scripts.movement;
 using Godot;
 using System;
+using System.Text;
 
 namespace FaffLatest.scripts.ui
 { 
-	public class UIElementContainer : Node
+	public class UIElementContainer : Control
 	{
 		[Export]
 		public PackedScene CharacterDamageTextScene { get; private set; }
@@ -33,6 +34,8 @@ namespace FaffLatest.scripts.ui
 
 		public Control EffectLabelsParent { get; private set; }
 
+		public ConfirmationDialog ConfirmationDialog {get; private set;}
+
 		public override void _Ready()
 		{
 			GetUIChildrenNodes();
@@ -58,6 +61,7 @@ namespace FaffLatest.scripts.ui
 		{
 			GD.Print("Getting children nodes");
 			CharacterSelector = GetNode<CharacterSelector>("CharacterSelector");
+			ConfirmationDialog = GetNode<ConfirmationDialog>("ConfirmationDialog");
 			SelectedCharacter = GetNode<SelectedCharacter>("SelectedCharacter");
 			EffectLabelsParent = GetNode<Control>("EffectLabels");
 		}
@@ -67,23 +71,37 @@ namespace FaffLatest.scripts.ui
 			SelectedCharacter.ConnectSignals(GetNode(NodeReferences.Systems.GAMESTATE_MANAGER));
 		}
 
+		private void _On_Confirm_Character_Attack(Character character)
+		{
+			var dialogTextBuilder = new StringBuilder();
+			dialogTextBuilder.AppendLine($"{character.Stats.CharacterName} still has {character.ProperBody.MovementStats.AmountLeftToMoveThisTurn} moves left this turn");
+			dialogTextBuilder.AppendLine("If you attack you will be unable to move for the rest of the turn - are you sure?");
+
+			ConfirmationDialog.DialogText = dialogTextBuilder.ToString();
+
+			ConfirmationDialog.WindowTitle = "Confirm Attack";
+			ConfirmationDialog.Show();
+		}
+
 		private void _On_Character_ReceivedDamage(Node character, int damage, Node origin, bool killingBlow)
 		{
-			if (killingBlow)
-				return;
-
-			var asChar = character as Character;
+            var asChar = character as Character;
 
 			if(camera == null)
 				camera = GetNode<Camera>(NodeReferences.BaseLevel.Cameras.MAIN_CAMERA);
 
-			SpawnDamageLabel(asChar.ProperBody, damage.ToString());
+			SpawnDamageLabel(asChar.ProperBody.GlobalTransform.origin, damage.ToString());
+
+			if (killingBlow)
+            {
+				SpawnDamageLabel(asChar.ProperBody.GlobalTransform.origin, "KILLED");
+            }
 		}
 
-		public Control SpawnDamageLabel(Spatial worldObject, string text)
+		public Control SpawnDamageLabel(Vector3 position, string text)
 		{
 			var parent = CharacterDamageTextScene.Instance<WorldCenteredControl>();
-			parent.Initialise(worldObject, camera);
+			parent.Initialise(position, camera);
 
 			EffectLabelsParent.AddChild(parent);
 
@@ -111,6 +129,5 @@ namespace FaffLatest.scripts.ui
 
 			return label;
 		}
-
 	}
 }

@@ -71,7 +71,7 @@ public class MovementDisplayMeshInstance : MeshInstance
 	{
 		var currentMaterial = GetActiveMaterial(0) as ShaderMaterial;
 
-		var playerPosition = body.Transform.origin;
+		var playerPosition = body.GlobalTransform.origin;
 
 		currentMaterial.SetShaderParam("playerPosition", playerPosition);
 		currentMaterial.SetShaderParam("playerMovementDistance", body.MovementStats.MaxMovementDistancePerTurn);

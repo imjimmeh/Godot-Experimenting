@@ -126,7 +126,7 @@ namespace FaffLatest.scripts.ai
         private void GetMovementTarget()
         {
             var targetPosition = GetAttackTargetAndPosition();
-            var vector = (parent.ProperBody.Transform.origin - targetPosition);
+            var vector = (parent.ProperBody.GlobalTransform.origin - targetPosition);
             var distance = Mathf.Abs(vector.x + vector.z);
 
             if (distance < 1.00001f)
@@ -137,7 +137,7 @@ namespace FaffLatest.scripts.ai
 
             var foundEmptyPosition = AStarNavigator.Instance.TryGetNearestEmptyPointToLocation(
                 target: targetPosition,
-                origin: parent.ProperBody.Transform.origin,
+                origin: parent.ProperBody.GlobalTransform.origin,
                 out Vector3 foundPoint);
 
             if (!foundEmptyPosition)
@@ -154,7 +154,7 @@ namespace FaffLatest.scripts.ai
         private void GetPathToMovementDestination()
         {
             var result = AStarNavigator.Instance.TryGetMovementPath(
-            start: parent.ProperBody.Transform.origin,
+            start: parent.ProperBody.GlobalTransform.origin,
             end: currentMovementDestination.Value,
             character: parent);
 

@@ -6,6 +6,12 @@ using Godot;
 namespace FaffLatest.scripts.state{
     public class CharacterManager : Node
     {
+        [Signal]
+        public delegate void _Faction_Killed(Faction faction);
+
+        [Signal]
+        public delegate void _Character_ConfirmAttack(Character character);
+
         public static CharacterManager Instance;
 
         private HashSet<Character> aiCharacters;
@@ -43,18 +49,29 @@ namespace FaffLatest.scripts.state{
 
         public bool AddPlayerCharacter(Character character) => playerCharacters.Add(character);
         
-        
-        private void _On_Character_Disposing(Character character) => RemoveCharacter(character);
+        private void _On_Character_Disposing(Character character){
+            
+            var faction = RemoveCharacter(character);
 
-        public bool RemoveCharacter(Character character) => character.Stats.IsPlayerCharacter switch
+            if(faction.characters.Count == 0)
+            {
+                EmitSignal(nameof(_Faction_Killed), faction.name);
+            }
+        }
+
+        public  (HashSet<Character> characters, Faction name) RemoveCharacter(Character character)
         {
-            true => RemovePlayerCharacter(character),
-            false => RemoveAiCharacter(character)
-        };
-    
-        public bool RemoveAiCharacter(Character character) => aiCharacters.Remove(character);
+            var faction = GetOtherCharactersForCharactersFaction(character);
+            faction.characters.Remove(character);
 
-        public bool RemovePlayerCharacter(Character character) => playerCharacters.Remove(character);
-        
+            return faction;
+        }  
+
+        public (HashSet<Character> characters, Faction name) GetOtherCharactersForCharactersFaction(Character character)
+        => character.Stats.IsPlayerCharacter switch
+        {
+            true => (playerCharacters, Faction.PLAYER),
+            false =>  (aiCharacters, Faction.ENEMY),
+        };
     }
 }
