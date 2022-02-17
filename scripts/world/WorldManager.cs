@@ -98,6 +98,7 @@ namespace FaffLatest.scripts.world
 
 		public async void GetSpawnLocationsAndSpawnCharacters(CharacterStats[] characters)
 		{
+			CharacterManager.Instance.InitialiseCollections(characters.Length);
 			var spawnLocations = this.GetSpawnArea();
 			await SpawnManager.SpawnCharacters(characters, spawnLocations);
 			EmitSignal(nameof(_Characters_Loaded));

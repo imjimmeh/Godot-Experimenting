@@ -63,7 +63,7 @@ namespace FaffLatest.scripts.movement
                 {
                     foundPoint = astar.IsLocationValidAndFree(target, tryCount, ref closestDistance, x, y, out point);
 
-                    if (closestDistance <= 1.001f)
+                    if (foundPoint && closestDistance <= 1.001f)
                         break;
                 }
             }

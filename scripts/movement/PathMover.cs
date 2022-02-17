@@ -18,9 +18,7 @@ namespace FaffLatest.scripts.movement
 		public Vector3[] Path = null;
 		public Vector3 CurrentTarget => Path[CurrentPathIndex];
 
-
 		public int CurrentPathIndex = 0;
-
 
         public override void _Ready()
 		{

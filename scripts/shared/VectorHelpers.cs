@@ -6,11 +6,17 @@ namespace FaffLatest.scripts.shared
 {
     public static class VectorHelpers
     {
+        public static bool AnyValueLessThanZero(this Vector3 vector)
+            => vector.x < 0 || vector.z < 0;
+
+        public static bool AnyValueGreaterThanOrEqualToValue(this Vector3 vector, float v)
+            => vector.x >= v || vector.z >= v;
+
         public static bool LookingAtSamePoint(Vector3 backwardsVector, Vector3 movementVector)
         {
             var dotProduct = movementVector.Dot(backwardsVector);
 
-            var lookingAtDestination = dotProduct < -0.99f;
+            var lookingAtDestination = Mathf.IsEqualApprox(dotProduct, -1f);
 
             return lookingAtDestination;
         }

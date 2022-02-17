@@ -29,13 +29,14 @@ namespace FaffLatest.scripts.state
 		public PackedScene CharacterBase { get; private set; }
 
 		private Node aiCharactersRoot;
+		private Node aiManager;
 		private AStarNavigator astarNavigator;
 		private Node characterMovementPathManager;
 		private Node inputManager;
 		private Node gameStateManager;
 		private Node playerCharactersRoot;
-		private UIElementContainer ui;
 		private RandomNumberGenerator random;
+		private UIElementContainer ui;
 
 		public override void _Ready()
 		{
@@ -59,14 +60,25 @@ namespace FaffLatest.scripts.state
 
 				var character = await SpawnCharacter(charactersToCreate[x], spawnPosition);
 
-				if(!character.Stats.IsPlayerCharacter)
-					character.Stats.EquippedWeapon = ZombieWeapon;
-			}
+                if (!character.Stats.IsPlayerCharacter)
+                    AiSetup(character);
+
+            }
 
 			EmitSignal(SignalNames.Loading.CHARACTERS_SPAWNED);
 		}
 
-		public async Task<Character> SpawnCharacter(CharacterStats stats, Vector3 spawnPosition)
+        private void AiSetup(Character character)
+        {
+            character.Stats.EquippedWeapon = ZombieWeapon;
+			
+			var aicontroller = new AiCharacterController();
+			character.ProperBody.CallDeferred("add_child", aicontroller);
+			aicontroller.Name = "AiCharacterController";
+			aicontroller.Connect(nameof(AiCharacterController._AiCharacter_TurnFinished), aiManager, "_On_AiCharacter_TurnFinished");
+        }
+
+        public async Task<Character> SpawnCharacter(CharacterStats stats, Vector3 spawnPosition)
         {
             Character character = InitialiseCharacterFromStats(stats);
 
@@ -127,6 +139,7 @@ namespace FaffLatest.scripts.state
 		private void FindNeededNodes()
 		{
 			aiCharactersRoot = GetNode(NodeReferences.BaseLevel.AI_ROOT);
+			aiManager = AIManager.Instance;
 			astarNavigator = AStarNavigator.Instance;
 			characterMovementPathManager = GetNode<CharacterMovementPathManager>(NodeReferences.BaseLevel.Effects.MOVEMENT_PATH);
 			gameStateManager = GetNode(NodeReferences.Systems.GAMESTATE_MANAGER);

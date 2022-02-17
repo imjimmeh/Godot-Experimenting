@@ -87,7 +87,7 @@ namespace FaffLatest.scripts.characters
 
 		public void ResetTurnStats()
 		{
-			ProperBody.MovementStats.ResetMovement();
+			ProperBody.MovementStats.SetCantMoveAnymoreThisTurn();
 			IsActive = false;
 		}
 

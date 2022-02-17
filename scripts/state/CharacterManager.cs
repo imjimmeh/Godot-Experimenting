@@ -24,25 +24,24 @@ namespace FaffLatest.scripts.state{
             Instance = this;
         }
 
-        public void InitialiseCollections(int playerCharacterCount)
+        public CharacterManager InitialiseCollections(int playerCharacterCount)
         {
             aiCharacters = new HashSet<Character>(MaxAiCharacters);
             playerCharacters = new HashSet<Character>(playerCharacterCount);
+
+            
+            return this;
         }
 
-        public void AddCharacter(Character character)
-            => MethodToAddCharacter(character);
-
-        public Action<Character> MethodToAddCharacter(Character character) => character.Stats.IsPlayerCharacter switch
+        public bool AddCharacter(Character character) => character.Stats.IsPlayerCharacter switch
         {
-            true => AddPlayerCharacter,
-            false => AddAiCharacter
+            true => AddPlayerCharacter(character),
+            false => AddAiCharacter(character)
         };
     
-        public void AddAiCharacter(Character character)
-            => aiCharacters.Add(character);
+        public bool AddAiCharacter(Character character) => aiCharacters.Add(character);
 
-        public void AddPlayerCharacter(Character character)
-            => playerCharacters.Add(character);
+        public bool AddPlayerCharacter(Character character) => playerCharacters.Add(character);
+
     }
 }

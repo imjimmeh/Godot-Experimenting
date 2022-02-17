@@ -10,6 +10,8 @@ namespace FaffLatest.scripts.ai
 {
     public class AIManager : Node
     {
+        public static AIManager Instance;
+
         private HashSet<Character> aiCharacters => CharacterManager.Instance.AiCharacters;
 
         [Signal]
@@ -18,11 +20,33 @@ namespace FaffLatest.scripts.ai
         private bool isOurTurn;
 
         private Character currentlyActioningCharacter;
+        private AiCharacterController characterController;
 
         private int currentArrayPos = 0;
         private bool haveMoreCharacters => aiCharacters != null && aiCharacters.Count > currentArrayPos;
 
         private AStarNavigator aStarNavigator;
+
+        public override void _Ready()
+        {
+            aStarNavigator = AStarNavigator.Instance;
+            Connect("_Change_Turn", GetNode(NodeReferences.Systems.GAMESTATE_MANAGER), "SetTurn");
+            Instance = this;
+            base._Ready();
+        }
+
+        private void ConnectCharacterSignals()
+        {
+            foreach (var character in aiCharacters)
+            {
+                character.ProperBody
+                    .GetNode("AiCharacterController")
+                    .Connect("_AiCharacter_TurnFinished", this, "_On__AiCharacter_TurnFinished");
+
+                character.Connect(SignalNames.Characters.DISPOSING, this, SignalNames.Characters.DISPOSING_METHOD);
+            }
+        }
+
 
         public void SetAITurn(bool isTurn)
         {
@@ -44,86 +68,20 @@ namespace FaffLatest.scripts.ai
             if (!isOurTurn)
                 return;
 
-            if (currentlyActioningCharacter != null)
-            {
-                MoveCharacterIfPossible();
-            }
-            else if (haveMoreCharacters)
+            if (currentlyActioningCharacter == null && haveMoreCharacters)
             {
                 GetNextCharacter();
             }
-            else
+            else if(currentlyActioningCharacter == null && !haveMoreCharacters)
             {
                 EndTurn();
             }
         }
 
-        private void MoveCharacterIfPossible()
-        {
-            if(currentlyActioningCharacter == null)
-                return;
-
-            bool inactiveCurrentCharacterWithMovementLeft = !currentlyActioningCharacter.IsActive && currentlyActioningCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn > 0;
-
-            if (inactiveCurrentCharacterWithMovementLeft)
-            {
-                MoveCharacter();
-            }
-            else if (currentlyActioningCharacter.IsActive && currentlyActioningCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn <= 0)
-            {
-                CantMoveCharacterFurther();
-            }
-            else if (!currentlyActioningCharacter.ProperBody.HaveDestination)
-            {
-                CantMoveCharacterFurther();
-            }
-
-        }
-
-
         private void ClearCurrentlyActiveCharacter()
         {
             currentlyActioningCharacter.IsActive = false;
             currentlyActioningCharacter = null;
-        }
-
-        private void MoveCharacter()
-        {
-            var (_, targetPosition) = GetNearestPCToCharacter(currentlyActioningCharacter.ProperBody.Transform.origin);
-
-            var vector = (currentlyActioningCharacter.ProperBody.Transform.origin - targetPosition).Abs();
-            var distance = vector.x + vector.z;
-
-            if (distance < 1.00001f)
-            {
-                ClearCharacterForTurn();
-                return;
-            }
-
-            var foundEmptyPosition = aStarNavigator.TryGetNearestEmptyPointToLocation(
-                target: targetPosition, 
-                origin: currentlyActioningCharacter.ProperBody.Transform.origin, 
-                out Vector3 foundPoint);
-
-            if (!foundEmptyPosition)
-            {
-                CantMoveCharacterFurther();
-                return;
-            }
-
-            var result = aStarNavigator.TryGetMovementPath(
-                start: currentlyActioningCharacter.ProperBody.Transform.origin,
-                end: foundPoint,
-                character: currentlyActioningCharacter);
-
-            if (result == null || !result.CanFindPath)
-            {
-                CantMoveCharacterFurther();
-                return;
-            }
-
-            currentlyActioningCharacter.ProperBody.GetNode<PathMover>("PathMover").MoveWithPath(result.Path);
-            currentlyActioningCharacter.IsActive = true;
         }
 
         private void CantMoveCharacterFurther()
@@ -144,15 +102,16 @@ namespace FaffLatest.scripts.ai
 
         private void EndTurn()
         {
-            foreach (var character in aiCharacters)
-            {
-                character.ResetTurnStats();
-            }
 
             currentArrayPos = 0;
             isOurTurn = false;
 
             EmitSignal("_Change_Turn", Faction.PLAYER);
+            foreach (var character in aiCharacters)
+            {
+                character.ResetTurnStats();
+            }
+
         }
 
         private void GetNextCharacter()
@@ -164,58 +123,19 @@ namespace FaffLatest.scripts.ai
             }
 
             currentlyActioningCharacter = aiCharacters.ElementAt(currentArrayPos);
+            characterController = currentlyActioningCharacter.ProperBody.GetNode<AiCharacterController>("AiCharacterController");
             currentArrayPos++;
-        }
 
-        public override void _Ready()
-        {
-            aStarNavigator = GetNode<AStarNavigator>(NodeReferences.Systems.ASTAR);
-            Connect("_Change_Turn", GetNode(NodeReferences.Systems.GAMESTATE_MANAGER), "SetTurn");
-            base._Ready();
-        }
-
-        public (Character closestChar, Vector3 targetPosition) GetNearestPCToCharacter(Vector3 ourCharPos)
-        {
-            Character closestCharacter = null;
-            Vector3 targetPos = Vector3.Zero;
-
-            float closestDistance = 99999;
-
-            foreach (var character in aStarNavigator.CharacterLocations)
-            {
-                if (!character.Key.Stats.IsPlayerCharacter)
-                    continue;
-
-                var vector = (character.Key.ProperBody.Transform.origin - ourCharPos);
-                var distance = vector.Length();
-
-                if (distance < closestDistance)
-                {
-                    var direction = vector.Normalized().Round();
-                    targetPos = character.Key.ProperBody.Transform.origin - direction;
-                    closestDistance = distance;
-                    closestCharacter = character.Key;
-                }
-            }
-
-            return (closestCharacter, targetPos);
-        }
-
-        private void ConnectCharacterSignals()
-        {
-            foreach (var character in aiCharacters)
-            {
-                character.ProperBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, this, "_On_AICharacter_FinishedMoving");
-                character.Connect(SignalNames.Characters.DISPOSING, this, SignalNames.Characters.DISPOSING_METHOD);
-            }
-        }
-
-        private void _On_AICharacter_FinishedMoving(Node character, Vector3 newPosition)
-        {
-            if (haveMoreCharacters)
-                GetNextCharacter();
+            if(currentlyActioningCharacter != null)
+                characterController.SetOurTurn();
             else
-                ClearCurrentlyActiveCharacter();
+                EndTurn();
+        }
+
+        private void _On_AiCharacter_TurnFinished(Character character)
+        {
+            currentlyActioningCharacter = null;
+            characterController = null;
         }
 
         private void _On_Character_Disposing(Character character)

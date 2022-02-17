@@ -27,40 +27,38 @@ namespace FaffLatest.scripts.ui
 				.Connect(SignalNames.Loading.CHARACTERS_SPAWNED, this, SignalNames.Loading.CHARACTERS_SPAWNED_METHOD);
 		}
 
-		public void AddCharacters(IEnumerable<Character> characters)
+		public void CreateDisplays()
 		{
+			var characters = CharacterManager.Instance.PlayerCharacters;
+
 			if (characters == null)
-				return;
+				throw new System.Exception("Could not find player characters");
 
-			int characterCount = characters.Count();
+			int characterCount = characters.Count() + 1;
 			characterDisplays = new MiniCharacterDisplay[characterCount];
-
-			var index = 0;
 
 			int spriteSize = 32;
 
-			foreach(var character in characters)
-			{
-				var display = CreateDisplay(character, spriteSize, index);
-				characterDisplays[characterCount] = display;
-				CallDeferred("add_child",display);
-				index++;
-			}
+			var displays = characters.Select((character, index) => CreateDisplay(character, spriteSize, index));
+
+			characterDisplays = displays.ToArray();
 		}
 
 		private void _On_Characters_Spawned()
 		{
-			AddCharacters(CharacterManager.Instance.PlayerCharacters);
+			CreateDisplays();
 		}
 		
 
 		private MiniCharacterDisplay CreateDisplay(Character character, int spriteSize, int currentIndex)
 		{
-			var newInstance = MiniDisplay.Instance() as MiniCharacterDisplay;
-			newInstance.SetCharacter(character);
-			newInstance.MarginTop = CalculateMarginTop(Spacing, spriteSize, currentIndex);
+			var display = MiniDisplay.Instance() as MiniCharacterDisplay;
+			display.SetCharacter(character);
+			display.MarginTop = CalculateMarginTop(Spacing, spriteSize, currentIndex);
 
-			return newInstance;
+			CallDeferred("add_child", display);
+
+			return display;
 		}
 
 		private static float CalculateMarginTop(float spacing, int spriteSize, int index) => (spacing * index) + (spriteSize * index);

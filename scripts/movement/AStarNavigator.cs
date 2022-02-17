@@ -4,6 +4,8 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+using static FaffLatest.scripts.shared.VectorHelpers;
+
 namespace FaffLatest.scripts.movement
 {
     public class AStarNavigator : Node
@@ -122,7 +124,7 @@ namespace FaffLatest.scripts.movement
         {
             try
             {
-                if (OutsideWorldBounds(start, end) || OutsideMovementDistance(start, end, movementDistance))
+                if (OutsideWorldBounds(start, end))
                     return new GetMovementPathResult(false);;
 
                 var (startPoint, endPoint) = this.GetStartAndEndPoints(start, end);
@@ -140,20 +142,14 @@ namespace FaffLatest.scripts.movement
         }
 
         private bool OutsideWorldBounds(Vector3 start, Vector3 end)
-            => AnyValueLessThanZero(start)
-            || AnyValueLessThanZero(end) 
-            || AnyValueGreaterThanOrEqualToValue(start, Width)
-            || AnyValueGreaterThanOrEqualToValue(end, Length);
+            => OutsideWorldBounds(start, Width) || OutsideWorldBounds(end, Length);
 
-        private bool AnyValueLessThanZero(Vector3 vector)
-            => vector.x < 0 || vector.z < 0;
-
-        private bool AnyValueGreaterThanOrEqualToValue(Vector3 vector, float v)
-            => vector.x >= v || vector.z >= v;
+        private bool OutsideWorldBounds(Vector3 v, float maxValue)
+            => v.AnyValueLessThanZero() || v.AnyValueGreaterThanOrEqualToValue(maxValue);
+        
         private bool OutsideMovementDistance(Vector3 start, Vector3 end, int movementDistanceLeft)
 		    => start.DistanceToIgnoringHeight(end) > movementDistanceLeft;
-
-
+            
         public void _On_Character_Created(Character character)
         {
             var point = AStar.GetClosestPoint(character.ProperBody.GlobalTransform.origin);
