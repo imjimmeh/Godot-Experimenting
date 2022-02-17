@@ -88,6 +88,7 @@ namespace FaffLatest.scripts.characters
 		public void ResetTurnStats()
 		{
 			ProperBody.MovementStats.SetCantMoveAnymoreThisTurn();
+			Stats.EquippedWeapon.ResetTurnStats();
 			IsActive = false;
 		}
 

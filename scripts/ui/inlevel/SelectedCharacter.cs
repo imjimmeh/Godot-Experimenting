@@ -11,13 +11,20 @@ namespace FaffLatest.scripts.ui
 {
 	public class SelectedCharacter : Panel
 	{
-		private TextureRect portrait;
+        private const string ATTACK_ICON_NODE_NAME = "AttackIcon";
+        private const string PORTRAIT_NODE_NAME = "CharacterIcon";
+        private const string HEALTHBAR_NODE_NAME = "HealthBar";
+        private const string MOVEMENT_ICON_NODE_NAME = "MovementIcon";
+        private const string NAME_NODE_NAME = "Name";
+        private TextureRect portrait;
 		private HealthBar healthbar;
 		private Label name;
-		private Label movementText;
 
+		private IconWithText attackDisplay;
+		private IconWithText movementDisplay;
 		private Character selectedCharacter;
-		
+
+
 		public override void _Ready()
 		{
 			GetChildrenNodes();
@@ -26,7 +33,6 @@ namespace FaffLatest.scripts.ui
 
 		public void ConnectSignals(Node gameStateManager)
 		{
-			GD.Print("Connected signals");
 			gameStateManager.Connect(SignalNames.Characters.SELECTED, this, SignalNames.Characters.SELECTED_METHOD);
 			gameStateManager.Connect(SignalNames.Characters.SELECTION_CLEARED, this, SignalNames.Characters.SELECTION_CLEARED_METHOD);
 		}
@@ -34,26 +40,36 @@ namespace FaffLatest.scripts.ui
 
 		private void GetChildrenNodes()
 		{
-			portrait = GetNode<TextureRect>("CharacterIcon");
-			healthbar = portrait.GetNode<HealthBar>("HealthBar");
-			movementText = portrait.GetNode<Label>("MovementIcon/MovementText");
-			name = portrait.GetNode<Label>("Name");
+			portrait = GetNode<TextureRect>(PORTRAIT_NODE_NAME);
+
+
+			attackDisplay = portrait.GetNode<IconWithText>(ATTACK_ICON_NODE_NAME);
+			healthbar = portrait.GetNode<HealthBar>(HEALTHBAR_NODE_NAME);
+			movementDisplay = portrait.GetNode<IconWithText>(MOVEMENT_ICON_NODE_NAME);
+			name = portrait.GetNode<Label>(NAME_NODE_NAME);
 		}
 
 
 		private void _On_Character_Selected(Character character)
-		{
-			selectedCharacter = character;
+        {
+            selectedCharacter = character;
 
-			healthbar.SetValuesToCharacterValues(character);
-			portrait.Texture = character.Stats.FaceIcon;
-			name.Text = character.Stats.CharacterName;
-			movementText.Text = $"{character.ProperBody.MovementStats.AmountLeftToMoveThisTurn}/{character.ProperBody.MovementStats.MaxMovementDistancePerTurn}";
-			
-			CallDeferred("show");
-		}
+			attackDisplay.SetLabelText(AttackIconText(character));
+            healthbar.SetValuesToCharacterValues(character);
+            movementDisplay.SetLabelText(MovementIconText(character));
+            portrait.Texture = character.Stats.FaceIcon;
+            name.Text = character.Stats.CharacterName;
 
-		private void _On_Character_SelectionCleared()
+            CallDeferred("show");
+        }
+
+        private static string MovementIconText(Character character)
+			=> $"{character.ProperBody.MovementStats.AmountLeftToMoveThisTurn}/{character.ProperBody.MovementStats.MaxMovementDistancePerTurn}";
+
+		private static string AttackIconText(Character character)
+			=> $"{character.Stats.EquippedWeapon.AttacksLeftThisTurn}/{character.Stats.EquippedWeapon.AttacksPerTurn}\n{character.Stats.EquippedWeapon.Name}";
+
+        private void _On_Character_SelectionCleared()
 		{
 			selectedCharacter = null;
 

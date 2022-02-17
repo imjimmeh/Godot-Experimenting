@@ -61,6 +61,7 @@ namespace FaffLatest.scripts.state
                 if (!character.Stats.IsPlayerCharacter)
                     AiSetup(character);
 
+				character.ResetTurnStats();					
             }
 
 			EmitSignal(SignalNames.Loading.CHARACTERS_SPAWNED);

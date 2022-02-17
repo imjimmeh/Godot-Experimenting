@@ -182,6 +182,7 @@ namespace FaffLatest.scripts.movement
             if (characterLocations.TryGetValue(character, out PointInfo oldLocationPointInfo))
             {
                 AStar.SetPointDisabled(oldLocationPointInfo.Id, false);
+                oldLocationPointInfo.SetOccupier(null);
                 characterLocations.Remove(character);
                 GD.Print($"Cleared character from location");
             }

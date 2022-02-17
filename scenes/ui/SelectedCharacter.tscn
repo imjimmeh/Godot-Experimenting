@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://art/ui/healthbar/midhealth.png" type="Texture" id=1]
 [ext_resource path="res://scripts/ui/inlevel/SelectedCharacter.cs" type="Script" id=2]
@@ -6,7 +6,10 @@
 [ext_resource path="res://scripts/ui/inlevel/HealthBar.cs" type="Script" id=4]
 [ext_resource path="res://art/ui/healthbar/lowhealth.png" type="Texture" id=5]
 [ext_resource path="res://resources/fonts/TitilliumWeb-s32.tres" type="DynamicFont" id=6]
-[ext_resource path="res://scenes/ui/ingame/icons/MovementIcon.tscn" type="PackedScene" id=7]
+[ext_resource path="res://scenes/ui/IconWithText.tscn" type="PackedScene" id=7]
+[ext_resource path="res://art/ui/moving_icon.png" type="Texture" id=8]
+[ext_resource path="res://art/ui/action.png" type="Texture" id=9]
+[ext_resource path="res://resources/fonts/TitilliumWeb-Black.ttf" type="DynamicFontData" id=10]
 
 [sub_resource type="Shader" id=2]
 code = "shader_type canvas_item;
@@ -26,11 +29,43 @@ resource_local_to_scene = true
 shader = SubResource( 2 )
 shader_param/colour = Vector3( 1, 1, 1 )
 
+[sub_resource type="DynamicFont" id=6]
+resource_local_to_scene = true
+size = 32
+use_filter = true
+font_data = ExtResource( 10 )
+
+[sub_resource type="Shader" id=4]
+code = "shader_type canvas_item;
+uniform vec3 colour;
+
+void fragment() {
+
+	COLOR = texture(TEXTURE, UV);
+	if(COLOR.a > 0.0)
+	{
+		COLOR.rgb = colour;
+	}
+}"
+
+[sub_resource type="ShaderMaterial" id=5]
+resource_local_to_scene = true
+shader = SubResource( 4 )
+shader_param/colour = Vector3( 1, 1, 1 )
+
+[sub_resource type="DynamicFont" id=7]
+resource_local_to_scene = true
+size = 32
+use_filter = true
+font_data = ExtResource( 10 )
+
 [node name="SelectedCharacter" type="Panel"]
-visible = false
 margin_right = 256.0
 margin_bottom = 256.0
 script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="CharacterIcon" type="TextureRect" parent="."]
 margin_left = 60.0
@@ -78,3 +113,18 @@ margin_bottom = 14.0
 
 [node name="MovementIcon" parent="CharacterIcon" instance=ExtResource( 7 )]
 material = SubResource( 3 )
+margin_left = 20.0
+margin_top = 145.0
+margin_right = 40.0
+margin_bottom = 165.0
+texture = ExtResource( 8 )
+FontToUse = SubResource( 6 )
+
+[node name="AttackIcon" parent="CharacterIcon" instance=ExtResource( 7 )]
+material = SubResource( 5 )
+margin_left = 20.0
+margin_top = 175.0
+margin_right = 40.0
+margin_bottom = 195.0
+texture = ExtResource( 9 )
+FontToUse = SubResource( 7 )

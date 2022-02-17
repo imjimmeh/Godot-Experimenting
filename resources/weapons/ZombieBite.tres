@@ -6,7 +6,7 @@
 resource_local_to_scene = true
 script = ExtResource( 1 )
 Name = "ZombieBite"
-MinDamage = 3
-MaxDamage = 5
-AmmoPerClip = -1
+MinDamage = 1
+MaxDamage = 4
+AttacksPerTurn = 1
 Range = 1

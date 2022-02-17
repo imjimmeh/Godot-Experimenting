@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FaffLatest.scripts.shared;
+﻿using FaffLatest.scripts.shared;
 using Godot;
+
 namespace FaffLatest.scripts.weapons
 {
     public class Weapon : Reference
@@ -13,13 +9,14 @@ namespace FaffLatest.scripts.weapons
         {
         }
 
-        public Weapon(string name = null, int minDamage = 0, int maxDamage = 0, int ammoPerClip = 0, int currentAmmo = 0, int range = 0)
+        public Weapon(string name = null, int minDamage = 0, int maxDamage = 0, int attacksPerTurn = 0, int range = 0)
         {
             Name = name;
             MinDamage = minDamage;
             MaxDamage = maxDamage;
-            AmmoPerClip = ammoPerClip;
-            CurrentAmmo = currentAmmo;
+            AttacksPerTurn = attacksPerTurn;
+            AttacksLeftThisTurn = AttacksPerTurn;
+            Range = range;
         }
 
         [Export]
@@ -32,19 +29,17 @@ namespace FaffLatest.scripts.weapons
         public int MaxDamage { get; private set; }
 
         [Export]
-        public int AmmoPerClip { get; private set; }
+        public int AttacksPerTurn { get; private set; }
 
         [Export]
         public int Range { get; private set; }
 
-        public int CurrentAmmo { get; private set; }
+        public int AttacksLeftThisTurn { get; private set; }
 
-        public bool CanAttack => IsMelee || HaveAmmoLeft;
-
-        public bool HaveAmmoLeft => CurrentAmmo > 0;
-
+        public bool CanAttack => HaveAttacksLeft;
+        public bool HaveAttacksLeft => AttacksLeftThisTurn > 0;
         public bool IsMelee => Range == 1;
-        public bool UsesAmmo => AmmoPerClip > 0;
+        public bool UsesAmmo => AttacksPerTurn > 0;
 
         public bool TryAttack(out int damage)
         {
@@ -62,9 +57,14 @@ namespace FaffLatest.scripts.weapons
 
         public int GetAttackDamage() => RandomHelper.RNG.RandiRange(MinDamage, MaxDamage);
 
-        private void DecreaseAmmo() => CurrentAmmo--;
+        public void ResetTurnStats()
+        {
+            AttacksLeftThisTurn = AttacksPerTurn;
+        }
 
-        private void SetAmmo(int ammo) => CurrentAmmo = ammo;
+        private void DecreaseAmmo() => AttacksLeftThisTurn--;
 
+        private void SetAmmo(int ammo) => AttacksLeftThisTurn = ammo;
+        
     }
 }

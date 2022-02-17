@@ -24,12 +24,10 @@ namespace FaffLatest.scripts.ui
 		[Export]
 		public float MaxWidthOfIcon { get; set; } = 32;
 
-
 		private TextureRect characterPortrait;
 		private Label characterName;
 		private Character character;
-		private Control movementIcon;
-
+		private IconWithText movementIcon;
 
 		private bool mouseIsOver = false;
 
@@ -72,7 +70,7 @@ namespace FaffLatest.scripts.ui
 		{
 			characterPortrait = GetNode<TextureRect>("Portrait");
 			characterName = GetNode<Label>("CharacterName");
-			movementIcon = GetNode<Control>("MovementIcon");
+			movementIcon = GetNode<IconWithText>("MovementIcon");
 		}
 
 		public void SetCharacter(Character character)

@@ -39,7 +39,7 @@ namespace FaffLatest.scripts.ui
 			ConnectSignals();
 
 			var viewportSize = GetViewport().GetVisibleRect().Size;
-			SelectedCharacter.RectPosition = new Vector2(viewportSize.x - 200, viewportSize.y - 200);
+			SelectedCharacter.RectPosition = new Vector2(viewportSize.x - 200, viewportSize.y - 250);
 
 			CharacterDamageTextFont.Size = DAMAGE_FONT_SIZE;
 			CharacterDamageTextFont.OutlineSize = 1;

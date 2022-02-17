@@ -13,7 +13,7 @@ namespace FaffLatest.scripts.combat
                 return false;
             }
 
-            var canAttack = receiver.Stats.EquippedWeapon.TryAttack(out int damage);
+            var canAttack = attacker.Stats.EquippedWeapon.TryAttack(out int damage);
 
             if(!canAttack)
                 return false;
