@@ -29,11 +29,9 @@ namespace FaffLatest.scripts.state
 		public PackedScene CharacterBase { get; private set; }
 
 		private Node aiCharactersRoot;
-		private Node aiManager;
 		private AStarNavigator astarNavigator;
 		private Node characterMovementPathManager;
 		private Node inputManager;
-		private Node gameStateManager;
 		private Node playerCharactersRoot;
 		private RandomNumberGenerator random;
 		private UIElementContainer ui;
@@ -75,7 +73,7 @@ namespace FaffLatest.scripts.state
 			var aicontroller = new AiCharacterController();
 			character.ProperBody.CallDeferred("add_child", aicontroller);
 			aicontroller.Name = "AiCharacterController";
-			aicontroller.Connect(nameof(AiCharacterController._AiCharacter_TurnFinished), aiManager, "_On_AiCharacter_TurnFinished");
+			aicontroller.Connect(nameof(AiCharacterController._AiCharacter_TurnFinished), AIManager.Instance, "_On_AiCharacter_TurnFinished");
         }
 
         public async Task<Character> SpawnCharacter(CharacterStats stats, Vector3 spawnPosition)
@@ -122,27 +120,32 @@ namespace FaffLatest.scripts.state
 			inputManager.Connect(SignalNames.Characters.MOVE_TO, pathMover,  SignalNames.Characters.MOVE_TO_METHOD);
 
 			character.Connect(SignalNames.Characters.RECEIVED_DAMAGE, ui, SignalNames.Characters.RECEIVED_DAMAGE_METHOD);
-			character.Connect("_Character_Disposing", gameStateManager, "_On_Character_Disposing");
+			character.Connect("_Character_Disposing", GameStateManager.Instance, "_On_Character_Disposing");
+			character.Connect("_Character_Disposing", AStarNavigator.Instance, "_On_Character_Disposing");
+			character.Connect("_Character_Disposing", CharacterManager.Instance, "_On_Character_Disposing");
+
+			if(!character.Stats.IsPlayerCharacter)
+				character.Connect("_Character_Disposing", AIManager.Instance, "_On_Character_Disposing");
+
 
 			newCharacterKinematicBody.Connect(SignalNames.Characters.CLICKED_ON, inputManager, SignalNames.Characters.CLICKED_ON_METHOD);
 			newCharacterKinematicBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, astarNavigator, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
 			newCharacterKinematicBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, characterMovementPathManager, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
-			newCharacterKinematicBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, gameStateManager, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
+			newCharacterKinematicBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, GameStateManager.Instance, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
 
 			var bodyMesh = newCharacterKinematicBody.GetNode("CSGBox");
 
-			gameStateManager.Connect(SignalNames.Characters.SELECTED, bodyMesh, SignalNames.Characters.SELECTED_METHOD);
-			gameStateManager.Connect(SignalNames.Characters.SELECTION_CLEARED, bodyMesh, SignalNames.Characters.SELECTION_CLEARED_METHOD);
+			GameStateManager.Instance.Connect(SignalNames.Characters.SELECTED, bodyMesh, SignalNames.Characters.SELECTED_METHOD);
+			GameStateManager.Instance.Connect(SignalNames.Characters.SELECTION_CLEARED, bodyMesh, SignalNames.Characters.SELECTION_CLEARED_METHOD);
+
 
 		}
 
 		private void FindNeededNodes()
 		{
 			aiCharactersRoot = GetNode(NodeReferences.BaseLevel.AI_ROOT);
-			aiManager = AIManager.Instance;
 			astarNavigator = AStarNavigator.Instance;
 			characterMovementPathManager = GetNode<CharacterMovementPathManager>(NodeReferences.BaseLevel.Effects.MOVEMENT_PATH);
-			gameStateManager = GetNode(NodeReferences.Systems.GAMESTATE_MANAGER);
 			inputManager = GetNode(NodeReferences.Systems.INPUT_MANAGER);
 			playerCharactersRoot = GetNode(NodeReferences.BaseLevel.PLAYER_ROOT);
 			ui = GetNode<UIElementContainer>(NodeReferences.BaseLevel.UI);

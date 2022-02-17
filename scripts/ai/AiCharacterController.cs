@@ -118,6 +118,10 @@ namespace FaffLatest.scripts.ai
             parent.ProperBody.MovementStats.SetCantMoveAnymoreThisTurn();
             isActiveCharacter = false;
             parent.IsActive = false;
+
+            currentAttackTarget = null;
+            currentMovementDestination = null;
+            
             EmitSignal(nameof(_AiCharacter_TurnFinished), parent);
         }
         

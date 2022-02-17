@@ -35,19 +35,6 @@ namespace FaffLatest.scripts.ai
             base._Ready();
         }
 
-        private void ConnectCharacterSignals()
-        {
-            foreach (var character in aiCharacters)
-            {
-                character.ProperBody
-                    .GetNode("AiCharacterController")
-                    .Connect("_AiCharacter_TurnFinished", this, "_On__AiCharacter_TurnFinished");
-
-                character.Connect(SignalNames.Characters.DISPOSING, this, SignalNames.Characters.DISPOSING_METHOD);
-            }
-        }
-
-
         public void SetAITurn(bool isTurn)
         {
             isOurTurn = isTurn;
@@ -140,14 +127,9 @@ namespace FaffLatest.scripts.ai
 
         private void _On_Character_Disposing(Character character)
         {
-            if (character is Character asChar)
+            if (IsCurrentlySelectedCharacter(character))
             {
-                if (IsCurrentlySelectedCharacter(character))
-                {
-                    GetNextCharacter();
-                }
-
-                aiCharacters.Remove(asChar);
+                GetNextCharacter();
             }
         }
 

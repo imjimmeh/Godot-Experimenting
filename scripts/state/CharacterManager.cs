@@ -42,6 +42,19 @@ namespace FaffLatest.scripts.state{
         public bool AddAiCharacter(Character character) => aiCharacters.Add(character);
 
         public bool AddPlayerCharacter(Character character) => playerCharacters.Add(character);
+        
+        
+        private void _On_Character_Disposing(Character character) => RemoveCharacter(character);
 
+        public bool RemoveCharacter(Character character) => character.Stats.IsPlayerCharacter switch
+        {
+            true => RemovePlayerCharacter(character),
+            false => RemoveAiCharacter(character)
+        };
+    
+        public bool RemoveAiCharacter(Character character) => aiCharacters.Remove(character);
+
+        public bool RemovePlayerCharacter(Character character) => playerCharacters.Remove(character);
+        
     }
 }

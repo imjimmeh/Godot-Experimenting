@@ -146,10 +146,7 @@ namespace FaffLatest.scripts.movement
 
         private bool OutsideWorldBounds(Vector3 v, float maxValue)
             => v.AnyValueLessThanZero() || v.AnyValueGreaterThanOrEqualToValue(maxValue);
-        
-        private bool OutsideMovementDistance(Vector3 start, Vector3 end, int movementDistanceLeft)
-		    => start.DistanceToIgnoringHeight(end) > movementDistanceLeft;
-            
+                    
         public void _On_Character_Created(Character character)
         {
             var point = AStar.GetClosestPoint(character.ProperBody.GlobalTransform.origin);
@@ -179,5 +176,20 @@ namespace FaffLatest.scripts.movement
                 characterLocations[character] = this.GetPointInfoForLocation(newPosition);
             }
         }
+
+        private void _On_Character_Disposing(Character character)
+        {
+            if (characterLocations.TryGetValue(character, out PointInfo oldLocationPointInfo))
+            {
+                AStar.SetPointDisabled(oldLocationPointInfo.Id, false);
+                characterLocations.Remove(character);
+                GD.Print($"Cleared character from location");
+            }
+            else
+            {
+                GD.Print($"Couldn't find chjaracter?");
+            }
+        }
+
     }
 }

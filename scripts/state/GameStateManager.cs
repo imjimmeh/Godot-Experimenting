@@ -10,6 +10,8 @@ namespace FaffLatest.scripts.state
 {
 	public class GameStateManager : Node
 	{
+		public static GameStateManager Instance;
+
 		private Character activeCharacter;
 
 		private Character selectedCharacter;
@@ -43,15 +45,15 @@ namespace FaffLatest.scripts.state
 
 		public override void _Ready()
 		{
-			base._Ready();
-
-            AStarNavigator = GetNode<AStarNavigator>("../AStarNavigator");
+			AStarNavigator = AStarNavigator.Instance;
             SpawnManager = GetNode<SpawnManager>("../SpawnManager");
 
-            var aiManager = GetNode<AIManager>("../AIManager");
 
             Connect(SignalNames.State.TURN_CHANGE, GetNode("../UIManager"), SignalNames.State.TURN_CHANGE_METHOD);
-            Connect(SignalNames.State.TURN_CHANGE, aiManager, SignalNames.State.TURN_CHANGE_METHOD);
+            Connect(SignalNames.State.TURN_CHANGE, AIManager.Instance, SignalNames.State.TURN_CHANGE_METHOD);
+
+			base._Ready();
+			Instance = this;
         }
 
         public void InitialiseMap()

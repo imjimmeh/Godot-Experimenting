@@ -10,11 +10,15 @@ namespace FaffLatest.scripts.combat
         {
             if (!IsWithinRange(attacker.ProperBody.GlobalTransform.origin, receiver.ProperBody.GlobalTransform.origin, attacker.Stats.EquippedWeapon.Range))
             {
-                GD.Print($"Out of range - we are at {attacker.ProperBody.Transform.origin}, receiver is at {receiver.ProperBody.GlobalTransform.origin}, our weapon range is {attacker.Stats.EquippedWeapon.Range}");
                 return false;
             }
 
-            receiver._On_Character_ReceiveDamage(receiver.Stats.EquippedWeapon.MinDamage, attacker);
+            var canAttack = receiver.Stats.EquippedWeapon.TryAttack(out int damage);
+
+            if(!canAttack)
+                return false;
+
+            receiver._On_Character_ReceiveDamage(damage, attacker);
             return true;
         }
 

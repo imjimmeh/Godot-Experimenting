@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FaffLatest.scripts.shared;
 using Godot;
 namespace FaffLatest.scripts.weapons
 {
@@ -22,7 +23,7 @@ namespace FaffLatest.scripts.weapons
         }
 
         [Export]
-        public string Name { get; private set;  }
+        public string Name { get; private set; }
 
         [Export]
         public int MinDamage { get; private set; }
@@ -38,8 +39,32 @@ namespace FaffLatest.scripts.weapons
 
         public int CurrentAmmo { get; private set; }
 
-        public bool CanShoot => CurrentAmmo > 0;
+        public bool CanAttack => IsMelee || HaveAmmoLeft;
+
+        public bool HaveAmmoLeft => CurrentAmmo > 0;
+
         public bool IsMelee => Range == 1;
         public bool UsesAmmo => AmmoPerClip > 0;
+
+        public bool TryAttack(out int damage)
+        {
+            damage = 0;
+             if (!CanAttack)
+                return false;
+
+            damage = GetAttackDamage();
+
+            if(!IsMelee)
+                DecreaseAmmo();
+                
+            return true;
+        }
+
+        public int GetAttackDamage() => RandomHelper.RNG.RandiRange(MinDamage, MaxDamage);
+
+        private void DecreaseAmmo() => CurrentAmmo--;
+
+        private void SetAmmo(int ammo) => CurrentAmmo = ammo;
+
     }
 }

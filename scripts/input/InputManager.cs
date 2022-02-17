@@ -77,9 +77,12 @@ namespace FaffLatest.scripts.input
 			}
 			else if(mouseButtonEvent.IsAttackCommand(gameStateManager, character))
 			{
-				gameStateManager
+				var canAttack = gameStateManager
 					.SelectedCharacter
 					.TryIssueAttackCommand(character);
+
+					if(!canAttack)
+						GD.Print("Cant attack - no ammo left?");
 			}
 		}
 
