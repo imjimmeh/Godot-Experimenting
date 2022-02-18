@@ -7,7 +7,7 @@ using Godot;
 
 namespace FaffLatest.scripts.movement
 {
-	public class MoveUpwards : Node
+	public class MovingUiControl : Node
 	{
 		[Export]
 		public float MovementSpeed { get; private set; } = 5;
@@ -20,45 +20,42 @@ namespace FaffLatest.scripts.movement
 
 		private Control parent;
 
-		private Vector2 targetDestination;
+		private Vector2 movementVector;
 
 		private Vector2 velocity;
 
-		public MoveUpwards()
+		public MovingUiControl()
 		{
 		}
 
-		public void SetParentField()
+		public override void _Ready()
 		{
-			parent = GetParent<Control>();
-			if (parent == null)
-				return;
-
-			SetTargetDestination();
+			base._Ready();
+			GetAndSetParent();
+		}
+		
+		public void GetAndSetParent(Control parent = null)
+		{
+			if (this.parent == null)
+			{
+				this.parent = parent ?? GetParent<Control>();
+			}
 		}
 
 		public override void _PhysicsProcess(float delta)
 		{
-			if (parent == null)
-			{
-				SetParentField();
-				return;
-			}
-
 			MoveTowardsTarget(delta);
 			base._Process(delta);
 		}
 
-		public void SetTargetDestination()
+		public void SetMovementVector(Vector2 movementVector)
 		{
-			targetDestination = new Vector2(parent.RectPosition.x, -2000);
+			this.movementVector = movementVector;
 		}
 
 		private void MoveTowardsTarget(float delta)
 		{
-			var direction = (targetDestination - parent.RectPosition).Normalized();
-			velocity += (direction * delta * MovementSpeed);
-
+			velocity += (movementVector * delta * MovementSpeed);
 			var target = parent.RectPosition + velocity;
 
 			parent.RectPosition = parent.RectPosition.LinearInterpolate(target, InterpWeight); 

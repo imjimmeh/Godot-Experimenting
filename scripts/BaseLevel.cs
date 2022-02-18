@@ -33,6 +33,10 @@ public class BaseLevel : Spatial
     {
         EmitSignal(nameof(_Level_Loaded));
         CharacterManager.Instance.Connect(nameof(CharacterManager._Faction_Killed), GameStateManager.Instance, $"_On{nameof(CharacterManager._Faction_Killed)}");
-        GetNode(NodeReferences.Systems.UI_MANAGER).CallDeferred("ShowUi");
+        var ui = GetNode(NodeReferences.Systems.UI_MANAGER);
+
+        ui.CallDeferred("ShowUi");
+        
+        UiLabelFactory.GenerateUiLabel("Testing", new FontValues(Colors.White, 12, Colors.Black, 3), new Vector3(5, 1, 5), null, 10);
     }
 }

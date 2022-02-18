@@ -103,7 +103,7 @@ namespace FaffLatest.scripts.ui
 			var parent = CharacterDamageTextScene.Instance();
 			var centererNode = parent.GetNode<WorldCenteredControl>("WorldCenteredControl");
 
-			centererNode.Initialise(position, camera);
+			centererNode.Initialise(parent as Control, position, camera);
 
 			EffectLabelsParent.AddChild(parent);
 

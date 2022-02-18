@@ -16,6 +16,11 @@ namespace FaffLatest.scripts.shared
 		private float secondsAlive = 0.0f;
 		private bool isDisposing = false;
 
+		public void SetSecondsToLive(float seconds)
+		{
+			SecondsToLive = seconds;
+		}
+		
 		public override void _Process(float delta)
 		{
 			base._Process(delta);
@@ -34,10 +39,9 @@ namespace FaffLatest.scripts.shared
 
 			if (secondsAlive > SecondsToLive)
 			{
-				var parent = GetParent().GetParent();
-				parent.QueueFree();
+				var parent = GetParent();
+				parent.CallDeferred("queue_free");
 				isDisposing = true;
-				parent.Dispose();
 			}
 		}
 	}

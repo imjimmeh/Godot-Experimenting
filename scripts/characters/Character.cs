@@ -15,7 +15,6 @@ namespace FaffLatest.scripts.characters
 		[Signal]
 		public delegate void _Character_ReceivedDamage(Node character, int damage, Node origin, bool killingBlow);
 
-		public Node Body;
 		public MovingKinematicBody ProperBody;
 
 		public Character()
@@ -46,8 +45,7 @@ namespace FaffLatest.scripts.characters
 
 		private void GetChildNodeFields()
 		{
-			Body = GetNode("KinematicBody");
-			ProperBody = Body as MovingKinematicBody;
+			ProperBody = GetNode<MovingKinematicBody>("KinematicBody");
 		}
 
 		public override void _Process(float delta)
@@ -67,22 +65,18 @@ namespace FaffLatest.scripts.characters
 
 		public void _On_Character_ReceiveDamage(int damage, Node origin)
 		{
-			GD.Print($"{Stats.CharacterName} received {damage} - initial health now at {Stats.CurrentHealth}");
 			Stats.AddHealth(-damage);
-
-			GD.Print($"{Stats.CurrentHealth} is new health");
 			EmitSignal(SignalNames.Characters.RECEIVED_DAMAGE, this, damage, origin, !IsAlive);
 
 			if (!IsAlive)
 			{
-				GD.Print($"Dead - dyin");
 				InitialiseDispose();
 			}
 		}
 
 		public void ConnectSignals()
 		{
-			Connect(SignalNames.Characters.READY, Body.GetNode("CharacterMovementGuide"), SignalNames.Characters.READY_METHOD);
+			Connect(SignalNames.Characters.READY, ProperBody.GetNode("CharacterMovementGuide"), SignalNames.Characters.READY_METHOD);
 			ProperBody.GetNode("PathMover").Connect(SignalNames.Characters.REACHED_PATH_PART, ProperBody.MovementStats, SignalNames.Characters.REACHED_PATH_PART_METHOD);
 			ProperBody.CharacterMesh.SetParent(this);
 		}

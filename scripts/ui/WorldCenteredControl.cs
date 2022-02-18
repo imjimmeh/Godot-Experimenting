@@ -22,13 +22,11 @@ namespace FaffLatest.scripts.ui
 		private bool isDisposing = false;
 
 
-		public void Initialise(Vector3 worldPositionToCenterOn, Camera camera)
+		public void Initialise(Control parent, Vector3 worldPositionToCenterOn, Camera camera)
 		{
+			this.parentControl = parent;
 			this.worldPositionToCenterOn = worldPositionToCenterOn;
 			this.camera = camera;
-			this.parentControl = GetParent<Control>();
-
-			this.parentControl.Connect("tree_exiting", this, nameof(DisposeThis));
 		}
 
 		public void SetPosition(Vector3 position)

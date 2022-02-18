@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://scenes/ui/ingame/LabelWithTimeToLive.tscn" type="PackedScene" id=1]
-[ext_resource path="res://scripts/movement/MoveUpwards.cs" type="Script" id=2]
+[ext_resource path="res://scripts/movement/MovingUiControl.cs" type="Script" id=2]
 [ext_resource path="res://scripts/ui/WorldCenteredControl.cs" type="Script" id=3]
 [ext_resource path="res://scripts/shared/ShrinkingNode.cs" type="Script" id=4]
 

@@ -43,7 +43,7 @@ namespace FaffLatest.scripts.ui{
             
             worldCenterer = healthBar.GetNode<WorldCenteredControl>("WorldCenteredControl");
 
-            worldCenterer.Initialise(PositionToDisplay, camera);
+            worldCenterer.Initialise(healthBar, PositionToDisplay, camera);
             charactersLastPosition = character.ProperBody.GlobalTransform.origin;
             healthBar.RectSize = new Vector2(80, 20);
             
