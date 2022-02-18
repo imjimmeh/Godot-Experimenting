@@ -24,12 +24,12 @@ namespace FaffLatest.scripts.ui{
 
         public override void _Process(float delta)
         {
-            bool characterHasMoved = charactersLastPosition != parent.ProperBody.GlobalTransform.origin;
+            bool characterHasMoved = charactersLastPosition != parent.Body.GlobalTransform.origin;
 
             if (characterHasMoved)
             {
                 worldCenterer.SetPosition(PositionToDisplay);
-                charactersLastPosition = parent.ProperBody.GlobalTransform.origin;
+                charactersLastPosition = parent.Body.GlobalTransform.origin;
             }
         }
 
@@ -44,7 +44,7 @@ namespace FaffLatest.scripts.ui{
             worldCenterer = healthBar.GetNode<WorldCenteredControl>("WorldCenteredControl");
 
             worldCenterer.Initialise(healthBar, PositionToDisplay, camera);
-            charactersLastPosition = character.ProperBody.GlobalTransform.origin;
+            charactersLastPosition = character.Body.GlobalTransform.origin;
             healthBar.RectSize = new Vector2(80, 20);
             
             healthBar.CallDeferred("show");
@@ -52,7 +52,7 @@ namespace FaffLatest.scripts.ui{
             _On_Character_ReceivedDamage(parent, 0, null, false);
         }
         
-        private Vector3 PositionToDisplay => parent.ProperBody.GlobalTransform.origin;
+        private Vector3 PositionToDisplay => parent.Body.GlobalTransform.origin;
 
         private void _On_Character_ReceivedDamage(Node character, int damage, Node origin, bool killingBlow)
         {

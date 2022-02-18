@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using FaffLatest.scripts.attacks;
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.movement;
 using FaffLatest.scripts.shared;
@@ -68,12 +69,12 @@ namespace FaffLatest.scripts.ai
 
         private bool TurnFinished => AiCharacterFinishedMovement && !parent.Stats.EquippedWeapon.CanAttack;
 
-        private bool AiCharacterFinishedMovement => parent.ProperBody.MovementStats.HasMovedThisTurn && pathMover.Path == null;
+        private bool AiCharacterFinishedMovement => parent.Body.MovementStats.HasMovedThisTurn && pathMover.Path == null;
 
-        private bool ShouldGetMovementDestination => !HaveMovementTarget && !parent.ProperBody.MovementStats.HasMovedThisTurn;
+        private bool ShouldGetMovementDestination => !HaveMovementTarget && !parent.Body.MovementStats.HasMovedThisTurn;
 
         private bool ShouldGetMovementPath =>
-            HaveMovementTarget && !parent.ProperBody.MovementStats.HasMovedThisTurn && pathMover.Path == null;
+            HaveMovementTarget && !parent.Body.MovementStats.HasMovedThisTurn && pathMover.Path == null;
 
         private bool IsAttackPhase => AiCharacterFinishedMovement && parent.Stats.EquippedWeapon.CanAttack;
 
@@ -82,36 +83,17 @@ namespace FaffLatest.scripts.ai
             isActiveCharacter = true;
         }
 
-        private void AttackTarget()
+        private async void AttackTarget()
         {
             GetAttackTargetAndPosition();
 
             if (!HaveAttackTarget)
                 EndTurn();
 
-            var attackResult = parent.TryAttackTarget(currentAttackTarget);
-            var shouldEndTurn = ShouldEndTurnAfterAttack(attackResult);
+            var successfulAttack = await AttackHelpers.TryAttack(parent, currentAttackTarget);
 
-            if(shouldEndTurn)
+            if(!successfulAttack)
                 EndTurn();
-        }
-
-        private bool ShouldEndTurnAfterAttack(AttackResult result)
-        {
-            switch(result)
-            {
-                case weapons.AttackResult.OutOfRange:
-                {
-                    parent.Stats.EquippedWeapon.EndTurn();
-                    return true;
-                }
-                case AttackResult.OutOfAttacksForTurn:
-                {
-                    return true;
-                }
-            }
-
-            return false;        
         }
 
         private Vector3 GetAttackTargetAndPosition()
@@ -124,22 +106,22 @@ namespace FaffLatest.scripts.ai
         private void GetMovementTarget()
         {
             var targetPosition = GetAttackTargetAndPosition();
-            var distance = parent.ProperBody.GlobalTransform.origin.DistanceToIgnoringHeight(targetPosition);
+            var distance = parent.Body.GlobalTransform.origin.DistanceToIgnoringHeight(targetPosition);
 
             if (Mathf.IsZeroApprox(distance))
             {
-                parent.ProperBody.MovementStats.SetCantMoveAnymoreThisTurn();
+                parent.Body.MovementStats.EndMovementTurn();
                 return;
             }
 
             var foundEmptyPosition = AStarNavigator.Instance.TryGetNearestEmptyPointToLocation(
                 target: targetPosition,
-                origin: parent.ProperBody.GlobalTransform.origin,
+                origin: parent.Body.GlobalTransform.origin,
                 out Vector3 foundPoint);
 
             if (!foundEmptyPosition)
             {
-                parent.ProperBody.MovementStats.SetCantMoveAnymoreThisTurn();
+                parent.Body.MovementStats.EndMovementTurn();
                 return;
             }
             else
@@ -151,13 +133,13 @@ namespace FaffLatest.scripts.ai
         private void GetPathToMovementDestination()
         {
             var result = AStarNavigator.Instance.TryGetMovementPath(
-            start: parent.ProperBody.GlobalTransform.origin,
+            start: parent.Body.GlobalTransform.origin,
             end: currentMovementDestination.Value,
             character: parent);
 
             if (result == null || !result.CanFindPath)
             {
-                parent.ProperBody.MovementStats.SetCantMoveAnymoreThisTurn();
+                parent.Body.MovementStats.EndMovementTurn();
                 return;
             }
 
@@ -168,7 +150,7 @@ namespace FaffLatest.scripts.ai
         private void EndTurn()
         {
             parent.Stats.EquippedWeapon.EndTurn();
-            parent.ProperBody.MovementStats.SetCantMoveAnymoreThisTurn();
+            parent.Body.MovementStats.EndMovementTurn();
             isActiveCharacter = false;
             parent.IsActive = false;
 

@@ -74,7 +74,7 @@ namespace FaffLatest.scripts.movement
         public void StopRotating() => CurrentRotationSpeed = 0.0f;
         public void StopMoving() => Velocity = Vector3.Zero;
 
-        public void SetCantMoveAnymoreThisTurn()
+        public void EndMovementTurn()
         {
             AmountMovedThisTurn = MaxMovementDistancePerTurn;
         }

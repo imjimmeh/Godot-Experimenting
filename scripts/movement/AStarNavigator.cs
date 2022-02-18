@@ -47,7 +47,7 @@ namespace FaffLatest.scripts.movement
             => this.TryGetNearestEmptyPointToLocationWithLoop(target, origin, 5, out point);
 
 
-        public GetMovementPathResult TryGetMovementPath(Vector3 start, Vector3 end, Character character) => TryGetMovementPath(start, end, character.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
+        public GetMovementPathResult TryGetMovementPath(Vector3 start, Vector3 end, Character character) => TryGetMovementPath(start, end, character.Body.MovementStats.AmountLeftToMoveThisTurn);
 
         public GetMovementPathResult TryGetMovementPath(Vector3 start, Vector3 end, int movementDistance)
         {
@@ -78,9 +78,9 @@ namespace FaffLatest.scripts.movement
                     
         public void _On_Character_Created(Character character)
         {
-            var point = AStar.GetClosestPoint(character.ProperBody.GlobalTransform.origin);
+            var point = AStar.GetClosestPoint(character.Body.GlobalTransform.origin);
             AStar.SetPointDisabled(point);
-            this.CreatePointInfos(character, character.ProperBody);
+            this.CreatePointInfos(character, character.Body);
         }
 
         private void _On_Character_FinishedMoving(Character character, Vector3 newPosition)

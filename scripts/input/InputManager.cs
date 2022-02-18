@@ -1,3 +1,4 @@
+using FaffLatest.scripts.attacks;
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.combat;
 using FaffLatest.scripts.constants;
@@ -55,7 +56,7 @@ namespace FaffLatest.scripts.input
 
             if (gameStateManager.HaveACharacterSelected && character == gameStateManager.SelectedCharacter)
             {
-				EmitSignal(SignalNames.Cameras.MOVE_TO_POSITION, gameStateManager.SelectedCharacter.ProperBody.GlobalTransform.origin);
+				EmitSignal(SignalNames.Cameras.MOVE_TO_POSITION, gameStateManager.SelectedCharacter.Body.GlobalTransform.origin);
             }
             else
             {
@@ -77,20 +78,7 @@ namespace FaffLatest.scripts.input
 			}
 			else if(mouseButtonEvent.IsAttackCommand(gameStateManager, character))
             {
-                var targetCheck = gameStateManager.SelectedCharacter.CanAttackTarget(character);
-                var canAttack = ProceedWithAttack(character, targetCheck);
-
-				if(!canAttack)
-					return;
-
-                if (character.ProperBody.MovementStats.AmountLeftToMoveThisTurn > 0)
-                {
-                    await ConfirmMovementLeft(character);
-                }
-
-                var attackResult = gameStateManager
-                    .SelectedCharacter
-                    .TryAttackTarget(character);
+				await AttackHelpers.TryAttack(gameStateManager.SelectedCharacter, character);
             }
         }
 
@@ -100,7 +88,7 @@ namespace FaffLatest.scripts.input
 
             if (!proceed)
             {
-                UIManager.Instance.SpawnDamageLabel(character.ProperBody.GlobalTransform.origin, "Cancelling!");
+                UIManager.Instance.SpawnDamageLabel(character.Body.GlobalTransform.origin, "Cancelling!");
             }
         }
 
@@ -110,13 +98,13 @@ namespace FaffLatest.scripts.input
             {
                 case weapons.AttackResult.OutOfRange:
                     {
-                        UIManager.Instance.SpawnDamageLabel(character.ProperBody.GlobalTransform.origin, "Out of range!");
+                        UIManager.Instance.SpawnDamageLabel(character.Body.GlobalTransform.origin, "Out of range!");
                         return false;
                     }
 
                 case weapons.AttackResult.OutOfAttacksForTurn:
                     {
-                        UIManager.Instance.SpawnDamageLabel(character.ProperBody.GlobalTransform.origin, "Out of attacks!");
+                        UIManager.Instance.SpawnDamageLabel(character.Body.GlobalTransform.origin, "Out of attacks!");
                         return false;
                     }
             }
@@ -160,7 +148,7 @@ namespace FaffLatest.scripts.input
 
 		private void _On_Character_MoveOrder(Vector3 position)
 		{
-			var canMove = gameStateManager?.SelectedCharacter?.ProperBody.MovementStats.CanMove;
+			var canMove = gameStateManager?.SelectedCharacter?.Body.MovementStats.CanMove;
 
 			if (canMove.HasValue && canMove.Value)
 			{
@@ -171,11 +159,11 @@ namespace FaffLatest.scripts.input
 		private void IssueMoveOrder(Vector3 position)
 		{		
             position = position.Round();
-            position = position.CopyYValue(gameStateManager.SelectedCharacter.ProperBody.Transform.origin);
-            position = GetTargetPositionClampedByMovementDistance(position, gameStateManager.SelectedCharacter.ProperBody);
+            position = position.CopyYValue(gameStateManager.SelectedCharacter.Body.Transform.origin);
+            position = GetTargetPositionClampedByMovementDistance(position, gameStateManager.SelectedCharacter.Body);
 
             var result = aStarNavigator.TryGetMovementPath(
-				start: gameStateManager.SelectedCharacter.ProperBody.Transform.origin, 
+				start: gameStateManager.SelectedCharacter.Body.Transform.origin, 
 				end: position, 
 				character: gameStateManager.SelectedCharacter); 
 
@@ -191,9 +179,9 @@ namespace FaffLatest.scripts.input
         {
             var distance = (position - body.Transform.origin).Length();
 
-            if (distance > gameStateManager.SelectedCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn)
+            if (distance > gameStateManager.SelectedCharacter.Body.MovementStats.AmountLeftToMoveThisTurn)
             {
-				position = body.Transform.origin.MoveToward(position, gameStateManager.SelectedCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn);
+				position = body.Transform.origin.MoveToward(position, gameStateManager.SelectedCharacter.Body.MovementStats.AmountLeftToMoveThisTurn);
                 position = position.Round();
             }
 

@@ -52,7 +52,7 @@ public class ColouredBox : CSGBox
         if (parent.Stats.IsPlayerCharacter == character.Stats.IsPlayerCharacter)
             return;
 
-        var distance = character.ProperBody.GlobalTransform.origin.DistanceToIgnoringHeight(parent.ProperBody.GlobalTransform.origin);
+        var distance = character.Body.GlobalTransform.origin.DistanceToIgnoringHeight(parent.Body.GlobalTransform.origin);
 
         var isInRange = character.Stats.EquippedWeapon.WithinAttackRange(distance);
 

@@ -21,7 +21,6 @@ namespace FaffLatest.scripts.ui
 
 		private bool isDisposing = false;
 
-
 		public void Initialise(Control parent, Vector3 worldPositionToCenterOn, Camera camera)
 		{
 			this.parentControl = parent;

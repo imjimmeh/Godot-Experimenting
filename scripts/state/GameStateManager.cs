@@ -39,7 +39,7 @@ namespace FaffLatest.scripts.state
 
 		public bool SelectedCharacterCanUseAction => HaveACharacterSelected && !SelectedCharacter.Stats.HasUsedActionThisTurn;
 
-		public bool SelectedCharacterCanMove => HaveACharacterSelected && !SelectedCharacter.ProperBody.MovementStats.CanMove;
+		public bool SelectedCharacterCanMove => HaveACharacterSelected && !SelectedCharacter.Body.MovementStats.CanMove;
 
 		public bool IsPlayerTurn => CurrentTurn == Faction.PLAYER;
 
@@ -159,7 +159,7 @@ namespace FaffLatest.scripts.state
             {
                 var asCharacter = characters[x] as Character;
 
-                if (asCharacter.ProperBody.MovementStats.CanMove)
+                if (asCharacter.Body.MovementStats.CanMove)
 					return false;
             }
 

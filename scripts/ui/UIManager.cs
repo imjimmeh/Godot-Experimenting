@@ -81,11 +81,19 @@ namespace FaffLatest.scripts.ui
         }
 
         private void GenerateNewTurnText(string whoseTurn)
-        {
-            var screenCenter = this.GetCenterOfScreen();
-            var (parent, label) = UiLabelFactory.GenerateUiLabel($"{whoseTurn}" + "\n" + "Turn", new FontValues(Colors.Red, 32, Colors.Black, 3), null, null, 3);
+        {   
+            var text = ($"{whoseTurn}" + "\n" + "Turn");
             var labelSize = whoseTurn.Length * 16;
-            parent.RectPosition = new Vector2(screenCenter.x - labelSize, screenCenter.y - 32);
+
+            var screenCenter = this.GetCenterOfScreen();
+            var position = new Vector2(screenCenter.x - labelSize, screenCenter.y - 32);
+
+            var (parent, label) = UiLabelFactory.GenerateUiLabel(text: text,
+                                                                values: new FontValues(Colors.Red, 32, Colors.Black, 3),
+                                                                position: position,
+                                                                centerOnWorldPosition: null, 
+                                                                movementVector: null, 
+                                                                timeToLive: 2);
             label.Align = Label.AlignEnum.Center;
         }
 
@@ -109,11 +117,11 @@ namespace FaffLatest.scripts.ui
         private ConfirmationDialog BuildConfirmationDialog(Character character)
         {
             var dialogTextBuilder = new StringBuilder();
-            dialogTextBuilder.AppendLine($"{character.Stats.CharacterName} still has {character.ProperBody.MovementStats.AmountLeftToMoveThisTurn} moves left this turn");
+            dialogTextBuilder.AppendLine($"{character.Stats.CharacterName} still has {character.Body.MovementStats.AmountLeftToMoveThisTurn} moves left this turn");
             dialogTextBuilder.AppendLine("If you attack you will be unable to move for the rest of the turn - are you sure?");
             elementContainer.ConfirmationDialog.DialogText = dialogTextBuilder.ToString();
             elementContainer.ConfirmationDialog.WindowTitle = "Confirm Attack";
-            elementContainer.ConfirmationDialog.Popup_(new Rect2(GetViewport().GetCenterOfScreen(), GetViewport().GetCenterOfScreen()));
+            elementContainer.ConfirmationDialog.Popup_(new Rect2(GetViewport().GetCenterOfScreen(), GetViewport().GetCenterOfScreen()/2));
 
             if(!signalsConnected)
             {
@@ -132,18 +140,14 @@ namespace FaffLatest.scripts.ui
 			if(camera == null)
 				camera = GetNode<Camera>(NodeReferences.BaseLevel.Cameras.MAIN_CAMERA);
 
-			SpawnDamageLabel(asChar.ProperBody.GlobalTransform.origin, damage.ToString());
-
-			if (killingBlow)
-            {
-				SpawnDamageLabel(asChar.ProperBody.GlobalTransform.origin, "KILLED");
-            }
+			SpawnDamageLabel(asChar.Body.GlobalTransform.origin, damage.ToString());
 		}
 
 		public Control SpawnDamageLabel(Vector3 position, string text)
 		{
             var (parent, label) = UiLabelFactory.GenerateUiLabel(text: text,
-																values: new FontValues(Colors.Red, 16, Colors.Black, 1), 
+																values: new FontValues(Colors.Red, 16, Colors.Black, 1),
+                                                                position: camera.UnprojectPosition(position),
 																centerOnWorldPosition: position, 
 																movementVector: new Vector2(0, -1), 
 																timeToLive: 3);
@@ -153,13 +157,14 @@ namespace FaffLatest.scripts.ui
 
 		public Control SpawnBigTemporaryText(Vector2 position, string text)
 		{
+            position = new Vector2(position.x - ((6 * BIG_FONT_SIZE) / 2), position.y);
+
 			var (parent, label) = UiLabelFactory.GenerateUiLabel(text: text,
 																values: new FontValues(Colors.Red, 16, Colors.Black, 1), 
+                                                                position: position,
 																centerOnWorldPosition: null, 
 																movementVector: new Vector2(0, -1), 
 																timeToLive: 3);
-
-			label.RectPosition = new Vector2(position.x - ((6 * BIG_FONT_SIZE) / 2), position.y);
 
 			return label;
 		}

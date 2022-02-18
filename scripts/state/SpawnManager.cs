@@ -71,7 +71,7 @@ namespace FaffLatest.scripts.state
             character.Stats.EquippedWeapon = ZombieWeapon;
 			
 			var aicontroller = new AiCharacterController();
-			character.ProperBody.CallDeferred("add_child", aicontroller);
+			character.Body.CallDeferred("add_child", aicontroller);
 			aicontroller.Name = "AiCharacterController";
 			aicontroller.Connect(nameof(AiCharacterController._AiCharacter_TurnFinished), AIManager.Instance, "_On_AiCharacter_TurnFinished");
         }
@@ -101,7 +101,7 @@ namespace FaffLatest.scripts.state
         {
             await ToSignal(character, "ready");
 
-            var body = character.ProperBody;
+            var body = character.Body;
             SetPosition(spawnPosition, body);
             AddCharacterSignals(body, character);
             astarNavigator._On_Character_Created(character);

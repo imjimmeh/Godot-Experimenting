@@ -64,7 +64,7 @@ namespace FaffLatest.scripts.ui
         }
 
         private static string MovementIconText(Character character)
-			=> $"{character.ProperBody.MovementStats.AmountLeftToMoveThisTurn}/{character.ProperBody.MovementStats.MaxMovementDistancePerTurn}";
+			=> $"{character.Body.MovementStats.AmountLeftToMoveThisTurn}/{character.Body.MovementStats.MaxMovementDistancePerTurn}";
 
 		private static string AttackIconText(Character character)
 			=> $"{character.Stats.EquippedWeapon.AttacksLeftThisTurn}/{character.Stats.EquippedWeapon.AttacksPerTurn}\n{character.Stats.EquippedWeapon.Name}";

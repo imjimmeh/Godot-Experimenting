@@ -56,6 +56,8 @@ namespace FaffLatest.scripts.ui
 			Connect("mouse_exited", this, "_MouseExited");
 
 			GetNode(NodeReferences.Systems.GAMESTATE_MANAGER).Connect(SignalNames.State.TURN_CHANGE, this, SignalNames.State.TURN_CHANGE_METHOD);
+
+			characterPortrait.HintTooltip = characterName.Text;
 		}
 
 		private void InitialiseFont()
@@ -76,7 +78,7 @@ namespace FaffLatest.scripts.ui
 		public void SetCharacter(Character character)
 		{
 			this.character = character;
-			this.character.ProperBody.Connect(SignalNames.Characters.MOVEMENT_FINISHED, this, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
+			this.character.Body.Connect(SignalNames.Characters.MOVEMENT_FINISHED, this, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
 		}
 
 		public override void _Process(float delta)
@@ -139,7 +141,7 @@ namespace FaffLatest.scripts.ui
 
 			if(character is Character asChar)
 			{
-				if (!asChar.ProperBody.MovementStats.CanMove)
+				if (!asChar.Body.MovementStats.CanMove)
 				{
 					movementIcon.CallDeferred("hide");
 				}
@@ -148,7 +150,7 @@ namespace FaffLatest.scripts.ui
 
 		private void _On_Turn_Changed(string whoseTurn)
 		{
-			if(character.ProperBody.MovementStats.CanMove)
+			if(character.Body.MovementStats.CanMove)
 			{
 				movementIcon.CallDeferred("show");
 			}

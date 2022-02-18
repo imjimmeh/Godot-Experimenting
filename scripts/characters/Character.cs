@@ -15,7 +15,7 @@ namespace FaffLatest.scripts.characters
 		[Signal]
 		public delegate void _Character_ReceivedDamage(Node character, int damage, Node origin, bool killingBlow);
 
-		public MovingKinematicBody ProperBody;
+		public MovingKinematicBody Body;
 
 		public Character()
 		{
@@ -38,14 +38,14 @@ namespace FaffLatest.scripts.characters
 
 			AddToGroup(GroupNames.CHARACTER);
 			ConnectSignals();
-			ProperBody.CharacterMesh.SetColour(Stats);
+			Body.CharacterMesh.SetColour(Stats);
 
 			EmitSignal(SignalNames.Characters.READY, this);
 		}
 
 		private void GetChildNodeFields()
 		{
-			ProperBody = GetNode<MovingKinematicBody>("KinematicBody");
+			Body = GetNode<MovingKinematicBody>("KinematicBody");
 		}
 
 		public override void _Process(float delta)
@@ -61,7 +61,7 @@ namespace FaffLatest.scripts.characters
 			}
 		}
 
-		private bool IsSetActiveButFinishedTurn() => IsActive && ProperBody.MovementStats.AmountLeftToMoveThisTurn == 0;
+		private bool IsSetActiveButFinishedTurn() => IsActive && Body.MovementStats.AmountLeftToMoveThisTurn == 0;
 
 		public void _On_Character_ReceiveDamage(int damage, Node origin)
 		{
@@ -76,9 +76,9 @@ namespace FaffLatest.scripts.characters
 
 		public void ConnectSignals()
 		{
-			Connect(SignalNames.Characters.READY, ProperBody.GetNode("CharacterMovementGuide"), SignalNames.Characters.READY_METHOD);
-			ProperBody.GetNode("PathMover").Connect(SignalNames.Characters.REACHED_PATH_PART, ProperBody.MovementStats, SignalNames.Characters.REACHED_PATH_PART_METHOD);
-			ProperBody.CharacterMesh.SetParent(this);
+			Connect(SignalNames.Characters.READY, Body.GetNode("CharacterMovementGuide"), SignalNames.Characters.READY_METHOD);
+			Body.GetNode("PathMover").Connect(SignalNames.Characters.REACHED_PATH_PART, Body.MovementStats, SignalNames.Characters.REACHED_PATH_PART_METHOD);
+			Body.CharacterMesh.SetParent(this);
 		}
 
 		public AttackResult TryAttackTarget(Character target)
@@ -112,7 +112,7 @@ namespace FaffLatest.scripts.characters
 		}
 		public void ResetTurnStats()
 		{
-			ProperBody.MovementStats.ResetMovementForTurn();
+			Body.MovementStats.ResetMovementForTurn();
 			Stats.EquippedWeapon.ResetTurnStats();
 			IsActive = false;
 		}

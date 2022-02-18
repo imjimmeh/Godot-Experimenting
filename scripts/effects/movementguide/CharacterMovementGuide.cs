@@ -53,7 +53,7 @@ namespace FaffLatest.scripts.effects.movementguide
 
         private void GetBody()
         {
-            body = parent.ProperBody;
+            body = parent.Body;
         }
 
         private void ConnectSignals()
@@ -91,7 +91,7 @@ namespace FaffLatest.scripts.effects.movementguide
 
         private void ShowCells()
         {
-            var amountLeftToMoveThisTurn = parent.ProperBody.MovementStats.AmountLeftToMoveThisTurn;
+            var amountLeftToMoveThisTurn = parent.Body.MovementStats.AmountLeftToMoveThisTurn;
             
             foreach(var pathPart in existingMovementGuide)
             {

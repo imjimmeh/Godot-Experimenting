@@ -36,7 +36,5 @@ public class BaseLevel : Spatial
         var ui = GetNode(NodeReferences.Systems.UI_MANAGER);
 
         ui.CallDeferred("ShowUi");
-        
-        UiLabelFactory.GenerateUiLabel("Testing", new FontValues(Colors.White, 12, Colors.Black, 3), new Vector3(5, 1, 5), null, 10);
     }
 }

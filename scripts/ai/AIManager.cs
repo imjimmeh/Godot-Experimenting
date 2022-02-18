@@ -79,9 +79,9 @@ namespace FaffLatest.scripts.ai
 
         private void ClearCharacterForTurn()
         {
-            while (currentlyActioningCharacter.ProperBody.MovementStats.AmountLeftToMoveThisTurn > 0)
+            while (currentlyActioningCharacter.Body.MovementStats.AmountLeftToMoveThisTurn > 0)
             {
-                currentlyActioningCharacter.ProperBody.MovementStats.IncreaseAmountMovedThisTurn();
+                currentlyActioningCharacter.Body.MovementStats.IncreaseAmountMovedThisTurn();
             }
 
             ClearCurrentlyActiveCharacter();
@@ -110,7 +110,7 @@ namespace FaffLatest.scripts.ai
             }
 
             currentlyActioningCharacter = aiCharacters.ElementAt(currentArrayPos);
-            characterController = currentlyActioningCharacter.ProperBody.GetNode<AiCharacterController>("AiCharacterController");
+            characterController = currentlyActioningCharacter.Body.GetNode<AiCharacterController>("AiCharacterController");
             currentArrayPos++;
 
             if(currentlyActioningCharacter != null)

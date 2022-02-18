@@ -10,7 +10,7 @@ namespace FaffLatest.scripts.effects.movementguide
     {
         public static void CreateMeshes(this CharacterMovementGuide cmg, ref Dictionary<Vector2, CharacterMovementGuideCell> movementGuide, Character character)
         {
-            var max = character.ProperBody.MovementStats.MaxMovementDistancePerTurn;
+            var max = character.Body.MovementStats.MaxMovementDistancePerTurn;
             var min = max * -1;
 
             movementGuide = new Dictionary<Vector2, CharacterMovementGuideCell>();
@@ -28,7 +28,7 @@ namespace FaffLatest.scripts.effects.movementguide
         {
             var currentVector = new Vector3(x: x, y: 0, z: y);
 
-            bool withinMovementDistance = character.ProperBody.MovementStats.IsCellWithinMovementDistance(Vector3.Zero, currentVector);
+            bool withinMovementDistance = character.Body.MovementStats.IsCellWithinMovementDistance(Vector3.Zero, currentVector);
 
             if (!withinMovementDistance)
                 return;
@@ -43,7 +43,7 @@ namespace FaffLatest.scripts.effects.movementguide
             cmg.ConnectCellSignals(mesh)
                 .AddCellToArray(mesh, a, b);
 
-            mesh.SetParentCharacterTransform(character.ProperBody);
+            mesh.SetParentCharacterTransform(character.Body);
             mesh.CallDeferred("show");
             
             cmg.Connect(SignalNames.MovementGuide.CELL_CALCULATE_VISIBLITY, mesh, nameof(CharacterMovementGuideCell.CalculateVisiblity));       

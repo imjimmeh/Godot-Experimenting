@@ -8,6 +8,7 @@
 margin_right = 171.0
 margin_bottom = 36.0
 rect_scale = Vector2( 0.8, 0.5 )
+mouse_filter = 2
 max_value = 0.0
 texture_progress = ExtResource( 3 )
 tint_progress = Color( 0, 1, 0, 1 )
