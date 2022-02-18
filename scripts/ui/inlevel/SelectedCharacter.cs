@@ -73,8 +73,6 @@ namespace FaffLatest.scripts.ui
 		{
 			selectedCharacter = null;
 
-			healthbar.CharacterSelectionCleared();
-
 			CallDeferred("hide");
 		}
 

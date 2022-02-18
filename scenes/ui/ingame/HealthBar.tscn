@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://scripts/ui/inlevel/HealthBar.cs" type="Script" id=1]
+[ext_resource path="res://resources/fonts/TitilliumWeb-s32.tres" type="DynamicFont" id=2]
+[ext_resource path="res://art/ui/healthbar/midhealth.png" type="Texture" id=3]
+
+[node name="HealthBar" type="TextureProgress"]
+margin_right = 171.0
+margin_bottom = 36.0
+rect_scale = Vector2( 0.8, 0.5 )
+max_value = 0.0
+texture_progress = ExtResource( 3 )
+tint_progress = Color( 0, 1, 0, 1 )
+nine_patch_stretch = true
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+HealthTextFont = ExtResource( 2 )
+
+[node name="HealthText" type="Label" parent="."]
+margin_left = 50.0
+margin_right = 90.0
+margin_bottom = 14.0
