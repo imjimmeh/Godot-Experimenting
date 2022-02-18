@@ -100,8 +100,10 @@ namespace FaffLatest.scripts.ui
 
 		public Control SpawnDamageLabel(Vector3 position, string text)
 		{
-			var parent = CharacterDamageTextScene.Instance<WorldCenteredControl>();
-			parent.Initialise(position, camera);
+			var parent = CharacterDamageTextScene.Instance();
+			var centererNode = parent.GetNode<WorldCenteredControl>("WorldCenteredControl");
+
+			centererNode.Initialise(position, camera);
 
 			EffectLabelsParent.AddChild(parent);
 

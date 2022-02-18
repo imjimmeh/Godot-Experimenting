@@ -11,4 +11,4 @@ MaxRotationSpeed = 1.0
 MaxMovementSpeed = 0.3
 Velocity = Vector3( 0, 0, 0 )
 Acceleration = 0.4
-MaxMovementDistancePerTurn = 15
+MaxMovementDistancePerTurn = 10

@@ -41,23 +41,19 @@ public class HealthBar : TextureProgress
 		float percentage = (float)character.Stats.CurrentHealth/(float)character.Stats.MaxHealth;
 		RectScale = new Vector2(percentage, RectScale.y);
 
-		if(percentage <= 0.25)
-		{
-			TintProgress = new Color(1, 0, 0, 1);
-		}
-		else if(percentage <= 0.75)
-		{
-			TintProgress = new Color(1, 1, 0, 1);
-		}
-		else
-		{
-			TintProgress = new Color(0, 1, 0, 1);
-		}
+		TintProgress = new Color(percentage > 75 ? 0 : 1, percentage > 50 ? 1 : percentage, 0, 1);
 	}
 
 	public void SetValuesToCharacterValues(Character character)
     {
-		SetValueToCharactersCurrentHealth(character);
-		MaxValue = character.Stats.MaxHealth;
-	}
+        Hide();
+        SetMaxHealth(character);
+        SetValueToCharactersCurrentHealth(character);
+        CallDeferred("show");
+    }
+
+    private void SetMaxHealth(Character character)
+    {
+        MaxValue = character.Stats.MaxHealth;
+    }
 }

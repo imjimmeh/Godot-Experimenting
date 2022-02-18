@@ -8,7 +8,6 @@
 [node name="CharacterCenter" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -20,3 +19,6 @@ script = ExtResource( 2 )
 
 [node name="ShrikingNode" type="Node" parent="Label"]
 script = ExtResource( 4 )
+
+[node name="WorldCenteredControl" type="Node" parent="."]
+script = ExtResource( 3 )
