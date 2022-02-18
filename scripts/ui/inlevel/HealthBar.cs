@@ -34,17 +34,35 @@ public class HealthBar : TextureProgress
 	}
 
 	public void SetValueToCharactersCurrentHealth(Character character)
-	{
-		Value = character.Stats.CurrentHealth;
-		healthText.Text = $"{character.Stats.CurrentHealth}/{character.Stats.MaxHealth}";
+    {
+		float percentage = (float)character.Stats.CurrentHealth / (float)character.Stats.MaxHealth;
+		SetColour(percentage);
+        Value = character.Stats.CurrentHealth;
+        healthText.Text = $"{character.Stats.CurrentHealth}/{character.Stats.MaxHealth}";
 
-		float percentage = (float)character.Stats.CurrentHealth/(float)character.Stats.MaxHealth;
-		RectScale = new Vector2(percentage, RectScale.y);
+        RectScale = new Vector2(percentage, RectScale.y);
 
-		TintProgress = new Color(percentage > 75 ? 0 : 1, percentage > 50 ? 1 : percentage, 0, 1);
-	}
+    }
 
-	public void SetValuesToCharacterValues(Character character)
+    private void SetColour(float percentage)
+    {
+        float red = 1.0f, green = 1.0f;
+
+        if (percentage <= 0.5f)
+        {
+            red = 1f;
+            green = percentage * 1.9f;
+        }
+        else
+        {
+            red =  (1 - percentage) * 1.9f;
+			green = 1f;
+        }
+
+        TintProgress = new Color(red, green, 0, 1);
+    }
+
+    public void SetValuesToCharacterValues(Character character)
     {
         Hide();
         SetMaxHealth(character);
