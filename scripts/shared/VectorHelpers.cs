@@ -41,11 +41,17 @@ namespace FaffLatest.scripts.shared
         public static Vector3 CopyZValue(this Vector3 vector, Vector3 target)
             => vector.CopyValues(target, false, false, true);
 
-        public static float DistanceToIgnoringHeight(this Vector3 origin, Vector3 target)
+        public static float NonEuclideanDistanceToIgnoringHeight(this Vector3 origin, Vector3 target)
         {
             var distance = (target - origin).Abs();
 
             return distance.x + distance.z;
+        }
+        
+        public static float DistanceToIgnoringHeight(this Vector3 origin, Vector3 target)
+        {
+            var withSameY = origin.CopyYValue(target);
+            return origin.DistanceTo(target);
         }
 
         public static Vector3 MovementVectorTo(this Vector3 origin, Vector3 target)

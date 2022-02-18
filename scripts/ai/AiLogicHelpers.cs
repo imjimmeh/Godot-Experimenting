@@ -6,7 +6,6 @@ namespace FaffLatest.scripts.ai
 {
     public static class AiLogicHelpers
     {
-        
         public static (Character closestCharacter, Vector3 targetPosition) GetNearestOpponentCharacter(this Character us)
         {
             Character closestCharacter = null;

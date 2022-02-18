@@ -34,7 +34,7 @@ namespace FaffLatest.scripts.state
 		private Node inputManager;
 		private Node playerCharactersRoot;
 		private RandomNumberGenerator random;
-		private UIElementContainer ui;
+		private Node ui;
 
 		public override void _Ready()
 		{
@@ -49,6 +49,7 @@ namespace FaffLatest.scripts.state
 
 		public async Task SpawnCharacters(CharacterStats[] charactersToCreate, SpawnableAreas spawnArea)
 		{
+			var spawnCharacterTasks = new List<Task>();
 			for (var x = 0; x < charactersToCreate.Length; x++)
 			{
 				if (charactersToCreate[x] == null)
@@ -56,14 +57,12 @@ namespace FaffLatest.scripts.state
 
 				var spawnPosition = spawnArea.GetSpawnPosition(charactersToCreate[x]);
 
-				var character = await SpawnCharacter(charactersToCreate[x], spawnPosition);
+				//var character = await SpawnCharacter(charactersToCreate[x], spawnPosition);
+				spawnCharacterTasks.Add(SpawnCharacter(charactersToCreate[x], spawnPosition));
 
-                if (!character.Stats.IsPlayerCharacter)
-                    AiSetup(character);
-
-				character.ResetTurnStats();					
             }
 
+			await Task.WhenAll(spawnCharacterTasks);
 			EmitSignal(SignalNames.Loading.CHARACTERS_SPAWNED);
 		}
 
@@ -108,6 +107,11 @@ namespace FaffLatest.scripts.state
             astarNavigator._On_Character_Created(character);
 
             CharacterManager.Instance.AddCharacter(character);
+
+			if (!character.Stats.IsPlayerCharacter)
+                    AiSetup(character);
+
+			character.ResetTurnStats();					
         }
 
         private static void SetPosition(Vector3 spawnPosition, Spatial character)
@@ -148,7 +152,7 @@ namespace FaffLatest.scripts.state
 			characterMovementPathManager = GetNode<CharacterMovementPathManager>(NodeReferences.BaseLevel.Effects.MOVEMENT_PATH);
 			inputManager = GetNode(NodeReferences.Systems.INPUT_MANAGER);
 			playerCharactersRoot = GetNode(NodeReferences.BaseLevel.PLAYER_ROOT);
-			ui = GetNode<UIElementContainer>(NodeReferences.BaseLevel.UI);
+			ui = GetNode(NodeReferences.Systems.UI_MANAGER);
 		}
     }
 }

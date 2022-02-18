@@ -127,7 +127,7 @@ namespace FaffLatest.scripts.ai
             var vector = (parent.ProperBody.GlobalTransform.origin - targetPosition);
             var distance = Mathf.Abs(vector.x + vector.z);
 
-            if (distance < 1.00001f)
+            if (distance < 0.5f)
             {
                 parent.ProperBody.MovementStats.SetCantMoveAnymoreThisTurn();
                 return;

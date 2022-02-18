@@ -1,6 +1,7 @@
 using FaffLatest.scripts.characters;
 using Godot;
 using System;
+using static FaffLatest.scripts.shared.VectorHelpers;
 
 public class ColouredBox : CSGBox
 {
@@ -51,7 +52,7 @@ public class ColouredBox : CSGBox
         if (parent.Stats.IsPlayerCharacter == character.Stats.IsPlayerCharacter)
             return;
 
-        var distance = (character.ProperBody.GlobalTransform.origin - GlobalTransform.origin).Length();
+        var distance = character.ProperBody.GlobalTransform.origin.DistanceToIgnoringHeight(parent.ProperBody.GlobalTransform.origin);
 
         var isInRange = distance <= character.Stats.EquippedWeapon.Range;
 
