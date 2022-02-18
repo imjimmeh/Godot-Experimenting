@@ -153,7 +153,6 @@ public class MovingKinematicBody : KinematicBody
         this.InterpolateAndMove(delta, CurrentMovementDestination);
 
         bool atSamePoint = ReachedCurrentDestination();
-        //GD.Print(distance);
 
         if (atSamePoint)
         {

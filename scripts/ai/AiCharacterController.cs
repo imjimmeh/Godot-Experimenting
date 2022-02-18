@@ -58,12 +58,10 @@ namespace FaffLatest.scripts.ai
             }
             else if (IsAttackPhase)
             {
-                GD.Print($"Zombie trying to attack target");
                 AttackTarget();
             }
             else if (TurnFinished)
             {
-                GD.Print($"Ending turn");
                 EndTurn();
             }
         }

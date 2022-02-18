@@ -158,14 +158,12 @@ namespace FaffLatest.scripts.ui
 		{
 			mouseIsOver = true;
 			characterName.CallDeferred("show");
-			GD.Print("Mouse is over");
 		}
 
 		private void _MouseExited()
 		{
 			mouseIsOver = false;
 			characterName.CallDeferred("hide");
-			GD.Print("Mouse left");
 		}
 	}
 }

@@ -65,7 +65,7 @@ namespace FaffLatest.scripts.movement
             }
             catch (Exception ex)
             {
-                GD.Print($"Error getting path from {start} to {end}- {ex.Message}");
+                GD.Print($"Error getting path  {start} to {end}- {ex.Message}");
                 return new GetMovementPathResult(false);
             }
         }

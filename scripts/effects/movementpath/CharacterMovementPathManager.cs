@@ -49,7 +49,6 @@ namespace FaffLatest.scripts.effects
 
 		private static void ConnectSignals(Node pathMover, CharacterMovementPath newMesh)
 		{
-			//GD.Print($"Connected mesh");
 			pathMover.Connect(SignalNames.Characters.REACHED_PATH_PART, newMesh, SignalNames.Characters.REACHED_PATH_PART_METHOD);
 		}
 
@@ -67,7 +66,6 @@ namespace FaffLatest.scripts.effects
 
 		private void _On_Character_FinishedMoving(Node character, Vector3 newPosition)
 		{
-			//GD.Print("Disposing");
 			DisposeMesh();
 		}
 

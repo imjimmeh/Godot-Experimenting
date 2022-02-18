@@ -59,7 +59,6 @@ namespace FaffLatest.scripts.ui
 
 		private void GetUIChildrenNodes()
 		{
-			GD.Print("Getting children nodes");
 			CharacterSelector = GetNode<CharacterSelector>("CharacterSelector");
 			ConfirmationDialog = GetNode<ConfirmationDialog>("ConfirmationDialog");
 			SelectedCharacter = GetNode<SelectedCharacter>("SelectedCharacter");

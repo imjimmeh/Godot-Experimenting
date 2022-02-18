@@ -103,7 +103,6 @@ namespace FaffLatest.scripts.state
             await ToSignal(character, "ready");
 
             var body = character.ProperBody;
-			GD.Print($"Setting character to position {spawnPosition}");
             SetPosition(spawnPosition, body);
             AddCharacterSignals(body, character);
             astarNavigator._On_Character_Created(character);

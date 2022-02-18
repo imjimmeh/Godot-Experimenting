@@ -31,7 +31,6 @@ namespace FaffLatest.scripts.movement
 			var old = OccupyingNode;
 			OccupyingNode = newOccupier;
 
-			//GD.Print($"{newOccupier} is now occupying {Id}");
 			return (old, OccupyingNode);
 		}
 

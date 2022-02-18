@@ -43,7 +43,6 @@ namespace FaffLatest.scripts.input
 
 		private void _On_Character_PortraitClicked(Character character)
         {
-			GD.Print("Portrait clicked");
             ProcessCharacterClick(character);
         }
 
@@ -54,7 +53,6 @@ namespace FaffLatest.scripts.input
 
             if (gameStateManager.HaveACharacterSelected && character == gameStateManager.SelectedCharacter)
             {
-				GD.Print($"Move camera");
 				EmitSignal(SignalNames.Cameras.MOVE_TO_POSITION, gameStateManager.SelectedCharacter.ProperBody.GlobalTransform.origin);
             }
             else
@@ -85,19 +83,16 @@ namespace FaffLatest.scripts.input
 				{
 					case weapons.AttackResult.OutOfRange:
 					{
-						GD.Print($"Out of range");
 						break;
 					}
 
 					case weapons.AttackResult.OutOfAttacksForTurn:
 					{
-						GD.Print($"Out of attacks");
 						break;
 					}
 
 					case weapons.AttackResult.Success:
 					{
-						GD.Print("Success");
 						break;
 					}
 				}
@@ -134,7 +129,6 @@ namespace FaffLatest.scripts.input
 			}
 			else
 			{ 
-				//GD.Print($"Unhandled world mouse released event Mb.i is {mouseButtonEvent.ButtonIndex}");
 			}
 
 		}

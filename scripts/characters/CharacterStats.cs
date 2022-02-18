@@ -50,13 +50,11 @@ public class CharacterStats : Resource
 	public void SetCharacterName(string name)
 	{
 		this.CharacterName = name;
-		//GD.Print(this.CharacterName);
 	}
 
 	public void SetPlayerCharacter(bool isPlayerCharacter)
 	{
 		IsPlayerCharacter = isPlayerCharacter;
-		//GD.Print(this.IsPlayerCharacter);
 	}
 
 	public void SetWeapon(Weapon weapon)

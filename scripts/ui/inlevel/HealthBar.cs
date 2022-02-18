@@ -39,9 +39,7 @@ public class HealthBar : TextureProgress
 		SetColour(percentage);
         Value = character.Stats.CurrentHealth;
         healthText.Text = $"{character.Stats.CurrentHealth}/{character.Stats.MaxHealth}";
-
         RectScale = new Vector2(percentage, RectScale.y);
-
     }
 
     private void SetColour(float percentage)
