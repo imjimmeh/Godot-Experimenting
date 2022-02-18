@@ -64,7 +64,7 @@ namespace FaffLatest.scripts.weapons
             return AttackResult.Success;
         }
 
-        public bool WithinAttackRange(float enemyDistance) => Range + 0.5 >= enemyDistance;
+        public bool WithinAttackRange(float enemyDistance) => Range + 0.5f >= enemyDistance;
 
         public int GetAttackDamage() => RandomHelper.RNG.RandiRange(MinDamage, MaxDamage);
 

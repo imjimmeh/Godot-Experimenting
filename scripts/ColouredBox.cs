@@ -54,7 +54,7 @@ public class ColouredBox : CSGBox
 
         var distance = character.ProperBody.GlobalTransform.origin.DistanceToIgnoringHeight(parent.ProperBody.GlobalTransform.origin);
 
-        var isInRange = distance <= character.Stats.EquippedWeapon.Range;
+        var isInRange = character.Stats.EquippedWeapon.WithinAttackRange(distance);
 
         material.SetShaderParam(SHADER_PARAM_IN_ATTACK_RANGE, isInRange);
     }

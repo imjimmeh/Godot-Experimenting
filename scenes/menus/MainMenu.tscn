@@ -9,7 +9,8 @@
 [node name="BaseMenu" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_right = 976.0
+margin_left = 1.0
+margin_right = 977.0
 margin_bottom = 1400.0
 script = ExtResource( 2 )
 __meta__ = {

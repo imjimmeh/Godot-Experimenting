@@ -124,10 +124,9 @@ namespace FaffLatest.scripts.ai
         private void GetMovementTarget()
         {
             var targetPosition = GetAttackTargetAndPosition();
-            var vector = (parent.ProperBody.GlobalTransform.origin - targetPosition);
-            var distance = Mathf.Abs(vector.x + vector.z);
+            var distance = parent.ProperBody.GlobalTransform.origin.DistanceToIgnoringHeight(targetPosition);
 
-            if (distance < 0.5f)
+            if (Mathf.IsZeroApprox(distance))
             {
                 parent.ProperBody.MovementStats.SetCantMoveAnymoreThisTurn();
                 return;
