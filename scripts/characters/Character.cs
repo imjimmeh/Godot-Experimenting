@@ -98,6 +98,18 @@ namespace FaffLatest.scripts.characters
 			return AttackResult.Success;
 		}
 
+		public AttackResult CanAttackTarget(Character target)
+		{
+			var distanceToTarget = this.DistanceToIgnoringHeight(target);
+            
+            if(!Stats.EquippedWeapon.WithinAttackRange(distanceToTarget))
+				return AttackResult.OutOfRange;
+
+			if (!Stats.EquippedWeapon.HaveAttacksLeft)
+                return AttackResult.OutOfAttacksForTurn;
+
+			return AttackResult.CanAttack;
+		}
 		public void ResetTurnStats()
 		{
 			ProperBody.MovementStats.ResetMovementForTurn();

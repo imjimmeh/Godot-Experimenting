@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using System.Threading.Tasks;
 using FaffLatest.scripts.characters;
@@ -10,6 +11,11 @@ namespace FaffLatest.scripts.ui
 
 	public class UIManager : Node
 	{
+        [Signal]
+        public delegate void _ConfirmationDialog_Response(bool ok);
+
+        public static UIManager Instance;
+
         private const int BIG_FONT_SIZE = 32;
         private const int DAMAGE_FONT_SIZE = 20;
 
@@ -24,6 +30,9 @@ namespace FaffLatest.scripts.ui
 
 		public FontManager Fonts => fontManager;
 		
+        private bool confirmationDialogResponse = false;
+        private bool signalsConnected = false;
+        
 		public override async void _Ready()
         {
             FindChildren();
@@ -33,6 +42,8 @@ namespace FaffLatest.scripts.ui
 
 			await GetCamera();
             InitialiseFactories();
+
+            Instance = this;
         }
 
         private void InitialiseFactories()
@@ -57,6 +68,18 @@ namespace FaffLatest.scripts.ui
             GenerateNewTurnText(whoseTurn);
         }
 
+        private void ConfirmDialog_OK_Pressed()
+        {
+            confirmationDialogResponse = true;
+            EmitSignal(nameof(_ConfirmationDialog_Response), true);
+        }
+
+           private void ConfirmDialog_Cancel_Pressed()
+        {
+            confirmationDialogResponse = false;
+            EmitSignal(nameof(_ConfirmationDialog_Response), false);
+        }
+
         private void GenerateNewTurnText(string whoseTurn)
         {
             var screenCenter = this.GetCenterOfScreen();
@@ -71,21 +94,35 @@ namespace FaffLatest.scripts.ui
 			elementContainer.Show();
 		}
 
-		private void _On_Confirm_Character_Attack(Character character)
+		public async Task<bool> ConfirmCharacterAttack(Character character)
         {
-            BuildConfirmationDialog(character);
-            elementContainer.ConfirmationDialog.Show();
+            var dialog = BuildConfirmationDialog(character);
+            var okButton = dialog.GetOk();
+            var cancelButton = dialog.GetCancel();
+
+            elementContainer.ConfirmationDialog.CallDeferred("show");
+            
+            await ToSignal(this, nameof(_ConfirmationDialog_Response));
+            return confirmationDialogResponse;
         }
 
-        private void BuildConfirmationDialog(Character character)
+        private ConfirmationDialog BuildConfirmationDialog(Character character)
         {
             var dialogTextBuilder = new StringBuilder();
             dialogTextBuilder.AppendLine($"{character.Stats.CharacterName} still has {character.ProperBody.MovementStats.AmountLeftToMoveThisTurn} moves left this turn");
             dialogTextBuilder.AppendLine("If you attack you will be unable to move for the rest of the turn - are you sure?");
-
             elementContainer.ConfirmationDialog.DialogText = dialogTextBuilder.ToString();
-
             elementContainer.ConfirmationDialog.WindowTitle = "Confirm Attack";
+            elementContainer.ConfirmationDialog.Popup_(new Rect2(GetViewport().GetCenterOfScreen(), GetViewport().GetCenterOfScreen()));
+
+            if(!signalsConnected)
+            {
+                elementContainer.ConfirmationDialog.GetOk().Connect("pressed", this, nameof(ConfirmDialog_OK_Pressed));
+                elementContainer.ConfirmationDialog.GetCancel().Connect("pressed", this, nameof(ConfirmDialog_Cancel_Pressed));
+                signalsConnected = true;
+            }
+
+            return elementContainer.ConfirmationDialog;
         }
 
         private void _On_Character_ReceivedDamage(Node character, int damage, Node origin, bool killingBlow)

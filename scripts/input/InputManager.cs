@@ -4,9 +4,11 @@ using FaffLatest.scripts.constants;
 using FaffLatest.scripts.movement;
 using FaffLatest.scripts.shared;
 using FaffLatest.scripts.state;
+using FaffLatest.scripts.ui;
 using FaffLatest.scripts.world;
 using Godot;
 using System;
+using System.Threading.Tasks;
 
 namespace FaffLatest.scripts.input
 {
@@ -66,7 +68,7 @@ namespace FaffLatest.scripts.input
 
         }
 
-        private void _On_Character_Mouse_Released(Character character, InputEventMouseButton mouseButtonEvent)
+        private async void _On_Character_Mouse_Released(Character character, InputEventMouseButton mouseButtonEvent)
 		{
             if (mouseButtonEvent.IsSelectCharacterAction(gameStateManager, character))
 			{
@@ -74,32 +76,55 @@ namespace FaffLatest.scripts.input
 					.SetCurrentlySelectedCharacter(character);
 			}
 			else if(mouseButtonEvent.IsAttackCommand(gameStateManager, character))
-			{
-				var attackResult = gameStateManager
-					.SelectedCharacter
-					.TryAttackTarget(character);
+            {
+                var targetCheck = gameStateManager.SelectedCharacter.CanAttackTarget(character);
+                var canAttack = ProceedWithAttack(character, targetCheck);
 
-				switch(attackResult)
-				{
-					case weapons.AttackResult.OutOfRange:
-					{
-						break;
-					}
+				if(!canAttack)
+					return;
 
-					case weapons.AttackResult.OutOfAttacksForTurn:
-					{
-						break;
-					}
+                if (character.ProperBody.MovementStats.AmountLeftToMoveThisTurn > 0)
+                {
+                    await ConfirmMovementLeft(character);
+                }
 
-					case weapons.AttackResult.Success:
-					{
-						break;
-					}
-				}
-			}
-		}
+                var attackResult = gameStateManager
+                    .SelectedCharacter
+                    .TryAttackTarget(character);
+            }
+        }
 
-		private void _On_World_ClickedOn(ClickableWorldElement world, InputEventMouseButton mouseButtonEvent, Vector3 position)
+        private static async Task ConfirmMovementLeft(Character character)
+        {
+            var proceed = await UIManager.Instance.ConfirmCharacterAttack(character);
+
+            if (!proceed)
+            {
+                UIManager.Instance.SpawnDamageLabel(character.ProperBody.GlobalTransform.origin, "Cancelling!");
+            }
+        }
+
+        private static bool ProceedWithAttack(Character character, weapons.AttackResult canAttackTarget)
+        {
+            switch (canAttackTarget)
+            {
+                case weapons.AttackResult.OutOfRange:
+                    {
+                        UIManager.Instance.SpawnDamageLabel(character.ProperBody.GlobalTransform.origin, "Out of range!");
+                        return false;
+                    }
+
+                case weapons.AttackResult.OutOfAttacksForTurn:
+                    {
+                        UIManager.Instance.SpawnDamageLabel(character.ProperBody.GlobalTransform.origin, "Out of attacks!");
+                        return false;
+                    }
+            }
+
+			return true;
+        }
+
+        private void _On_World_ClickedOn(ClickableWorldElement world, InputEventMouseButton mouseButtonEvent, Vector3 position)
 		{
 			if (mouseButtonEvent.Pressed)
 			{
