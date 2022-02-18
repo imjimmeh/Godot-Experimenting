@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
 using FaffLatest.scripts.movement;
+using FaffLatest.scripts.ui;
 using Godot;
 
 namespace FaffLatest.scripts.effects.movementguide
@@ -27,7 +28,8 @@ namespace FaffLatest.scripts.effects.movementguide
         public AStarNavigator AStar { get; private set; }
 
         private Thread thread = new Thread();
-        private Mutex mutex = new Mutex();
+
+        private Control pathLengthDisplay;
 
         public override void _Ready()
         {
@@ -77,6 +79,8 @@ namespace FaffLatest.scripts.effects.movementguide
         {
             if (character != parent)
             {
+                ClearLabel();
+
                 Hide();
                 return;
             }
@@ -101,13 +105,15 @@ namespace FaffLatest.scripts.effects.movementguide
             Show();
         }
 
-        private void _On_Cell_Mouse_Entered(CharacterMovementGuideCell node)
+        private async void _On_Cell_Mouse_Entered(CharacterMovementGuideCell node)
         {
+            ClearLabel();
+
             var result = AStar.TryGetMovementPath(
                 start: body.GlobalTransform.origin,
                 end: node.GlobalTransform.origin,
                 character: parent);
-            
+
             if (!result.CanFindPath)
             {
                 ClearExistingPath();
@@ -121,8 +127,22 @@ namespace FaffLatest.scripts.effects.movementguide
                 ProcessNewPathPart(result, newPath, x);
             }
 
+            Vector3 position = result.Path[result.Path.Length - 1];
+
+            pathLengthDisplay = UIManager.Instance.CreateLabelAtWorldPosition(result.Path.Length.ToString(),
+            new FontValues(Colors.White, 16, Colors.Black, 1), position);
+
             ClearExistingPath();
             currentPath = newPath;
+        }
+
+        private void ClearLabel()
+        {
+            if (pathLengthDisplay != null)
+            {
+                pathLengthDisplay.QueueFree();
+                pathLengthDisplay = null;
+            }
         }
 
         private void ProcessNewPathPart(GetMovementPathResult result, HashSet<CharacterMovementGuideCell> newPath, int x)
@@ -169,6 +189,7 @@ namespace FaffLatest.scripts.effects.movementguide
         {
             if (mouseInput.ButtonIndex == 2)
             {
+                ClearLabel();
                 var cell = node as CharacterMovementGuideCell;
                 var worldPos = cell.GlobalTransform.origin;
                 EmitSignal(SignalNames.Characters.MOVE_ORDER, worldPos);

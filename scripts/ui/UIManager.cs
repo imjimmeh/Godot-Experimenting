@@ -102,6 +102,16 @@ namespace FaffLatest.scripts.ui
 			elementContainer.Show();
 		}
 
+        public Control CreateLabelAtWorldPosition(string text, FontValues fontValues, Vector3 worldPosition)
+        {
+            var (parent, label) = UiLabelFactory.GenerateUiLabel(text,
+                                                    new FontValues(Colors.White, 16, Colors.Black, 1),
+                                                    camera.UnprojectPosition(worldPosition),
+                                                    worldPosition);
+
+            return parent;
+        }
+        
 		public async Task<bool> ConfirmCharacterAttack(Character character)
         {
             var dialog = BuildConfirmationDialog(character);
