@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Town/meshes/Env_DirtPatch_01.tres" type="ArrayMesh" id=1]
+
+[node name="Env_DirtPatch_01" type="MeshInstance"]
+mesh = ExtResource( 1 )
+material/0 = null

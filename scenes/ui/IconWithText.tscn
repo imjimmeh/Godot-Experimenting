@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://scripts/ui/IconWithText.cs" type="Script" id=1]
-[ext_resource path="res://materials/canvasItem_ChangeTextureColour.tres" type="Material" id=2]
+[ext_resource path="res://materials/effects/canvasItem_ChangeTextureColour.tres" type="Material" id=2]
 [ext_resource path="res://resources/fonts/TitilliumWeb-s32.tres" type="DynamicFont" id=3]
 
 [node name="Icon" type="TextureRect"]

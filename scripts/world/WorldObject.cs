@@ -41,9 +41,32 @@ namespace FaffLatest.scripts.world
 					{
 						return GetOccupiedCellsForBoxShape(box);
 					}
+				case ConcavePolygonShape concavePolygonShape:
+                    {
+						return GetOccupiedCellsForConcavePolygonShape(concavePolygonShape);
+                    }
 			}
 
 			return null;
+		}
+
+		public IEnumerable<Vector3> GetOccupiedCellsForConcavePolygonShape(ConcavePolygonShape concavePolygonShape)
+		{
+			var data = concavePolygonShape.Data;
+
+			HashSet<Vector3> foundPositions = new HashSet<Vector3>();
+			foreach(var poly in data)
+            {
+				if(Mathf.IsZeroApprox(poly.y))
+                {
+					var position = poly + GlobalTransform.origin;
+					position = position.Round();
+					if(!foundPositions.Contains(position))
+						foundPositions.Add(position);
+                }
+            }
+
+			return foundPositions;
 		}
 
 		public IEnumerable<Vector3> GetOccupiedCellsForBoxShape(BoxShape box)

@@ -8,7 +8,7 @@
 [ext_resource path="res://resources/characters/defaultCharacterMovementStats.tres" type="Resource" id=6]
 [ext_resource path="res://scripts/ColouredBox.cs" type="Script" id=7]
 [ext_resource path="res://scripts/effects/movementguide/CharacterMovementGuide.cs" type="Script" id=8]
-[ext_resource path="res://materials/character_material.tres" type="Material" id=9]
+[ext_resource path="res://materials/characters/character_material.tres" type="Material" id=9]
 [ext_resource path="res://scenes/ui/ingame/MiniHealthBar.tscn" type="PackedScene" id=10]
 [ext_resource path="res://resources/fonts/TitilliumWeb-Black.ttf" type="DynamicFontData" id=11]
 
