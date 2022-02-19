@@ -17,7 +17,7 @@ namespace FaffLatest.scripts.movement{
         }
 
         private static GetMovementPathResult TrimPath(Vector3[] points, Vector3 start, int maxLength)
-        {
+        {   
             if (points == null || points.Length == 0)
                 return new GetMovementPathResult(false);
             else if (points.Length == 1)
