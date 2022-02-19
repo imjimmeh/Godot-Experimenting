@@ -98,7 +98,7 @@ namespace FaffLatest.scripts.effects.movementguide
             
             foreach(var pathPart in existingMovementGuide)
             {
-                pathPart.Value.CalculateVisiblity(amountLeftToMoveThisTurn);
+                pathPart.Value.CalculateVisiblity(amountLeftToMoveThisTurn, parent.Stats.EquippedWeapon.Range);
             }
 
             Show();
@@ -121,18 +121,27 @@ namespace FaffLatest.scripts.effects.movementguide
 
             var newPath = new HashSet<CharacterMovementGuideCell>(result.Path.Length);
 
+            
             for (var x = 0; x < result.Path.Length; x++)
             {
                 ProcessNewPathPart(result, newPath, x);
             }
 
+            if(result.Path.Length > 0)
+            {
+                CreateLengthLabel(result);
+            }
+            
+            ClearExistingPath();
+            currentPath = newPath;
+        }
+
+        private void CreateLengthLabel(GetMovementPathResult result)
+        {
             Vector3 position = result.Path[result.Path.Length - 1];
 
             pathLengthDisplay = UIManager.Instance.CreateLabelAtWorldPosition(result.Path.Length.ToString(),
             new FontValues(Colors.White, 16, Colors.Black, 1), position);
-
-            ClearExistingPath();
-            currentPath = newPath;
         }
 
         private void ClearLabel()

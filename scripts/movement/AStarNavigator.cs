@@ -70,10 +70,10 @@ namespace FaffLatest.scripts.movement
             }
         }
 
-        private bool OutsideWorldBounds(Vector3 start, Vector3 end)
+        public bool OutsideWorldBounds(Vector3 start, Vector3 end)
             => OutsideWorldBounds(start, Width) || OutsideWorldBounds(end, Length);
 
-        private bool OutsideWorldBounds(Vector3 v, float maxValue)
+        public bool OutsideWorldBounds(Vector3 v, float maxValue)
             => v.AnyValueLessThanZero() || v.AnyValueGreaterThanOrEqualToValue(maxValue);
                     
         public void _On_Character_Created(Character character)

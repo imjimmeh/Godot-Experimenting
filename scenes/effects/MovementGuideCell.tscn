@@ -6,10 +6,12 @@
 [sub_resource type="ShaderMaterial" id=10]
 resource_local_to_scene = true
 shader = ExtResource( 1 )
-shader_param/alpha = 0.5
+shader_param/alpha = 0.25
+shader_param/attackRangeColour = Vector3( 1, 0, 0 )
 shader_param/highlightedColour = Vector3( 0, 1, 0 )
-shader_param/normalColour = Vector3( 1, 0, 0 )
-shader_param/pathColour = Vector3( 1, 0, 1 )
+shader_param/normalColour = Vector3( 1, 0, 1 )
+shader_param/pathColour = Vector3( 0, 0, 1 )
+shader_param/isInAttackRange = false
 shader_param/isTargetCell = false
 shader_param/isPartOfPath = false
 

@@ -87,11 +87,29 @@ namespace FaffLatest.scripts.effects.movementguide
 			Connect(SignalNames.MovementGuide.CLICKED_ON, GetParent(), SignalNames.MovementGuide.CLICKED_ON_METHOD);
 		}
 
-		public void CalculateVisiblity(int movementDistanceLeft)
+		public void CalculateVisiblity(int movementDistanceLeft, int weaponRange)
         {
-			GetPathAndSetVisiblity(movementDistanceLeft);
+            if (AStar.OutsideWorldBounds(this.GlobalTransform.origin, this.GlobalTransform.origin))
+                return;
+
+            if (IsInAttackRange(weaponRange))
+            {
+				Visible = true;
+				return;
+            }
+
+            GetPathAndSetVisiblity(movementDistanceLeft);
         }
-		
+
+        private bool IsInAttackRange(int weaponRange)
+        {
+			var distanceToParent = parent.GlobalTransform.origin.DistanceToIgnoringHeight(this.GlobalTransform.origin);
+            var isInAttackRange = distanceToParent <= weaponRange + 0.5f;
+
+			material.SetShaderParam("isInAttackRange", isInAttackRange);
+			return isInAttackRange;
+        }
+
         private bool GetPathAndSetVisiblity(int movementDistanceLeft)
 		{
             var result = AStar.TryGetMovementPath(parent.GlobalTransform.origin, GlobalTransform.origin, movementDistanceLeft);

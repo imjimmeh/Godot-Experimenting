@@ -18,7 +18,6 @@ namespace FaffLatest.scripts.effects.attackrange
 
         private async Task ConnectSignals()
         {
-            Visible = false;
             var gsm = GetNode(NodeReferences.Systems.GAMESTATE_MANAGER);
             gsm.Connect(SignalNames.Characters.SELECTED, this, SignalNames.Characters.SELECTED_METHOD);
             gsm.Connect(SignalNames.Characters.SELECTION_CLEARED, this, SignalNames.Characters.SELECTION_CLEARED_METHOD);
@@ -28,7 +27,6 @@ namespace FaffLatest.scripts.effects.attackrange
 
             await ToSignal(parentCharacter, "ready");
             Scale = new Vector3(character.Stats.EquippedWeapon.Range + 0.5f, 1, character.Stats.EquippedWeapon.Range + 0.5f);
-            Visible = true;     
         }
 
         private void _On_Character_SelectionCleared()
