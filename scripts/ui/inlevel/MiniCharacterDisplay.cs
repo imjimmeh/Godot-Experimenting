@@ -87,12 +87,6 @@ namespace FaffLatest.scripts.ui
 			{
 				SetValues();
 			}
-
-			if(mouseIsOver)
-			{
-				var mousePos = GetGlobalMousePosition();
-				characterName.RectGlobalPosition = new Vector2(mousePos.x + (characterName.Text.Length), mousePos.y + 10);
-			}
 		}
 
 		private void SetValues()

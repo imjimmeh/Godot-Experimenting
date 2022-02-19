@@ -6,8 +6,8 @@
 
 [node name="Icon" type="TextureRect"]
 material = ExtResource( 2 )
-margin_right = 20.0
-margin_bottom = 20.0
+margin_right = 40.0
+margin_bottom = 40.0
 expand = true
 script = ExtResource( 1 )
 __meta__ = {

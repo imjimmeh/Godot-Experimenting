@@ -36,5 +36,7 @@ namespace FaffLatest.scripts.ui
         }
 
         public void SetLabelText(string newText) => text.Text = newText;
+
+        public void SetToolTip(string tooltip) => HintTooltip = tooltip;
     }
 }

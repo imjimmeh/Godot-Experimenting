@@ -72,6 +72,10 @@ namespace FaffLatest.scripts.ui
         private void SetAttackDisplay(Character character)
         {
             attackDisplay.SetLabelText(AttackIconText(character));
+			attackDisplay.SetToolTip(
+			$"Range: {character.Stats.EquippedWeapon.Range}\n"+
+			$"Min Damage: {character.Stats.EquippedWeapon.MinDamage}\n"+
+			$"Max Damage: {character.Stats.EquippedWeapon.MaxDamage}");
         }
 
         private static string MovementIconText(Character character)
