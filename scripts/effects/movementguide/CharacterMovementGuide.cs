@@ -66,6 +66,7 @@ namespace FaffLatest.scripts.effects.movementguide
 
             Connect(SignalNames.Characters.MOVE_ORDER, GetNode(NodeReferences.Systems.INPUT_MANAGER), SignalNames.Characters.MOVE_ORDER_METHOD);
 
+            parent.Connect("_Character_Attacking", this, "_On_Character_Attacking");
         }
 
         private void _On_Character_Ready(Node character)
@@ -79,9 +80,7 @@ namespace FaffLatest.scripts.effects.movementguide
         {
             if (character != parent)
             {
-                ClearLabel();
-
-                Hide();
+                _On_Character_SelectionCleared();
                 return;
             }
             
@@ -105,7 +104,7 @@ namespace FaffLatest.scripts.effects.movementguide
             Show();
         }
 
-        private async void _On_Cell_Mouse_Entered(CharacterMovementGuideCell node)
+        private void _On_Cell_Mouse_Entered(CharacterMovementGuideCell node)
         {
             ClearLabel();
 
@@ -201,7 +200,18 @@ namespace FaffLatest.scripts.effects.movementguide
 
         private void _On_Character_SelectionCleared()
         {
+            if(pathLengthDisplay != null)
+            {
+                pathLengthDisplay.QueueFree();
+                pathLengthDisplay = null;
+            }
+
             Hide();
+        }
+
+        private void _On_Character_Attacking(Node attacker, Node target)
+        {
+            _On_Character_SelectionCleared();
         }
     }
 }

@@ -1,0 +1,13 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://meshes/characterAttackSphereMesh.tres" type="SphereMesh" id=1]
+[ext_resource path="res://scripts/movement/RotatingNode.cs" type="Script" id=2]
+[ext_resource path="res://scripts/effects/attackrange/CharacterAttackRange.cs" type="Script" id=3]
+
+[node name="AttackRange" type="MeshInstance"]
+mesh = ExtResource( 1 )
+material/0 = null
+script = ExtResource( 3 )
+
+[node name="RotatingNode" type="Node" parent="."]
+script = ExtResource( 2 )

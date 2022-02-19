@@ -4,17 +4,14 @@ using FaffLatest.scripts.constants;
 using FaffLatest.scripts.effects;
 using FaffLatest.scripts.map;
 using FaffLatest.scripts.movement;
-using FaffLatest.scripts.shared;
-using FaffLatest.scripts.ui;
 using FaffLatest.scripts.weapons;
 using Godot;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FaffLatest.scripts.state
 {
-	public class SpawnManager : Node
+    public class SpawnManager : Node
 	{
 		[Signal]
 		public delegate void _Characters_Spawned();
@@ -141,8 +138,6 @@ namespace FaffLatest.scripts.state
 
 			GameStateManager.Instance.Connect(SignalNames.Characters.SELECTED, bodyMesh, SignalNames.Characters.SELECTED_METHOD);
 			GameStateManager.Instance.Connect(SignalNames.Characters.SELECTION_CLEARED, bodyMesh, SignalNames.Characters.SELECTION_CLEARED_METHOD);
-
-
 		}
 
 		private void FindNeededNodes()

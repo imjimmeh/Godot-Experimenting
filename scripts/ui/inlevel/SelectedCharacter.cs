@@ -54,13 +54,24 @@ namespace FaffLatest.scripts.ui
         {
             selectedCharacter = character;
 
-			attackDisplay.SetLabelText(AttackIconText(character));
+            SetAttackDisplay(character);
             healthbar.SetValuesToCharacterValues(character);
-            movementDisplay.SetLabelText(MovementIconText(character));
+            SetMovementDisplay(character);
             portrait.Texture = character.Stats.FaceIcon;
             name.Text = character.Stats.CharacterName;
 
+            selectedCharacter.Connect(nameof(Character._Character_Attacking), this, "_On_Character_Attacking");
             CallDeferred("show");
+        }
+
+        private void SetMovementDisplay(Character character)
+        {
+            movementDisplay.SetLabelText(MovementIconText(character));
+        }
+
+        private void SetAttackDisplay(Character character)
+        {
+            attackDisplay.SetLabelText(AttackIconText(character));
         }
 
         private static string MovementIconText(Character character)
@@ -71,7 +82,11 @@ namespace FaffLatest.scripts.ui
 
         private void _On_Character_SelectionCleared()
 		{
-			selectedCharacter = null;
+			if(selectedCharacter != null)
+			{
+				selectedCharacter.Disconnect(nameof(Character._Character_Attacking), this, "_On_Character_Attacking");
+				selectedCharacter = null;
+			}
 
 			CallDeferred("hide");
 		}
@@ -82,6 +97,14 @@ namespace FaffLatest.scripts.ui
 				return;
 
 			healthbar.SetValueToCharactersCurrentHealth(character);
+		}
+
+		private void _On_Character_Attacking(Character attacker, Character receiver)
+		{
+			if(attacker == selectedCharacter)
+			{
+				SetAttackDisplay(attacker);
+			}
 		}
 	}
 }

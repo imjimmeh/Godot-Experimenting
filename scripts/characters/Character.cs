@@ -7,14 +7,17 @@ namespace FaffLatest.scripts.characters
 	public class Character : Node
 	{
 		[Signal]
-		public delegate void _Character_Disposing(Node character);
+		public delegate void _Character_Disposing(Character character);
 
 		[Signal]
-		public delegate void _Character_Ready(Node character);
+		public delegate void _Character_Ready(Character character);
 
 		[Signal]
-		public delegate void _Character_ReceivedDamage(Node character, int damage, Node origin, bool killingBlow);
+		public delegate void _Character_ReceivedDamage(Character character, int damage, Node origin, bool killingBlow);
 
+		[Signal]
+		public delegate void _Character_Attacking(Character attacker, Character receiver);
+		
 		public MovingKinematicBody Body;
 
 		public Character()
@@ -94,7 +97,7 @@ namespace FaffLatest.scripts.characters
 				return attackResult;
 
 			target._On_Character_ReceiveDamage(damage, this);
-			
+			EmitSignal(nameof(_Character_Attacking), this, target);
 			return AttackResult.Success;
 		}
 

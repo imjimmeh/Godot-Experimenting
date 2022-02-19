@@ -13,6 +13,8 @@ namespace FaffLatest.scripts.ui{
         private Vector3 charactersLastPosition;
         private int characterLastHealth = 0;
 
+        private bool initialisedValues = false;
+
         public override async void _Ready()
         {
             base._Ready();
@@ -24,6 +26,11 @@ namespace FaffLatest.scripts.ui{
 
         public override void _Process(float delta)
         {
+            if(!initialisedValues)
+            {
+                _On_Character_ReceivedDamage(parent, 0, null, false);
+            }
+
             bool characterHasMoved = charactersLastPosition != parent.Body.GlobalTransform.origin;
 
             if (characterHasMoved)
@@ -46,10 +53,6 @@ namespace FaffLatest.scripts.ui{
             worldCenterer.Initialise(healthBar, PositionToDisplay, camera);
             charactersLastPosition = character.Body.GlobalTransform.origin;
             healthBar.RectSize = new Vector2(80, 20);
-            
-            healthBar.CallDeferred("show");
-
-            _On_Character_ReceivedDamage(parent, 0, null, false);
         }
         
         private Vector3 PositionToDisplay => parent.Body.GlobalTransform.origin;

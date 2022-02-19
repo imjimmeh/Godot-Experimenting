@@ -1,0 +1,9 @@
+[gd_resource type="SphereMesh" load_steps=2 format=2]
+
+[ext_resource path="res://materials/characterAttackRange.tres" type="Material" id=1]
+
+[resource]
+resource_local_to_scene = true
+material = ExtResource( 1 )
+height = 1.0
+is_hemisphere = true

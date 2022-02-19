@@ -12,6 +12,7 @@ use_filter = true
 font_data = ExtResource( 3 )
 
 [node name="HealthBar" instance=ExtResource( 2 )]
+visible = false
 HealthTextFont = SubResource( 1 )
 
 [node name="CharacterValueBinderNode" type="Node" parent="." index="1"]

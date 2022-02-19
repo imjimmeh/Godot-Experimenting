@@ -6,7 +6,7 @@
 resource_local_to_scene = true
 script = ExtResource( 1 )
 Name = "AK47"
-MinDamage = 2
-MaxDamage = 8
+MinDamage = 1
+MaxDamage = 3
 AttacksPerTurn = 3
 Range = 5

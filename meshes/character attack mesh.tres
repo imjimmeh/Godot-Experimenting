@@ -1,0 +1,34 @@
+[gd_resource type="CylinderMesh" load_steps=3 format=2]
+
+[sub_resource type="Shader" id=5]
+resource_local_to_scene = true
+code = "shader_type spatial;
+
+uniform vec3 outlineColour = vec3(1.0, 0.0, 0.0);
+uniform float outlineAlpha = 1.0;
+uniform float outlineWidth = 0.1;
+
+void fragment()
+{
+	vec3 colour = outlineColour;
+	
+	float maxValue = 1.0 - outlineWidth;
+	
+	bool isOutline = UV.y < 0.2 || UV.y > 0.8;
+	
+	ALPHA = isOutline ? 1.0 : 0.0;
+	ALBEDO = outlineColour;
+}"
+
+[sub_resource type="ShaderMaterial" id=4]
+resource_local_to_scene = true
+shader = SubResource( 5 )
+shader_param/outlineColour = Vector3( 1, 0, 0 )
+shader_param/outlineAlpha = 1.0
+shader_param/outlineWidth = 0.1
+
+[resource]
+material = SubResource( 4 )
+bottom_radius = 2.0
+height = 0.01
+radial_segments = 36

@@ -6,7 +6,7 @@
 resource_local_to_scene = true
 script = ExtResource( 1 )
 Name = "4x4"
-MinDamage = 20
-MaxDamage = 40
+MinDamage = 4
+MaxDamage = 12
 AttacksPerTurn = 1
 Range = 1
