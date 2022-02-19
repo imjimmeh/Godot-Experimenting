@@ -56,8 +56,6 @@ namespace FaffLatest.scripts.ui
 			Connect("mouse_exited", this, "_MouseExited");
 
 			GetNode(NodeReferences.Systems.GAMESTATE_MANAGER).Connect(SignalNames.State.TURN_CHANGE, this, SignalNames.State.TURN_CHANGE_METHOD);
-
-			characterPortrait.HintTooltip = characterName.Text;
 		}
 
 		private void InitialiseFont()
@@ -159,13 +157,12 @@ namespace FaffLatest.scripts.ui
 		private void _MouseEntered()
 		{
 			mouseIsOver = true;
-			characterName.CallDeferred("show");
 		}
+
 
 		private void _MouseExited()
 		{
 			mouseIsOver = false;
-			characterName.CallDeferred("hide");
 		}
 	}
 }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://scripts/ui/inlevel/MiniCharacterDisplay.cs" type="Script" id=1]
 [ext_resource path="res://resources/fonts/TitilliumWeb-s32.tres" type="DynamicFont" id=2]
@@ -6,6 +6,7 @@
 [ext_resource path="res://art/ui/action.png" type="Texture" id=4]
 [ext_resource path="res://art/ui/moving_icon.png" type="Texture" id=5]
 [ext_resource path="res://resources/fonts/TitilliumWeb-Black.ttf" type="DynamicFontData" id=6]
+[ext_resource path="res://scripts/ui/TooltipControl.cs" type="Script" id=7]
 
 [sub_resource type="Theme" id=1]
 default_font = ExtResource( 2 )
@@ -57,6 +58,7 @@ visible = false
 margin_right = 40.0
 margin_bottom = 14.0
 theme = SubResource( 1 )
+script = ExtResource( 7 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -70,13 +72,12 @@ margin_bottom = 80.0
 texture = ExtResource( 5 )
 FontToUse = SubResource( 4 )
 
-[node name="AttackIcon" type="TextureRect" parent="."]
-margin_left = 240.0
+[node name="AttackIcon" parent="." instance=ExtResource( 3 )]
+material = SubResource( 3 )
+margin_left = 200.0
 margin_top = 60.0
-margin_right = 290.0
-margin_bottom = 110.0
+margin_right = 220.0
+margin_bottom = 80.0
 texture = ExtResource( 4 )
-expand = true
-__meta__ = {
-"_edit_use_anchors_": false
-}
+FontToUse = SubResource( 4 )
+IconSize = Vector2( 40, 40 )
