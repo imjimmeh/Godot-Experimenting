@@ -70,5 +70,6 @@ namespace FaffLatest.scripts.attacks
             if (!character.Stats.IsPlayerCharacter)
                 UIManager.Instance.SpawnDamageLabel(character.Body.GlobalTransform.origin, message);
         }
+
     }
 }

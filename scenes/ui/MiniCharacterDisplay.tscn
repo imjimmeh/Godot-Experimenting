@@ -75,10 +75,10 @@ IconSize = Vector2( 40, 40 )
 
 [node name="AttackIcon" parent="." instance=ExtResource( 3 )]
 material = SubResource( 3 )
-margin_left = 200.0
-margin_top = 60.0
-margin_right = 220.0
-margin_bottom = 80.0
+margin_left = 185.0
+margin_top = 49.0
+margin_right = 225.0
+margin_bottom = 89.0
 texture = ExtResource( 4 )
 FontToUse = SubResource( 4 )
 IconSize = Vector2( 40, 40 )

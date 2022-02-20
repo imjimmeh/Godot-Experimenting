@@ -28,6 +28,7 @@ namespace FaffLatest.scripts.ui
 		private Label characterName;
 		private Character character;
 		private IconWithText movementIcon;
+		private IconWithText attackIcon;
 
 		private bool mouseIsOver = false;
 
@@ -68,6 +69,7 @@ namespace FaffLatest.scripts.ui
 
 		private void GetChildrenNodes()
 		{
+			attackIcon = GetNode<IconWithText>("AttackIcon");
 			characterPortrait = GetNode<TextureRect>("Portrait");
 			characterName = GetNode<Label>("CharacterName");
 			movementIcon = GetNode<IconWithText>("MovementIcon");
@@ -77,7 +79,10 @@ namespace FaffLatest.scripts.ui
 		{
 			this.character = character;
 			this.character.Body.Connect(SignalNames.Characters.MOVEMENT_FINISHED, this, SignalNames.Characters.MOVEMENT_FINISHED_METHOD);
+			this.character.Connect(nameof(Character._Character_ReceivedDamage), this, $"_On{nameof(Character._Character_ReceivedDamage)}");
+			this.character.Connect(nameof(Character._Character_Attacking), this, $"_On{nameof(Character._Character_Attacking)}");
 		}
+
 
 		public override void _Process(float delta)
 		{
@@ -124,27 +129,26 @@ namespace FaffLatest.scripts.ui
 			base._Input(inputEvent);
 		}
 
-
-
-		private void _On_Character_FinishedMoving(Node character, Vector3 newPosition)
+		private void _On_Character_FinishedMoving(Character character, Vector3 newPosition)
 		{
-			if (this.character != character)
-				return;
+			if (!character.Body.MovementStats.CanMove)
+            {
+                HideMovementIcon();
+            }
 
-			if(character is Character asChar)
-			{
-				if (!asChar.Body.MovementStats.CanMove)
-				{
-					movementIcon.CallDeferred("hide");
-				}
-			}
-		}
+        }
 
-		private void _On_Turn_Changed(string whoseTurn)
+        private void HideMovementIcon()
+        {
+            movementIcon.CallDeferred("hide");
+        }
+
+        private void _On_Turn_Changed(string whoseTurn)
 		{
 			if(character.Body.MovementStats.CanMove)
 			{
 				movementIcon.CallDeferred("show");
+				attackIcon.CallDeferred("show");
 			}
 		}
 
@@ -153,10 +157,32 @@ namespace FaffLatest.scripts.ui
 			mouseIsOver = true;
 		}
 
-
 		private void _MouseExited()
 		{
 			mouseIsOver = false;
 		}
-	}
+
+		private void _On_Character_ReceivedDamage(Character character, int damage, Vector3 origin, bool killingBlow)
+		{
+			if(killingBlow)
+			{
+				CallDeferred("queue_free");
+			}
+		}
+
+		
+        private void _On_Character_Attacking(Character attacker, Character receiver)
+        {
+            if(attacker.Stats.EquippedWeapon.AttacksLeftThisTurn == 0)
+            {
+				HideMovementIcon();
+                HideAttackIcon();
+            }
+        }
+
+        private void HideAttackIcon()
+        {
+            attackIcon.CallDeferred("hide");
+        }
+    }
 }

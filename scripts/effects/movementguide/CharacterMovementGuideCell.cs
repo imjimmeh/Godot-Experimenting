@@ -92,7 +92,7 @@ namespace FaffLatest.scripts.effects.movementguide
             if (AStar.OutsideWorldBounds(this.GlobalTransform.origin, this.GlobalTransform.origin))
                 return;
 
-            if (IsInAttackRange(weaponRange))
+            if (IsInAttackRange(weaponRange) && !AStar.IsPointDisabled(this.GlobalTransform.origin))
             {
 				Visible = true;
 				return;

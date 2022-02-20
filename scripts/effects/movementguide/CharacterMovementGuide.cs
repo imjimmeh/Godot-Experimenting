@@ -96,6 +96,9 @@ namespace FaffLatest.scripts.effects.movementguide
         {
             var amountLeftToMoveThisTurn = parent.Body.MovementStats.AmountLeftToMoveThisTurn;
             
+            if(amountLeftToMoveThisTurn == 0 && parent.Stats.EquippedWeapon.AttacksLeftThisTurn == 0)
+                return;
+                
             foreach(var pathPart in existingMovementGuide)
             {
                 pathPart.Value.CalculateVisiblity(amountLeftToMoveThisTurn, parent.Stats.EquippedWeapon.Range);

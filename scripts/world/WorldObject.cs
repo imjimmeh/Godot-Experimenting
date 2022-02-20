@@ -1,20 +1,32 @@
-using FaffLatest.scripts.constants;
 using FaffLatest.scripts.movement;
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FaffLatest.scripts.world
 {
-	public class WorldObject : Spatial
+    public class WorldObject : StaticBody
 	{
-		public override void _Ready()
+		private SpatialMaterial material;
+
+		public async override void _Ready()
 		{
 			base._Ready();
 			AddToGroup("worldObjects");
+
+			await ToSignal(GetParent(), "ready");
+			try
+			{
+			material = GetParent<MeshInstance>().Mesh.SurfaceGetMaterial(0) as SpatialMaterial;
+
+			Connect("mouse_entered", this, "_On_MouseEntered");
+			Connect("mouse_exited", this, "_On_MouseExited");
+			}
+			catch(Exception ex)
+			{
+				GD.Print($"{ex.Message} - {Name}");
+			}
+
 		}
 
 		public void NotifyAStarNavigator()
@@ -61,6 +73,7 @@ namespace FaffLatest.scripts.world
 				{
 					var position = poly + GlobalTransform.origin;
 					position = position.Round();
+					
 					if(!foundPositions.Contains(position))
 						foundPositions.Add(position);
 				}
@@ -87,6 +100,18 @@ namespace FaffLatest.scripts.world
 						z: topLeft.z + y);
 				}
 			}
+		}
+
+		private void _On_MouseEntered()
+		{
+			material.FlagsTransparent = true;
+			material.AlbedoColor = new Color(1, 1, 1, 0.5f);
+		}
+
+		private void _On_MouseExited()
+		{
+			material.FlagsTransparent = true;
+			material.AlbedoColor = new Color(1, 1, 1, 1);
 		}
 	}
 }

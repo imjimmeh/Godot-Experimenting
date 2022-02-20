@@ -3,6 +3,7 @@
 [ext_resource path="res://materials/environment/town_material.tres" type="Material" id=1]
 
 [resource]
+resource_local_to_scene = true
 blend_shape_mode = 0
 surfaces/0 = {
 "aabb": AABB( -0.758949, -0.0985394, -0.779151, 1.47838, 3.79375, 1.52117 ),

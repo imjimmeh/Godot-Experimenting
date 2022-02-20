@@ -1,8 +1,13 @@
-[gd_resource type="ArrayMesh" load_steps=2 format=2]
+[gd_resource type="ArrayMesh" load_steps=3 format=2]
 
-[ext_resource path="res://materials/environment/town_material.tres" type="Material" id=1]
+[ext_resource path="res://art/textures/PolygonTown_Texture_03_C.png" type="Texture" id=1]
+
+[sub_resource type="SpatialMaterial" id=1]
+resource_local_to_scene = true
+albedo_texture = ExtResource( 1 )
 
 [resource]
+resource_local_to_scene = true
 blend_shape_mode = 0
 surfaces/0 = {
 "aabb": AABB( -1.31744, 0, -0.883453, 2.29655, 4.68915, 2.26126 ),
@@ -11,7 +16,7 @@ surfaces/0 = {
 "blend_shape_data": [  ],
 "format": 2194711,
 "index_count": 900,
-"material": ExtResource( 1 ),
+"material": SubResource( 1 ),
 "name": "lambert2",
 "primitive": 4,
 "skeleton_aabb": [  ],
