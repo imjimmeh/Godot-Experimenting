@@ -13,7 +13,7 @@ namespace FaffLatest.scripts.characters
 		public delegate void _Character_Ready(Character character);
 
 		[Signal]
-		public delegate void _Character_ReceivedDamage(Character character, int damage, Node origin, bool killingBlow);
+		public delegate void _Character_ReceivedDamage(Character character, int damage, Vector3 origin, bool killingBlow);
 
 		[Signal]
 		public delegate void _Character_Attacking(Character attacker, Character receiver);
@@ -66,7 +66,7 @@ namespace FaffLatest.scripts.characters
 
 		private bool IsSetActiveButFinishedTurn() => IsActive && Body.MovementStats.AmountLeftToMoveThisTurn == 0;
 
-		public void _On_Character_ReceiveDamage(int damage, Node origin)
+		public void _On_Character_ReceiveDamage(int damage, Vector3 origin)
 		{
 			Stats.AddHealth(-damage);
 			EmitSignal(SignalNames.Characters.RECEIVED_DAMAGE, this, damage, origin, !IsAlive);
@@ -96,7 +96,7 @@ namespace FaffLatest.scripts.characters
 			if(attackResult != AttackResult.Success)
 				return attackResult;
 
-			target._On_Character_ReceiveDamage(damage, this);
+			target._On_Character_ReceiveDamage(damage, Body.GlobalTransform.origin);
 			EmitSignal(nameof(_Character_Attacking), this, target);
 			return AttackResult.Success;
 		}

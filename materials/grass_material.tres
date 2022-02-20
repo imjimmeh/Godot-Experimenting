@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" load_steps=5 format=2]
+
+[ext_resource path="res://shaders/grass_shader.tres" type="Shader" id=1]
+[ext_resource path="res://art/textures/world/grass_02_diffuse.png" type="Texture" id=2]
+[ext_resource path="res://art/textures/world/grass_02_normal.png" type="Texture" id=3]
+[ext_resource path="res://art/textures/world/grass_02_specular.png" type="Texture" id=4]
+
+[resource]
+shader = ExtResource( 1 )
+shader_param/amplitude = 0.1
+shader_param/speed = Vector2( 2, 1.5 )
+shader_param/scale = Vector2( 0.1, 0.2 )
+shader_param/texture_map = ExtResource( 2 )
+shader_param/normal_map = ExtResource( 3 )
+shader_param/specular_map = ExtResource( 4 )

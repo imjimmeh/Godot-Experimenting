@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://art/textures/world/grass1.jpg" type="Texture" id=1]
 [ext_resource path="res://scripts/world/ClickableWorldElement.cs" type="Script" id=2]
@@ -7,6 +7,10 @@
 [ext_resource path="res://scenes/environment/trees/Env_Tree_01.tscn" type="PackedScene" id=5]
 [ext_resource path="res://scenes/world/objects/Car.tscn" type="PackedScene" id=6]
 [ext_resource path="res://scenes/environment/trees/Env_Tree_02_Framed.tscn" type="PackedScene" id=7]
+[ext_resource path="res://scenes/environment/trees/Env_Tree_02.tscn" type="PackedScene" id=8]
+[ext_resource path="res://scenes/environment/trees/Env_Tree_Tall_01.tscn" type="PackedScene" id=9]
+[ext_resource path="res://scripts/world/WorldFloorMesh.cs" type="Script" id=10]
+[ext_resource path="res://scenes/environment/dirt/Env_DirtPatch_01.tscn" type="PackedScene" id=11]
 
 [sub_resource type="SpatialMaterial" id=1]
 flags_unshaded = true
@@ -35,6 +39,8 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0, 25 )
 mesh = SubResource( 6 )
 skeleton = NodePath("../../..")
 material/0 = null
+script = ExtResource( 10 )
+DirtPatch = ExtResource( 11 )
 
 [node name="StaticBody" type="StaticBody" parent="."]
 script = ExtResource( 2 )
@@ -55,11 +61,17 @@ mesh = SubResource( 8 )
 [node name="Objects" type="Node" parent="."]
 
 [node name="SM_Env_Tree_01" parent="Objects" instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0, 9 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 15 )
 skeleton = NodePath("../..")
 
 [node name="Car" parent="Objects" instance=ExtResource( 6 )]
 
 [node name="Env_Tree_02_Framed" parent="Objects" instance=ExtResource( 7 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 12 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0, 19 )
 skeleton = NodePath("../..")
+
+[node name="Env_Tree_02" parent="Objects" instance=ExtResource( 8 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 0, 20 )
+
+[node name="Env_Tree_Tall_01" parent="Objects" instance=ExtResource( 9 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 20 )

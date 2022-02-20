@@ -5,5 +5,5 @@
 [node name="Cameras" type="Node"]
 
 [node name="MainCamera" type="Camera" parent="."]
-transform = Transform( 1, 0, 0, 0, 0.258819, 0.965926, 0, -0.965926, 0.258819, 22.5, 15, 10 )
+transform = Transform( 1, 0, 0, 0, 0.258819, 0.965926, 0, -0.965926, 0.258819, 22, 10, 10 )
 script = ExtResource( 1 )

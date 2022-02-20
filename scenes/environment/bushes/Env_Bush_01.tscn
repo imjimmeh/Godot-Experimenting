@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://Town/meshes/Env_Bush_01.tres" type="ArrayMesh" id=1]
+[ext_resource path="res://meshes/Env_Bush_01.tres" type="ArrayMesh" id=1]
 
 [node name="Env_Bush_01" type="MeshInstance"]
 mesh = ExtResource( 1 )

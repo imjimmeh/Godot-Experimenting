@@ -7,6 +7,9 @@ namespace FaffLatest.scripts.attacks
 {
     public static class AttackHelpers
     {
+        private const string OUT_OF_ATTACKS = "Out of attacks!";
+        private const string OUT_OF_RANGE = "Out of range!";
+
         public static async Task<bool> TryAttack(Character attacker, Character target)
         {
             var targetCheck = attacker.CanAttackTarget(target);
@@ -48,18 +51,24 @@ namespace FaffLatest.scripts.attacks
             {
                 case weapons.AttackResult.OutOfRange:
                     {
-                        UIManager.Instance.SpawnDamageLabel(character.Body.GlobalTransform.origin, "Out of range!");
+                        ShowPCFeedback(character, OUT_OF_RANGE);
                         return false;
                     }
 
                 case weapons.AttackResult.OutOfAttacksForTurn:
                     {
-                        UIManager.Instance.SpawnDamageLabel(character.Body.GlobalTransform.origin, "Out of attacks!");
+                        ShowPCFeedback(character, OUT_OF_ATTACKS);
                         return false;
                     }
             }
 
 			return true;
+        }
+
+        private static void ShowPCFeedback(Character character, string message)
+        {
+            if (!character.Stats.IsPlayerCharacter)
+                UIManager.Instance.SpawnDamageLabel(character.Body.GlobalTransform.origin, message);
         }
     }
 }
