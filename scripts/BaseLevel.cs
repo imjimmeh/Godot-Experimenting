@@ -1,14 +1,10 @@
-using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
 using FaffLatest.scripts.map;
-using FaffLatest.scripts.movement;
 using FaffLatest.scripts.state;
-using FaffLatest.scripts.ui;
 using FaffLatest.scripts.world;
 using Godot;
-using System;
 
-public class BaseLevel : Spatial
+public class BaseLevel : ViewportContainer
 { 
 	[Export]
 	public Texture FaceSprites { get; set; }
@@ -16,9 +12,20 @@ public class BaseLevel : Spatial
 	[Signal]
 	public delegate void _Level_Loaded();
 
+	private Viewport _fogOfWarViewport;
+	private ShaderMaterial _mat;
+
 	public override void _Ready()
 	{
 		base._Ready();
+		_fogOfWarViewport = GetNode(NodeReferences.BaseLevel.WORLD_MANAGER + "/FogOfWarViewport") as Viewport;
+		_mat = Material as ShaderMaterial;
+	}
+
+	public override async void _Process(float delta)
+	{
+		base._Process(delta);
+		(Material as ShaderMaterial).SetShaderParam("FogOfWarTexture", _fogOfWarViewport.GetTexture());
 	}
 
 	public async void LoadLevel(MapInfo map)
