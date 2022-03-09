@@ -53,10 +53,7 @@ namespace FaffLatest.scripts.state
 					break;
 
 				var spawnPosition = spawnArea.GetSpawnPosition(charactersToCreate[x]);
-
-				//var character = await SpawnCharacter(charactersToCreate[x], spawnPosition);
 				spawnCharacterTasks.Add(SpawnCharacter(charactersToCreate[x], spawnPosition));
-
             }
 
 			await Task.WhenAll(spawnCharacterTasks);

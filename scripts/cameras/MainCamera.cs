@@ -1,11 +1,11 @@
 using FaffLatest.scripts.constants;
 using FaffLatest.scripts.shared;
 using Godot;
-using System;
+using System.Collections.Generic;
 
 namespace FaffLatest.scripts.cameras
 {
-	public class MainCamera : Camera
+    public class MainCamera : Camera
 	{
 		Vector3 velocity;
 
@@ -23,7 +23,7 @@ namespace FaffLatest.scripts.cameras
 			GetNode(NodeReferences.Systems.INPUT_MANAGER).Connect(SignalNames.Cameras.MOVE_TO_POSITION, this, SignalNames.Cameras.MOVE_TO_POSITION_METHOD);
 			base._Ready();
 		}
-
+		
 		public override void _PhysicsProcess(float delta)
 		{
 			base._PhysicsProcess(delta);

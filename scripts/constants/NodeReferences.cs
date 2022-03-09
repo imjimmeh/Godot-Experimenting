@@ -8,7 +8,7 @@ namespace FaffLatest.scripts.constants
 {
     public class NodeReferences
     {
-        public const string NORMAL_LEVEL_ROOT = "/root/BaseLevel";
+        public const string NORMAL_LEVEL_ROOT = "/root/BaseLevel/Viewport";
         public const string MENU_BODY = "/root/BaseMenu";
 
         public class Characters

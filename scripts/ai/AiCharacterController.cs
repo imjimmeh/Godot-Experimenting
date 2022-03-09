@@ -30,6 +30,8 @@ namespace FaffLatest.scripts.ai
             base._Ready();
 
             GetNodes();
+
+            SetProcess(false);
         }
 
         private void GetNodes()
@@ -81,6 +83,7 @@ namespace FaffLatest.scripts.ai
         public void SetOurTurn()
         {
             isActiveCharacter = true;
+            SetProcess(true);
         }
 
         private async void AttackTarget()
@@ -158,6 +161,7 @@ namespace FaffLatest.scripts.ai
             currentMovementDestination = null;
 
             EmitSignal(nameof(_AiCharacter_TurnFinished), parent);
+            SetProcess(false);
         }
 
     }

@@ -142,7 +142,7 @@ namespace FaffLatest.scripts.effects.movementguide
         private void CreateLengthLabel(GetMovementPathResult result)
         {
             Vector3 position = result.Path[result.Path.Length - 1];
-
+            GD.Print($"Ui Manager is null is {UIManager.Instance == null}");
             pathLengthDisplay = UIManager.Instance.CreateLabelAtWorldPosition(result.Path.Length.ToString(),
             new FontValues(Colors.White, 16, Colors.Black, 1), position);
         }

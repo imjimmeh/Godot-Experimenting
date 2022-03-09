@@ -84,3 +84,5 @@ randomness = 0.5
 process_material = SubResource( 5 )
 draw_pass_1 = SubResource( 6 )
 script = ExtResource( 13 )
+
+[node name="MeshInstance" type="MeshInstance" parent="KinematicBody"]

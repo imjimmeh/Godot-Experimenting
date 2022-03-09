@@ -4,7 +4,7 @@ using FaffLatest.scripts.state;
 using FaffLatest.scripts.world;
 using Godot;
 
-public class BaseLevel : ViewportContainer
+public class BaseLevel : ViewportContainer	
 { 
 	[Export]
 	public Texture FaceSprites { get; set; }
@@ -12,20 +12,14 @@ public class BaseLevel : ViewportContainer
 	[Signal]
 	public delegate void _Level_Loaded();
 
-	private Viewport _fogOfWarViewport;
-	private ShaderMaterial _mat;
-
 	public override void _Ready()
 	{
 		base._Ready();
-		_fogOfWarViewport = GetNode(NodeReferences.BaseLevel.WORLD_MANAGER + "/FogOfWarViewport") as Viewport;
-		_mat = Material as ShaderMaterial;
 	}
 
-	public override async void _Process(float delta)
+	public override void _Process(float delta)
 	{
 		base._Process(delta);
-		(Material as ShaderMaterial).SetShaderParam("FogOfWarTexture", _fogOfWarViewport.GetTexture());
 	}
 
 	public async void LoadLevel(MapInfo map)

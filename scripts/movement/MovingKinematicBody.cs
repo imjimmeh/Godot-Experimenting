@@ -39,6 +39,8 @@ public class MovingKinematicBody : KinematicBody
     public Transform TargetRotation { get; private set; }
 
 
+    public PathMover PathMover => pathMover;
+    
     public bool HaveDestination = false;
 
     public override void _Ready()

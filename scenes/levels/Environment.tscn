@@ -1,9 +1,33 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://scripts/world/WorldManager.cs" type="Script" id=1]
 [ext_resource path="res://resources/systems/CharacterGeneratorStats.tres" type="Resource" id=2]
+[ext_resource path="res://scripts/effects/CSGFogOfWar.cs" type="Script" id=3]
+[ext_resource path="res://scripts/shared/CopySpatialPosition.cs" type="Script" id=4]
+[ext_resource path="res://materials/fogofwar.material" type="Material" id=5]
+[ext_resource path="res://materials/postprocessing/FogOfWarPostProcessing.tres" type="Material" id=6]
+
+[sub_resource type="World" id=1]
 
 [node name="WorldManager" type="Spatial"]
-transform = Transform( 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
 script = ExtResource( 1 )
 StatsForCharacterRandomiser = ExtResource( 2 )
+FogOfWarMaterial = ExtResource( 6 )
+
+[node name="FogOfWarViewport" type="Viewport" parent="."]
+size = Vector2( 1024, 768 )
+own_world = true
+world = SubResource( 1 )
+transparent_bg = true
+handle_input_locally = false
+render_target_update_mode = 3
+gui_disable_input = true
+
+[node name="FogOfWar" type="Spatial" parent="FogOfWarViewport"]
+script = ExtResource( 3 )
+FogOfWarMaterial = ExtResource( 5 )
+
+[node name="Camera" type="Camera" parent="FogOfWarViewport"]
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 10, 0 )
+script = ExtResource( 4 )
+NodePathToCopy = "/root/BaseLevel/Viewport/Cameras/MainCamera"

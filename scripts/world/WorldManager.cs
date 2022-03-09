@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+using FaffLatest.scripts.cameras;
 using FaffLatest.scripts.characters;
 using FaffLatest.scripts.constants;
 using FaffLatest.scripts.map;
@@ -28,7 +30,10 @@ namespace FaffLatest.scripts.world
 
 		[Signal]
 		public delegate void _World_Loaded();
-		
+
+		[Export]
+		public ShaderMaterial FogOfWarMaterial;
+
 		public override void _Ready()
 		{
 			base._Ready();
@@ -84,13 +89,13 @@ namespace FaffLatest.scripts.world
 
         private void InitialiseNewCharacters()
 		{
-			var chars = new CharacterStats[9];
+			var chars = new CharacterStats[15];
 
-			for (var x = 0; x < 9; x++)
+			for (var x = 0; x < 15; x++)
 			{
 				var newCharacter = CharacterRandomiser.GenerateRandomCharacter();
 				chars[x] = newCharacter;
-				chars[x].IsPlayerCharacter = x <= 5;
+				chars[x].IsPlayerCharacter = x <= 4;
 			}
 
 			GetSpawnLocationsAndSpawnCharacters(chars);
@@ -102,6 +107,8 @@ namespace FaffLatest.scripts.world
 			var spawnLocations = this.GetSpawnArea();
 			await SpawnManager.SpawnCharacters(characters, spawnLocations);
 			EmitSignal(nameof(_Characters_Loaded));
+
+			GetNode<CSGFogOfWar>("FogOfWarViewport/FogOfWar").CreateFogOfWar();
 		}
 
 		
@@ -118,8 +125,8 @@ namespace FaffLatest.scripts.world
 		private MeshInstance GetLevelInstance(MapInfo map)
 		{
 			var levelInstance = map.Level.Instance();
-			CallDeferred("add_child",levelInstance);
-
+			CallDeferred("add_child", levelInstance);
+			
 			return levelInstance as MeshInstance;
 		}
 	}

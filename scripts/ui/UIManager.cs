@@ -14,7 +14,7 @@ namespace FaffLatest.scripts.ui
         [Signal]
         public delegate void _ConfirmationDialog_Response(bool ok);
 
-        public static UIManager Instance;
+        public static UIManager Instance { get; private set; }
 
         private const int BIG_FONT_SIZE = 32;
         private const int DAMAGE_FONT_SIZE = 20;
@@ -33,17 +33,18 @@ namespace FaffLatest.scripts.ui
         private bool confirmationDialogResponse = false;
         private bool signalsConnected = false;
         
-		public override async void _Ready()
+		public override void _Ready()
         {
-            FindChildren();
             fontManager = new FontManager(FontToUse);
 
-            base._Ready();
-
-			await GetCamera();
+            FindChildren();
+			GetCamera();
             InitialiseFactories();
 
             Instance = this;
+
+            
+            base._Ready();
         }
 
         private void InitialiseFactories()
@@ -51,11 +52,9 @@ namespace FaffLatest.scripts.ui
             UiLabelFactory.Initialise(ElementContainer, fontManager, camera);
         }
 
-        private async Task GetCamera()
+        private void GetCamera()
         {
-            var camera = GetNode(NodeReferences.BaseLevel.Cameras.MAIN_CAMERA);
-            await ToSignal(camera, "ready");
-            this.camera = camera as Camera;
+            this.camera = GetNode<Camera>(NodeReferences.BaseLevel.Cameras.MAIN_CAMERA);
         }
 
         private void FindChildren()

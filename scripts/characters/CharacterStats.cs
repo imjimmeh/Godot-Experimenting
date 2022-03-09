@@ -14,6 +14,10 @@ public class CharacterStats : Resource
 	[Export]
 	public bool IsPlayerCharacter { get; set; }
 
+
+	[Export]
+	public float LineOfSight { get; set; } = 10.0f;
+	
 	[Export]
 	public Texture FaceIcon { get; private set; }
 

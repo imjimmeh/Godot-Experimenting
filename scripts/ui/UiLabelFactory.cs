@@ -7,7 +7,6 @@ namespace FaffLatest.scripts.ui{
     {
         private static Camera camera;
         private static FontManager fonts;
-        private static Thread thread;
         private static Node uiParent;
 
         public static void Initialise(Node uiParent, FontManager fontManager, Camera camera)
@@ -20,7 +19,6 @@ namespace FaffLatest.scripts.ui{
         {
             UiLabelFactory.camera = camera;
             UiLabelFactory.uiParent = uiParent;
-            UiLabelFactory.thread = new Thread();
         }
 
         public static void SetFontManager(FontManager fontManager) => fonts = fontManager;
